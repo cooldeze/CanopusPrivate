@@ -1,0 +1,205 @@
+/* ══════════════════════════════════════════════════════════════════
+   CANOPUS — HARSH UI MODE (v2: clean, flat, purely functional)
+   Shared across index.html, jeejournal.html, library.html, empires.html,
+   conflicts.html and interests.html. Activated app-wide by running
+   `harsh on` (or just `harsh` to toggle) in the Terminal, persisted in
+   localStorage under 'canopus_harsh_ui'. Every page checks that key on
+   load and toggles html.harsh-ui, same as html.crt-retro.
+
+   Philosophy: this is NOT a cmd.exe cosplay skin. It's the app with
+   every non-functional flourish removed — one background, one
+   foreground colour, flat 1px borders, no shadow/glow/gradient/motion,
+   no decorative imagery. The Terminal becomes the landing screen (see
+   index.html's canopusGetHarsh() check); every other page is still
+   reachable with `open <page>` from there, just stripped down to
+   whatever it needs to actually work.
+   ══════════════════════════════════════════════════════════════════ */
+
+html.harsh-ui{
+  --harsh-bg:#000;
+  --harsh-fg:#e8e8e8;
+  --harsh-dim:#777;
+  --harsh-border:#3a3a3a;
+}
+
+html.harsh-ui, html.harsh-ui body{
+  background:var(--harsh-bg) !important;
+}
+
+/* flatten everything: no radius, no glow, no gradient, no motion.
+   :not(.ti) is required — .ti is the Tabler icon font, which renders
+   its glyphs via a custom @font-face; forcing monospace onto it turns
+   every icon into an empty tofu box. */
+html.harsh-ui body,
+html.harsh-ui body *:not(.ti){
+  font-family:'IBM Plex Mono',ui-monospace,'SF Mono','JetBrains Mono','Courier New',monospace !important;
+  background-color:transparent !important;
+  background-image:none !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  transition:none !important;
+  animation:none !important;
+}
+html.harsh-ui body *::before,
+html.harsh-ui body *::after{
+  box-shadow:none !important;
+  text-shadow:none !important;
+  background-image:none !important;
+  animation:none !important;
+}
+
+/* full-screen overlays and modal backdrops MUST stay opaque, or
+   whatever page/mode was open underneath bleeds straight through them
+   (this is what was happening to the flight tracker). Every overlay
+   in this codebase follows the same naming convention — a class
+   ending in "-overlay" or "-bg", or an id ending in "-bg" — across
+   index.html (.flight-overlay, .fs-overlay, .nm-modal-bg, .tut-bg,
+   .cap-overlay, .kbd-sheet-bg, .start-modal-bg, .pfp-crop-bg,
+   #pp-root, #pp-modal), conflicts.html (.flow-overlay,
+   .flow-node-modal-bg), empires.html (#em-compare-bg, #em-timeline-bg,
+   #em-info-bg), vault.html (.ex-modal-bg), library.html
+   (.lib-info-bg) and sirius.html (.sq-modal-bg) — so one rule covers
+   all of them, present and future. */
+html.harsh-ui body [class*="-overlay"],
+html.harsh-ui body [class*="-bg"],
+html.harsh-ui body [id*="-bg"],
+html.harsh-ui body #pp-root,
+html.harsh-ui body #pp-modal{
+  background:#000 !important;
+}
+
+/* one background, one foreground, one dim tone, one border colour —
+   no palette borrowing from the CRT retro theme, no "which mode am I
+   in" ambiguity */
+html.harsh-ui body,
+html.harsh-ui body *{
+  color:var(--harsh-fg) !important;
+  border-color:var(--harsh-border) !important;
+}
+html.harsh-ui a,
+html.harsh-ui button,
+html.harsh-ui .nav-link.active{
+  color:#fff !important;
+}
+html.harsh-ui #crt-global-overlay{
+  display:none !important;
+}
+
+/* only plain <img>/<video> (photos, illustrations) are decoration in
+   this app — those are removed outright. svg and canvas are left
+   alone by default because across Canopus they're almost always
+   functional content, not decoration: the conflicts globe (#globe-svg),
+   the empires chart canvas (#em-canvas), the flight tracker globe
+   (#globe-canvas), the terminal globe, the Sky star map — hiding those
+   breaks the page rather than cleaning it up. Icon glyphs (.ti) are
+   obviously functional and stay untouched. If a genuinely decorative
+   svg/canvas ever needs hiding, mark it .harsh-hide explicitly rather
+   than hiding svg/canvas by default. */
+html.harsh-ui img,
+html.harsh-ui video{
+  display:none !important;
+}
+html.harsh-ui svg.harsh-hide,
+html.harsh-ui canvas.harsh-hide{
+  display:none !important;
+}
+
+/* ── Redesigned header ──────────────────────────────────────────────
+   A bare titlebar, nothing else. In harsh mode pages are switched by
+   typing `open <page>` in the Terminal, and you get back with
+   whatever key combo `shortcut` reports — so tabs, the profile
+   button, and the theme pickers all disappear. All that's left is a
+   dim app name on the left and the "more" dots button on the right,
+   standing in for a window's kebab menu. */
+html.harsh-ui .nav-links,
+html.harsh-ui .brand-mark,
+html.harsh-ui .nav-logo-info,
+html.harsh-ui .nav-profile-btn,
+html.harsh-ui .nav-fs:not(#navMoreBtn){
+  display:none !important;
+}
+html.harsh-ui #app-nav{
+  background:var(--harsh-bg) !important;
+  border-bottom:1px solid var(--harsh-border);
+  height:32px !important;
+  min-height:32px !important;
+  padding:0 12px !important;
+  justify-content:space-between;
+}
+html.harsh-ui .nav-logo{
+  font-size:11px !important;
+  letter-spacing:.04em !important;
+  color:var(--harsh-dim) !important;
+}
+html.harsh-ui #navMoreBtn{
+  display:flex !important;
+  color:var(--harsh-fg) !important;
+}
+
+/* the Terminal fills the full width, flush left — the header already
+   reads as the titlebar, so the body stays edge-to-edge instead of a
+   floating card */
+html.harsh-ui #page-terminal.active .term-wrap{
+  max-width:none !important;
+  margin:0 !important;
+}
+
+/* flat 1px square-cornered borders on structural containers instead
+   of shadowed panels — every "surface" is just a border, nothing is
+   raised or lit.
+
+   IMPORTANT: across every page in this app, "-card-", "-modal-",
+   "-panel-" and "-pop-" (with a trailing dash) name a SUB-PART of a
+   container, never the container itself — e.g. .info-card-title,
+   .info-card-blurb, .info-card-h, .nm-modal-text, .nm-modal-heading,
+   .sq-modal-quote, .ft-card-name, .lt-card-title, .sky-card-row,
+   .vt-card-top, .lib-card-head, .in-card-h2, .timer-panel-top,
+   .nav-pop-sep. The container itself is always the bare form with no
+   trailing dash: .info-card, .nm-modal, .sq-modal, .ft-card, .lt-card,
+   .sky-card, .vt-card, .lib-card. Without the :not() exclusions below,
+   every one of those sub-parts also matches the broad [class*="card"]
+   / [class*="modal"] selectors and gets its own border, so a single
+   card ends up as a stack of nested boxes (title boxed, blurb boxed,
+   each heading boxed, etc.) instead of one bordered surface. */
+html.harsh-ui [class*="panel"]:not([class*="-panel-"]),
+html.harsh-ui [class*="card"]:not([class*="-card-"]),
+html.harsh-ui [class*="modal"]:not([class*="-modal-"]),
+html.harsh-ui [class*="pop"]:not([class*="-pop-"]),
+html.harsh-ui button,
+html.harsh-ui input:not(.term-input),
+html.harsh-ui select,
+html.harsh-ui textarea{
+  border:1px solid var(--harsh-border) !important;
+}
+
+/* the terminal input is a real <input> element but should stay
+   borderless/blended into the input row, matching its normal (non-
+   harsh) styling — the row itself already has a top border to
+   separate it from the output log */
+html.harsh-ui .term-input{
+  border:none !important;
+}
+
+/* purely decorative extras: gone */
+html.harsh-ui .founder-note-btn{
+  display:none !important;
+}
+
+/* belt-and-braces: the :not(.ti) exclusion above should already stop
+   icons from being forced onto the monospace font, but this restates
+   it explicitly and directly on .ti (matching the exact selector
+   Tabler's own stylesheet uses) so there's no dependence on selector
+   ordering between stylesheets. If icons still show as empty boxes
+   after this, the icon font itself isn't loading (network/CDN issue),
+   not a harsh-mode CSS problem. */
+html.harsh-ui .ti{
+  font-family:'tabler-icons' !important;
+}
+
+/* plain scrollbars, no glow on the thumb */
+html.harsh-ui{ scrollbar-color:#666 #000; }
+html.harsh-ui ::-webkit-scrollbar{ background:#000; }
+html.harsh-ui ::-webkit-scrollbar-thumb{ background:#666 !important; }

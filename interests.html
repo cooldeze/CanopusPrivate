@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Interests — Canopus</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="retro-theme.css">
+<link rel="stylesheet" href="vhs-theme.css">
+<link rel="stylesheet" href="harsh-mode.css">
+<style>
+/* ── Accent system (shared with the rest of Canopus) ── */
+:root,body[data-accent="white"]{
+  --accent:#fff;--accent-hover:#ddd;--accent-on:#000;--accent-muted:#2a2a2a;--accent-soft:rgba(255,255,255,.06);
+}
+body[data-accent="blue"]{
+  --accent:#5a9fd4;--accent-hover:#4a8fc4;--accent-on:#000;--accent-muted:#2a4a6a;--accent-soft:rgba(90,159,212,.12);
+}
+body[data-accent="green"]{
+  --accent:#4a9a6a;--accent-hover:#3a8a5a;--accent-on:#000;--accent-muted:#1a3a2a;--accent-soft:rgba(74,154,106,.12);
+}
+body[data-accent="amber"]{
+  --accent:#c9952a;--accent-hover:#b8851a;--accent-on:#000;--accent-muted:#4a3a1a;--accent-soft:rgba(201,149,42,.12);
+}
+body[data-accent="pink"]{
+  --accent:#e0629c;--accent-hover:#cf4f8a;--accent-on:#000;--accent-muted:#4a1a32;--accent-soft:rgba(224,98,156,.12);
+}
+body.light[data-accent="white"]{
+  --accent:#111;--accent-hover:#333;--accent-on:#fff;--accent-muted:#aaa;--accent-soft:rgba(0,0,0,.05);
+}
+:root{
+  --in-bg:#000;--in-panel:#0a0a0a;--in-panel-hi:#111;--in-line:#1a1a1a;
+  --in-text-hi:#EDEDEE;--in-text-lo:#8B8E94;--in-text-faint:#4C4F55;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--in-bg);color:var(--in-text-hi);font-family:'Work Sans',sans-serif;font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--accent-muted);color:var(--in-text-hi)}
+a{color:var(--accent)}
+body.grey{--in-bg:#0A0A0B;--in-panel:#111214;--in-panel-hi:#17181B;--in-line:#212327}
+body.light{--in-bg:#f5f5f0;--in-panel:#fff;--in-panel-hi:#FBFAF7;--in-line:#e2e0d9;--in-text-hi:#161512;--in-text-lo:#6b6a63;--in-text-faint:#9a968a}
+
+/* ── NAV ── */
+html.chdr-hidden #app-nav{display:none!important}
+#app-nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) 14px calc(24px + env(safe-area-inset-left));z-index:100;background:linear-gradient(var(--in-bg) 70%,transparent);pointer-events:none}
+#app-nav>*{pointer-events:auto}
+.nav-logo-wrap{display:flex;align-items:center;gap:6px;text-decoration:none}
+.nav-logo{font-size:11px;font-weight:500;letter-spacing:.18em;color:rgba(255,255,255,.7);text-transform:uppercase}
+body.light .nav-logo{color:rgba(0,0,0,.55)}
+.nav-links{display:flex;gap:2px;padding:2px;overflow-x:auto;scrollbar-width:none;max-width:calc(100vw - 220px)}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-link{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;color:#666;transition:color .2s,background .2s;border:none;background:none;letter-spacing:.06em;font-family:'Inter',sans-serif;text-decoration:none;white-space:nowrap;flex-shrink:0}
+body.light .nav-link{color:#aaa}
+.nav-link.active{color:var(--accent);background:var(--accent-soft)}
+.nav-link:hover:not(.active){color:#aaa}
+body.light .nav-link:hover:not(.active){color:#555}
+.nav-util{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.nav-fs{width:30px;height:30px;border-radius:7px;background:transparent;border:none;color:#666;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:color .2s}
+.nav-fs:hover{color:#ccc}
+body.light .nav-fs{color:#aaa}
+.nav-menu-pop{position:fixed;right:24px;top:52px;background:var(--in-panel);border:0.5px solid var(--in-line);border-radius:10px;padding:4px;min-width:168px;z-index:110;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.nav-menu-pop.open{display:block}
+body.light .nav-menu-pop{background:#fff;border-color:#ddd;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.nav-menu-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;font-size:11px;color:#555;background:none;border:none;width:100%;text-align:left;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.04em;transition:background .12s,color .12s}
+.nav-menu-item:hover{background:var(--in-panel-hi);color:#aaa}
+body.light .nav-menu-item{color:#777}
+body.light .nav-menu-item:hover{background:#f0f0eb;color:#333}
+.nav-menu-item i{font-size:13px;width:14px;color:#333}
+body.light .nav-menu-item i{color:#bbb}
+.nav-accent-pop{position:fixed;right:62px;top:52px;background:var(--in-panel);border:0.5px solid var(--in-line);border-radius:10px;padding:8px 10px;z-index:110;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:7px}
+.nav-accent-pop.open{display:flex}
+body.light .nav-accent-pop{background:#fff;border-color:#ddd;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.accent-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--swatch);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.accent-swatch:hover{transform:scale(1.08)}
+.accent-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--swatch)}
+body.light .accent-swatch.active{box-shadow:0 0 0 2px #f5f5f0,0 0 0 3.5px var(--swatch)}
+.accent-swatch[data-accent="white"]{--swatch:#fff}
+.accent-swatch[data-accent="blue"]{--swatch:#5a9fd4}
+.accent-swatch[data-accent="green"]{--swatch:#4a9a6a}
+.accent-swatch[data-accent="amber"]{--swatch:#c9952a}
+.accent-swatch[data-accent="pink"]{--swatch:#e0629c}
+.nav-pop-sep{width:0.5px;align-self:stretch;background:#222;margin:0 1px}
+body.light .nav-pop-sep{background:#e2e0d9}
+.surface-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--sw);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.surface-swatch:hover{transform:scale(1.08)}
+.surface-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--sw)}
+body.light .surface-swatch.active{box-shadow:0 0 0 2px #f5f5f0,0 0 0 3.5px var(--sw)}
+.surface-swatch[data-surface="black"]{--sw:#000;border-color:#444}
+.surface-swatch[data-surface="grey"]{--sw:#3a3b3e}
+.surface-swatch[data-surface="white"]{--sw:#fff}
+
+@media(max-width:900px){
+  #app-nav{padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 16px calc(16px + env(safe-area-inset-left))}
+  .nav-logo-wrap{display:none}
+  .nav-links{max-width:calc(100vw - 128px)}
+}
+
+/* ── Page shell ── */
+.in-wrap{max-width:980px;margin:0 auto;padding:88px 24px 120px;position:relative;z-index:1}
+.in-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+.in-brand-row{display:flex;align-items:center;gap:10px}
+.in-brand-mark{width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.in-title{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;color:var(--in-text-hi);margin:0}
+.in-sub{font-size:12px;color:var(--in-text-faint);letter-spacing:.02em;margin-left:40px;display:block;margin-top:1px;max-width:440px}
+.in-clear-btn{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--in-text-faint);background:none;border:0.5px solid var(--in-line);border-radius:8px;padding:7px 12px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.03em;transition:color .15s,border-color .15s}
+.in-clear-btn:hover{color:#e05a5a;border-color:#e05a5a}
+
+/* ── Stat cards ── */
+.in-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
+.in-stat-card{background:var(--in-panel);border:0.5px solid var(--in-line);border-radius:var(--radius);padding:16px 18px}
+.in-stat-icon{width:26px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:10px}
+.in-stat-val{font-family:'Fraunces',serif;font-size:22px;font-weight:500;color:var(--in-text-hi);letter-spacing:-.01em;line-height:1.1}
+.in-stat-lbl{font-size:10.5px;color:var(--in-text-faint);letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+
+/* ── Radar card ── */
+.in-radar-card{background:var(--in-panel);border:0.5px solid var(--in-line);border-radius:var(--radius);padding:22px 22px 14px;margin-bottom:22px}
+.in-card-h2{font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--in-text-hi);margin:0 0 2px}
+.in-card-sub{font-size:11.5px;color:var(--in-text-faint);margin-bottom:6px}
+.in-radar-wrap{display:flex;justify-content:center}
+.in-radar-wrap svg{width:100%;max-width:480px;height:auto}
+.in-radar-axis-label{font-family:'Inter',sans-serif;font-size:9.5px;fill:var(--in-text-lo)}
+.in-radar-grid{fill:none;stroke:var(--in-line);stroke-width:1}
+.in-radar-spoke{stroke:var(--in-line);stroke-width:1}
+.in-radar-shape{fill:var(--accent);fill-opacity:.16;stroke:var(--accent);stroke-width:1.6;stroke-linejoin:round}
+.in-radar-dot{fill:var(--accent)}
+
+/* ── Feature breakdown ── */
+.in-feature-list{display:flex;flex-direction:column;gap:2px}
+.in-feature-row{display:grid;grid-template-columns:22px 100px 1fr 70px 54px;align-items:center;gap:10px;padding:9px 4px}
+.in-feature-row+.in-feature-row{border-top:0.5px solid var(--in-line)}
+.in-feature-icon{color:var(--in-text-lo);font-size:13px;text-align:center}
+.in-feature-name{font-size:12.5px;color:var(--in-text-hi);font-weight:500}
+.in-feature-bar-track{height:5px;border-radius:4px;background:var(--in-panel-hi);border:0.5px solid var(--in-line);overflow:hidden}
+.in-feature-bar-fill{height:100%;background:var(--accent);border-radius:4px}
+.in-feature-time{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--in-text-lo);text-align:right}
+.in-feature-visits{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--in-text-faint);text-align:right;white-space:nowrap}
+
+/* ── Content activity ── */
+.in-content-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+.in-content-card{background:var(--in-panel);border:0.5px solid var(--in-line);border-radius:var(--radius);padding:18px 18px 14px}
+.in-content-head{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.in-content-icon{width:24px;height:24px;border-radius:7px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px}
+.in-content-title{font-size:12.5px;font-weight:500;color:var(--in-text-hi)}
+.in-content-count{font-family:'Fraunces',serif;font-size:26px;font-weight:500;color:var(--in-text-hi);margin:8px 0 10px}
+.in-content-recent{display:flex;flex-direction:column;gap:7px}
+.in-content-item{font-size:11px;color:var(--in-text-lo);line-height:1.4;padding-bottom:7px;border-bottom:0.5px solid var(--in-line)}
+.in-content-item:last-child{border-bottom:none;padding-bottom:0}
+.in-content-item .t{color:var(--in-text-hi);display:block;margin-bottom:2px}
+.in-content-item .ago{font-size:9.5px;color:var(--in-text-faint);font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.in-content-empty{font-size:11px;color:var(--in-text-faint);font-style:italic}
+
+.in-empty-state{text-align:center;padding:70px 20px;color:var(--in-text-faint)}
+.in-empty-state i{font-size:26px;display:block;margin-bottom:14px;color:var(--in-text-lo)}
+.in-empty-state h2{font-family:'Fraunces',serif;font-weight:500;font-size:17px;color:var(--in-text-hi);margin:0 0 6px}
+.in-empty-state p{font-size:12.5px;max-width:340px;margin:0 auto}
+
+@media(max-width:760px){
+  .in-stats-grid{grid-template-columns:repeat(2,1fr)}
+  .in-content-grid{grid-template-columns:1fr}
+}
+@media(max-width:680px){
+  .in-wrap{padding:calc(84px + env(safe-area-inset-top)) 16px calc(100px + env(safe-area-inset-bottom))}
+  .in-header{align-items:flex-start}
+  .in-sub{display:block;margin-left:0;margin-top:6px}
+  .in-feature-row{grid-template-columns:18px 84px 1fr 60px 44px;gap:6px}
+}
+
+/* ── Small phones ── */
+@media(max-width:420px){
+  .in-wrap{padding:calc(78px + env(safe-area-inset-top)) 12px calc(90px + env(safe-area-inset-bottom))}
+  .in-title{font-size:20px}
+  .in-brand-mark{width:26px;height:26px;font-size:13px}
+  .in-sub{font-size:11px}
+  .in-clear-btn{font-size:10.5px;padding:6px 10px}
+  .in-stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .in-stat-card{padding:13px 14px}
+  .in-stat-val{font-size:19px}
+  .in-radar-card{padding:16px 14px 10px}
+  .in-feature-row{grid-template-columns:16px 68px 1fr 50px 40px;gap:5px;padding:8px 2px}
+  .in-feature-name{font-size:11.5px}
+  .in-feature-time,.in-feature-visits{font-size:9.5px}
+  .in-content-card{padding:14px 14px 12px}
+  .in-content-count{font-size:22px}
+}
+</style>
+</head>
+<body data-accent="white" data-track-feature="interests">
+<script src="retro-theme.js"></script>
+<script src="vhs-theme.js"></script>
+<script src="harsh-mode.js"></script>
+<script src="tracker.js"></script>
+
+<nav id="app-nav">
+  <a class="nav-logo-wrap" href="index.html">
+    <span class="nav-logo">Canopus</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html#focus">Focus</a>
+    <a class="nav-link" href="index.html#schedule">Schedule</a>
+    <a class="nav-link" href="index.html#progress">Progress</a>
+    <a class="nav-link" href="index.html#sky">Sky</a>
+    <a class="nav-link" href="index.html#capsule">Capsule</a>
+    <a class="nav-link" href="index.html#flight">Flight</a>
+    <a class="nav-link" href="index.html#passport">Passport</a>
+    <a class="nav-link" href="vault.html">Vault</a>
+    <a class="nav-link" href="empires.html">Empires</a>
+    <a class="nav-link" href="conflicts.html">Conflicts</a>
+    <a class="nav-link" href="index.html#literature">Literature</a>
+    <a class="nav-link" href="sirius.html">Sirius</a>
+    <a class="nav-link" href="library.html">Library</a>
+    <a class="nav-link" href="index.html#features">Features</a>
+    <a class="nav-link active" href="interests.html">Interests</a>
+    <a class="nav-link" href="index.html?openTerminal=1">Terminal</a>
+  </div>
+  <div class="nav-util">
+    <button class="nav-fs" id="accent-picker-btn" onclick="toggleAccentPicker(event)" aria-label="Accent color" title="Accent color"><i class="ti ti-palette"></i></button>
+    <button class="nav-fs" onclick="toggleAppTheme()" aria-label="Toggle theme" title="Light/dark"><i class="ti ti-sun"></i></button>
+    <button class="nav-fs" onclick="toggleFS()" aria-label="Fullscreen" title="Fullscreen"><i class="ti ti-maximize"></i></button>
+  </div>
+</nav>
+<script>
+/* ── Nav header: keep the open feature's tab centered in the scrollable
+   mobile strip, but leave it wherever the user scrolls it once they've
+   touched/dragged the strip themselves. ── */
+(function(){
+  function setup(){
+    var navLinks=document.querySelector('#app-nav .nav-links');
+    if(!navLinks) return;
+    var userTouching=false;
+    var releaseTimer=null;
+    function touchStart(){ userTouching=true; clearTimeout(releaseTimer); }
+    function touchEnd(){ clearTimeout(releaseTimer); releaseTimer=setTimeout(function(){ userTouching=false; },150); }
+    navLinks.addEventListener('touchstart',touchStart,{passive:true});
+    navLinks.addEventListener('touchend',touchEnd,{passive:true});
+    navLinks.addEventListener('touchcancel',touchEnd,{passive:true});
+    navLinks.addEventListener('mousedown',touchStart);
+    window.addEventListener('mouseup',touchEnd);
+    window.centerActiveNav=function(smooth){
+      if(userTouching) return;
+      var active=navLinks.querySelector('.nav-link.active');
+      if(!active) return;
+      active.scrollIntoView({behavior:smooth?'smooth':'auto',inline:'center',block:'nearest'});
+    };
+    window.centerActiveNav(false);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup);
+  else setup();
+})();
+</script>
+<div class="nav-accent-pop" id="navAccentPop">
+  <button class="accent-swatch" data-accent="white" onclick="setAppAccent('white')" title="White" aria-label="White accent"></button>
+  <button class="accent-swatch" data-accent="blue" onclick="setAppAccent('blue')" title="Blue" aria-label="Blue accent"></button>
+  <button class="accent-swatch" data-accent="green" onclick="setAppAccent('green')" title="Green" aria-label="Green accent"></button>
+  <button class="accent-swatch" data-accent="amber" onclick="setAppAccent('amber')" title="Amber" aria-label="Amber accent"></button>
+  <button class="accent-swatch" data-accent="pink" onclick="setAppAccent('pink')" title="Pink" aria-label="Pink accent"></button>
+  <span class="nav-pop-sep"></span>
+  <button class="surface-swatch" data-surface="black" onclick="setAppSurface('black')" title="Black" aria-label="Black surface"></button>
+  <button class="surface-swatch" data-surface="grey" onclick="setAppSurface('grey')" title="Grey" aria-label="Grey surface"></button>
+  <button class="surface-swatch" data-surface="white" onclick="setAppSurface('white')" title="White" aria-label="White surface"></button>
+</div>
+
+<div class="in-wrap">
+
+  <div class="in-header">
+    <div class="in-brand-row">
+      <span class="in-brand-mark"><i class="ti ti-chart-radar"></i></span>
+      <div>
+        <h1 class="in-title">Interests</h1>
+        <span class="in-sub">how your time and curiosity spread across Canopus, tracked only on this device</span>
+      </div>
+    </div>
+    <button class="in-clear-btn" onclick="inClearData()" title="Clear tracked data"><i class="ti ti-trash"></i>Clear data</button>
+  </div>
+
+  <div id="inContent"></div>
+
+</div>
+
+<script>
+/* ── shared nav: accent + theme + fullscreen (same keys as the rest of Canopus) ── */
+const THEME_KEY='dayplan_theme';
+const ACCENT_KEY='dayplan_accent';
+const SURFACE_KEY='dayplan_surface';
+const APP_ACCENTS=['white','blue','green','amber','pink'];
+const APP_SURFACES=['black','grey'];
+let appTheme='dark';
+let appAccent='white';
+let appSurface='black';
+
+function saveAppPreferences(){
+  try{
+    localStorage.setItem(THEME_KEY,appTheme);
+    localStorage.setItem(ACCENT_KEY,appAccent);
+    localStorage.setItem(SURFACE_KEY,appSurface);
+  }catch(e){}
+}
+function updateAccentSwatches(){
+  document.querySelectorAll('.accent-swatch').forEach(s=>{
+    s.classList.toggle('active',s.dataset.accent===appAccent);
+  });
+  document.querySelectorAll('.surface-swatch').forEach(s=>{
+    const isActive=(appTheme==='light'&&s.dataset.surface==='white')||(appTheme==='dark'&&s.dataset.surface===appSurface);
+    s.classList.toggle('active',isActive);
+  });
+}
+function applyAppPreferences(){
+  document.body.classList.toggle('light',appTheme==='light');
+  document.body.classList.toggle('grey',appTheme==='dark'&&appSurface==='grey');
+  document.body.dataset.accent=appAccent;
+  const icon=appTheme==='dark'?'<i class="ti ti-sun"></i>':'<i class="ti ti-moon"></i>';
+  document.querySelectorAll('[onclick="toggleAppTheme()"]').forEach(b=>b.innerHTML=icon);
+  updateAccentSwatches();
+  inRender();
+}
+function loadAppPreferences(){
+  try{
+    const t=localStorage.getItem(THEME_KEY);
+    const a=localStorage.getItem(ACCENT_KEY);
+    const s=localStorage.getItem(SURFACE_KEY);
+    if(t==='light'||t==='dark') appTheme=t;
+    if(a&&APP_ACCENTS.includes(a)) appAccent=a;
+    if(s&&APP_SURFACES.includes(s)) appSurface=s;
+  }catch(e){}
+  document.body.classList.toggle('light',appTheme==='light');
+  document.body.classList.toggle('grey',appTheme==='dark'&&appSurface==='grey');
+  document.body.dataset.accent=appAccent;
+  updateAccentSwatches();
+}
+function toggleAppTheme(){
+  appTheme=appTheme==='dark'?'light':'dark';
+  applyAppPreferences();
+  saveAppPreferences();
+}
+function setAppSurface(surface){
+  if(surface==='white'){
+    appTheme='light';
+  }else if(APP_SURFACES.includes(surface)){
+    appTheme='dark';
+    appSurface=surface;
+  }else{
+    return;
+  }
+  applyAppPreferences();
+  saveAppPreferences();
+  closeAccentPicker();
+}
+function setAppAccent(accent){
+  if(!APP_ACCENTS.includes(accent)) return;
+  appAccent=accent;
+  applyAppPreferences();
+  saveAppPreferences();
+  closeAccentPicker();
+}
+function toggleAccentPicker(e){
+  if(e)e.stopPropagation();
+  document.getElementById('navAccentPop').classList.toggle('open');
+}
+function closeAccentPicker(){
+  document.getElementById('navAccentPop').classList.remove('open');
+}
+function toggleFS(){
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+document.addEventListener('click',e=>{
+  const accentPop=document.getElementById('navAccentPop');
+  const accentBtn=document.getElementById('accent-picker-btn');
+  if(accentPop&&!accentPop.contains(e.target)&&accentBtn&&!accentBtn.contains(e.target))closeAccentPicker();
+});
+loadAppPreferences();
+
+/* ── feature metadata: key -> label / icon, in the same order as the main nav ── */
+const IN_FEATURES=[
+  {key:'focus',      label:'Focus',      icon:'ti-sun'},
+  {key:'schedule',   label:'Schedule',   icon:'ti-calendar'},
+  {key:'progress',   label:'Progress',   icon:'ti-chart-bar'},
+  {key:'sky',        label:'Sky',        icon:'ti-moon-stars'},
+  {key:'capsule',    label:'Capsule',    icon:'ti-capsule'},
+  {key:'flight',     label:'Flight',     icon:'ti-plane'},
+  {key:'passport',   label:'Passport',   icon:'ti-book'},
+  {key:'vault',      label:'Vault',      icon:'ti-lock'},
+  {key:'empires',    label:'Empires',    icon:'ti-crown'},
+  {key:'literature', label:'Literature', icon:'ti-feather'},
+  {key:'sirius',     label:'Sirius',     icon:'ti-quote'},
+  {key:'library',    label:'Library',    icon:'ti-books'},
+  {key:'features',   label:'Features',   icon:'ti-apps'}
+];
+
+function inFmtTime(secs){
+  secs=Math.round(secs||0);
+  if(secs<60) return secs+'s';
+  const m=Math.floor(secs/60), h=Math.floor(m/60);
+  if(h>0) return h+'h '+(m%60)+'m';
+  return m+'m';
+}
+function inFmtAgo(ts){
+  const diff=Date.now()-ts;
+  const m=Math.floor(diff/60000);
+  if(m<1) return 'just now';
+  if(m<60) return m+'m ago';
+  const h=Math.floor(m/60);
+  if(h<24) return h+'h ago';
+  const d=Math.floor(h/24);
+  if(d===1) return 'yesterday';
+  if(d<7) return d+'d ago';
+  return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
+function inEsc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+
+/* ── radar / spider chart, hand-drawn as SVG ── */
+function inRadarSvg(values){
+  // values: array of {label,icon,v} where v is 0..1 normalized
+  const n=values.length;
+  const size=460, cx=size/2, cy=size/2-6, R=150;
+  const rings=4;
+  let grid='';
+  for(let r=1;r<=rings;r++){
+    const rad=R*r/rings;
+    let pts=[];
+    for(let i=0;i<n;i++){
+      const ang=-Math.PI/2 + i*2*Math.PI/n;
+      pts.push((cx+rad*Math.cos(ang)).toFixed(1)+','+(cy+rad*Math.sin(ang)).toFixed(1));
+    }
+    grid+=`<polygon class="in-radar-grid" points="${pts.join(' ')}"/>`;
+  }
+  let spokes='', labels='', shapePts=[], dots='';
+  for(let i=0;i<n;i++){
+    const ang=-Math.PI/2 + i*2*Math.PI/n;
+    const ex=cx+R*Math.cos(ang), ey=cy+R*Math.sin(ang);
+    spokes+=`<line class="in-radar-spoke" x1="${cx}" y1="${cy}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}"/>`;
+    const lx=cx+(R+22)*Math.cos(ang), ly=cy+(R+22)*Math.sin(ang);
+    const anchor = Math.cos(ang)>0.3?'start':Math.cos(ang)<-0.3?'end':'middle';
+    labels+=`<text class="in-radar-axis-label" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle">${inEsc(values[i].label)}</text>`;
+    const v=Math.max(0.04,values[i].v);
+    const px=cx+R*v*Math.cos(ang), py=cy+R*v*Math.sin(ang);
+    shapePts.push(px.toFixed(1)+','+py.toFixed(1));
+    dots+=`<circle class="in-radar-dot" cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.6"><title>${inEsc(values[i].label)}</title></circle>`;
+  }
+  return `<svg viewBox="0 0 ${size} ${size-30}" xmlns="http://www.w3.org/2000/svg">
+    ${grid}${spokes}
+    <polygon class="in-radar-shape" points="${shapePts.join(' ')}"/>
+    ${dots}${labels}
+  </svg>`;
+}
+
+function inClearData(){
+  if(!window.CanopusTrack) return;
+  if(confirm('Clear all tracked interest data on this device? This cannot be undone.')){
+    CanopusTrack.clearAll();
+    inRender();
+  }
+}
+
+function inRender(){
+  const root=document.getElementById('inContent');
+  const data=window.CanopusTrack?CanopusTrack.getData():null;
+  if(!data){
+    root.innerHTML=`<div class="in-empty-state"><i class="ti ti-chart-radar"></i><h2>Nothing tracked yet</h2><p>Spend a little time around Canopus — Focus, Vault, Sirius, Literature — and your interest map will start filling in here.</p></div>`;
+    return;
+  }
+  const feats=data.features||{};
+  const totalSeconds=Object.values(feats).reduce((s,f)=>s+(f.seconds||0),0);
+  const totalVisits=Object.values(feats).reduce((s,f)=>s+(f.visits||0),0);
+  const articles=(data.content&&data.content.articles)||[];
+  const quotes=(data.content&&data.content.quotes)||[];
+  const stories=(data.content&&data.content.stories)||[];
+
+  if(totalVisits===0 && articles.length===0 && quotes.length===0 && stories.length===0){
+    root.innerHTML=`<div class="in-empty-state"><i class="ti ti-chart-radar"></i><h2>Nothing tracked yet</h2><p>Spend a little time around Canopus — Focus, Vault, Sirius, Literature — and your interest map will start filling in here.</p></div>`;
+    return;
+  }
+
+  let topFeature=null;
+  IN_FEATURES.forEach(f=>{
+    const secs=(feats[f.key]&&feats[f.key].seconds)||0;
+    if(!topFeature||secs>topFeature.secs) topFeature={key:f.key,label:f.label,secs};
+  });
+
+  const maxSecs=Math.max(1,...IN_FEATURES.map(f=>(feats[f.key]&&feats[f.key].seconds)||0));
+  const radarValues=IN_FEATURES.map(f=>({
+    label:f.label,
+    v:((feats[f.key]&&feats[f.key].seconds)||0)/maxSecs
+  }));
+
+  const statsHtml=`
+    <div class="in-stats-grid">
+      <div class="in-stat-card">
+        <div class="in-stat-icon"><i class="ti ti-clock-hour-4"></i></div>
+        <div class="in-stat-val">${inFmtTime(totalSeconds)}</div>
+        <div class="in-stat-lbl">Time on Canopus</div>
+      </div>
+      <div class="in-stat-card">
+        <div class="in-stat-icon"><i class="ti ti-click"></i></div>
+        <div class="in-stat-val">${totalVisits}</div>
+        <div class="in-stat-lbl">Feature visits</div>
+      </div>
+      <div class="in-stat-card">
+        <div class="in-stat-icon"><i class="ti ti-star"></i></div>
+        <div class="in-stat-val" style="font-size:17px">${topFeature&&topFeature.secs>0?inEsc(topFeature.label):'—'}</div>
+        <div class="in-stat-lbl">Most time spent</div>
+      </div>
+      <div class="in-stat-card">
+        <div class="in-stat-icon"><i class="ti ti-bookmark"></i></div>
+        <div class="in-stat-val">${articles.length+quotes.length+stories.length}</div>
+        <div class="in-stat-lbl">Articles, quotes &amp; stories</div>
+      </div>
+    </div>`;
+
+  const radarHtml=`
+    <div class="in-radar-card">
+      <div class="in-card-h2">Interest map</div>
+      <div class="in-card-sub">Each axis is a feature, scaled by time spent — the furthest points are where your attention goes most.</div>
+      <div class="in-radar-wrap">${inRadarSvg(radarValues)}</div>
+    </div>`;
+
+  const rows=IN_FEATURES.map(f=>{
+    const rec=feats[f.key]||{visits:0,seconds:0};
+    const pct=maxSecs>0?Math.round((rec.seconds/maxSecs)*100):0;
+    return {f,rec,pct};
+  }).sort((a,b)=>b.rec.seconds-a.rec.seconds || b.rec.visits-a.rec.visits);
+
+  const featureListHtml=`
+    <div class="in-radar-card">
+      <div class="in-card-h2">Time by feature</div>
+      <div class="in-card-sub">Sorted by time spent, most to least.</div>
+      <div class="in-feature-list">
+        ${rows.map(r=>`
+          <div class="in-feature-row">
+            <span class="in-feature-icon"><i class="ti ${r.f.icon}"></i></span>
+            <span class="in-feature-name">${inEsc(r.f.label)}</span>
+            <span class="in-feature-bar-track"><span class="in-feature-bar-fill" style="width:${r.pct}%"></span></span>
+            <span class="in-feature-time">${inFmtTime(r.rec.seconds)}</span>
+            <span class="in-feature-visits">${r.rec.visits} visit${r.rec.visits===1?'':'s'}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  function contentCard(icon,title,list,emptyLabel){
+    const recent=list.slice().reverse().slice(0,5);
+    return `
+      <div class="in-content-card">
+        <div class="in-content-head">
+          <span class="in-content-icon"><i class="ti ${icon}"></i></span>
+          <span class="in-content-title">${title}</span>
+        </div>
+        <div class="in-content-count">${list.length}</div>
+        <div class="in-content-recent">
+          ${recent.length?recent.map(it=>`<div class="in-content-item"><span class="t">${inEsc(it.title||it.id)}</span><span class="ago">${inFmtAgo(it.ts)}</span></div>`).join(''):`<div class="in-content-empty">${emptyLabel}</div>`}
+        </div>
+      </div>`;
+  }
+
+  const contentHtml=`
+    <div class="in-content-grid">
+      ${contentCard('ti-notebook','Articles visited (Vault)',articles,'None visited yet')}
+      ${contentCard('ti-quote','Quotes read (Sirius)',quotes,'None read yet')}
+      ${contentCard('ti-feather','Stories opened (Literature)',stories,'None opened yet')}
+    </div>`;
+
+  root.innerHTML = statsHtml + radarHtml + featureListHtml + contentHtml;
+}
+
+inRender();
+window.addEventListener('storage',function(e){ if(e.key==='canopus_interests_v1') inRender(); });
+</script>
+<script>
+/* ---- Canopus global terminal shortcut: redirects into index.html's Terminal page ---- */
+(function(){
+  var SC_KEY='canopus_term_shortcut';
+  function getShortcut(){
+    try{var raw=localStorage.getItem(SC_KEY);if(raw)return JSON.parse(raw);}catch(e){}
+    return {alt:true,ctrl:false,shift:false,meta:false,key:'`'};
+  }
+  function matches(e,sc){
+    if(!sc||!sc.key)return false;
+    return !!sc.ctrl===e.ctrlKey&&!!sc.alt===e.altKey&&!!sc.shift===e.shiftKey&&!!sc.meta===e.metaKey&&(e.key||'').toLowerCase()===sc.key.toLowerCase();
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(matches(e,getShortcut())){
+      e.preventDefault();
+      window.location.href='index.html?openTerminal=1';
+    }
+  },true);
+})();
+</script>
+<script>
+/* ---- Canopus: local keyboard shortcut to hide/show this page's header (persists across all Canopus pages) ---- */
+(function(){
+  var nav=document.getElementById('app-nav')||document.querySelector('header');
+  if(!nav)return;
+  function setHidden(hidden){
+    document.documentElement.classList.toggle('chdr-hidden',hidden);
+    try{localStorage.setItem('canopusHeaderHidden',hidden?'1':'0');}catch(e){}
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key||'').toLowerCase()==='h'){
+      e.preventDefault();
+      setHidden(!document.documentElement.classList.contains('chdr-hidden'));
+    }
+  },true);
+})();
+</script>
+</body>
+</html>

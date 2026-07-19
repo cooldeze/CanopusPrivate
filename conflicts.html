@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Canopus — Conflicts</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="retro-theme.css">
+<link rel="stylesheet" href="vhs-theme.css">
+<link rel="stylesheet" href="harsh-mode.css">
+<style>
+:root,body[data-accent="white"]{
+  --accent:#fff;--accent-hover:#ddd;--accent-on:#000;--accent-muted:#2a2a2a;--accent-soft:rgba(255,255,255,.06);
+}
+body[data-accent="blue"]{ --accent:#5a9fd4;--accent-hover:#4a8fc4;--accent-on:#000;--accent-muted:#2a4a6a;--accent-soft:rgba(90,159,212,.12); }
+body[data-accent="green"]{ --accent:#4a9a6a;--accent-hover:#3a8a5a;--accent-on:#000;--accent-muted:#1a3a2a;--accent-soft:rgba(74,154,106,.12); }
+body[data-accent="amber"]{ --accent:#c9952a;--accent-hover:#b8851a;--accent-on:#000;--accent-muted:#4a3a1a;--accent-soft:rgba(201,149,42,.12); }
+body[data-accent="pink"]{ --accent:#e0629c;--accent-hover:#cf4f8a;--accent-on:#000;--accent-muted:#4a1a32;--accent-soft:rgba(224,98,156,.12); }
+body.light[data-accent="white"]{ --accent:#111;--accent-hover:#333;--accent-on:#fff;--accent-muted:#aaa;--accent-soft:rgba(0,0,0,.05); }
+
+:root{
+  --surf-bg:#000;--surf-panel:#0a0a0a;--surf-panel-hi:#111;--surf-modal:#0d0e10;--surf-line:var(--surf-line);
+}
+body.grey{
+  --surf-bg:#0A0A0B;--surf-panel:#111214;--surf-panel-hi:#17181B;--surf-modal:#111214;--surf-line:#212327;
+}
+*{box-sizing:border-box;margin:0;padding:0;min-width:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{background:var(--surf-bg);color:#fff;font-family:'Inter',sans-serif;min-height:100%;overflow-x:hidden;width:100%;max-width:100vw}
+img,svg{max-width:100%}
+p,li,h1,h2,h3,.info-card-blurb,.moment-text,.section-desc,.subtitle,p.lede,.summary-box,.nm-modal-text,.flow-note,.flow-trigger-sub,.info-card ul{overflow-wrap:break-word;word-break:break-word}
+body.light{background:#f5f5f0;color:#111}
+a{color:inherit}
+::selection{background:var(--accent);color:var(--accent-on)}
+
+/* ── NAV (matches Canopus main site) ── */
+html.chdr-hidden #app-nav{display:none!important}
+#app-nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) 14px calc(24px + env(safe-area-inset-left));z-index:100;background:linear-gradient(var(--surf-bg) 70%,transparent);pointer-events:none}
+body.light #app-nav{background:linear-gradient(#f5f5f0 70%,transparent)}
+#app-nav>*{pointer-events:auto}
+.nav-logo-wrap{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-logo{font-size:11px;font-weight:500;letter-spacing:.18em;color:rgba(255,255,255,.7);text-transform:uppercase}
+body.light .nav-logo{color:rgba(0,0,0,.55)}
+.nav-crumb{font-size:11px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;opacity:.85}
+.nav-crumb::before{content:'/';margin:0 8px;color:#333;font-weight:400}
+body.light .nav-crumb::before{color:#ccc}
+.nav-links{display:flex;gap:2px;padding:2px;max-width:calc(100vw - 230px);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-link{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;color:#555;text-decoration:none;white-space:nowrap;transition:color .2s,background .2s;border:none;background:none;letter-spacing:.06em;font-family:'Inter',sans-serif}
+.nav-link.active{color:var(--accent);background:var(--accent-soft)}
+.nav-link:hover:not(.active){color:#888}
+body.light .nav-link{color:#aaa}
+body.light .nav-link:hover:not(.active){color:#555}
+
+.nav-util{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.nav-fs{width:30px;height:30px;border-radius:7px;background:transparent;border:none;color:#555;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:color .2s}
+.nav-fs:hover{color:#ccc}
+body.light .nav-fs{color:#aaa}
+body.light .nav-fs:hover{color:#333}
+.nav-menu-pop{position:fixed;right:24px;top:52px;background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:10px;padding:4px;min-width:168px;z-index:110;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.nav-menu-pop.open{display:block}
+body.light .nav-menu-pop{background:#fff;border-color:#ddd;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.nav-menu-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;font-size:11px;color:#666;background:none;border:none;width:100%;text-align:left;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.04em;transition:background .12s,color .12s}
+.nav-menu-item:hover{background:var(--surf-panel-hi);color:#ccc}
+body.light .nav-menu-item{color:#777}
+body.light .nav-menu-item:hover{background:#f0f0eb;color:#333}
+.nav-menu-item i{font-size:13px;width:14px;color:#444}
+.nav-accent-pop{position:fixed;right:62px;top:52px;background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:10px;padding:8px 10px;z-index:110;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:7px}
+.nav-accent-pop.open{display:flex}
+body.light .nav-accent-pop{background:#fff;border-color:#ddd;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.accent-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--swatch);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.accent-swatch:hover{transform:scale(1.08)}
+.accent-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--swatch)}
+body.light .accent-swatch.active{box-shadow:0 0 0 2px #f5f5f0,0 0 0 3.5px var(--swatch)}
+.accent-swatch[data-accent="white"]{--swatch:#fff}
+.accent-swatch[data-accent="blue"]{--swatch:#5a9fd4}
+.accent-swatch[data-accent="green"]{--swatch:#4a9a6a}
+.accent-swatch[data-accent="amber"]{--swatch:#c9952a}
+.accent-swatch[data-accent="pink"]{--swatch:#e0629c}
+.nav-pop-sep{width:0.5px;align-self:stretch;background:#222;margin:0 1px}
+body.light .nav-pop-sep{background:#e2e0d9}
+.surface-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--sw);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.surface-swatch:hover{transform:scale(1.08)}
+.surface-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--sw)}
+body.light .surface-swatch.active{box-shadow:0 0 0 2px #f5f5f0,0 0 0 3.5px var(--sw)}
+.surface-swatch[data-surface="black"]{--sw:#000;border-color:#444}
+.surface-swatch[data-surface="grey"]{--sw:#3a3b3e}
+.surface-swatch[data-surface="white"]{--sw:#fff}
+
+/* ── LAYOUT ── */
+#page-wrap{padding:104px 20px 80px;max-width:1040px;margin:0 auto}
+@media(min-width:900px){ #page-wrap{padding-top:120px} }
+
+.page-name-tag{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.nm-heading{display:inline-flex;align-items:center;gap:2px;flex-wrap:wrap}
+.nm-celestial{font-weight:700;text-transform:uppercase;color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em}
+.nm-paren{font-weight:400;text-transform:none;opacity:.5;font-size:.9em;letter-spacing:.02em;margin-left:5px;font-family:'Inter',sans-serif}
+.nm-info-btn{width:18px;height:18px;border-radius:50%;border:0.5px solid currentColor;opacity:.5;background:none;color:inherit;display:inline-flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;margin-left:6px;flex-shrink:0;transition:opacity .2s}
+.nm-info-btn:hover{opacity:1}
+
+h1.title{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(28px,6vw,44px);letter-spacing:-.02em;line-height:1.08;margin-bottom:10px}
+.subtitle{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:clamp(14px,2.4vw,17px);color:#999;max-width:640px;line-height:1.5;margin-bottom:22px}
+body.light .subtitle{color:#777}
+p.lede{font-size:14px;line-height:1.75;color:#aaa;max-width:680px;margin-bottom:8px}
+body.light p.lede{color:#555}
+
+.section{margin-top:56px}
+.section-eyebrow{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-family:'IBM Plex Mono',monospace;margin-bottom:8px}
+.section-title{font-family:'Fraunces',serif;font-size:clamp(20px,3.4vw,28px);font-weight:500;letter-spacing:-.01em;margin-bottom:6px}
+.section-desc{font-size:13.5px;color:#888;max-width:640px;line-height:1.6;margin-bottom:24px}
+body.light .section-desc{color:#666}
+
+/* ── GLOBE MODULE ── */
+.globe-module{display:grid;grid-template-columns:1fr;gap:22px}
+@media(min-width:860px){ .globe-module{grid-template-columns:1fr 380px;align-items:start} }
+
+.globe-stage{position:relative;background:radial-gradient(circle at 50% 38%,#0c0c0c,#000 70%);border:0.5px solid #1c1c1c;border-radius:20px;padding:18px;display:flex;flex-direction:column;align-items:center}
+body.light .globe-stage{background:radial-gradient(circle at 50% 38%,#ececE4,#f5f5f0 70%);border-color:#e2e0d9}
+#globe-svg{width:100%;max-width:460px;height:auto;cursor:grab;display:block;touch-action:none}
+#globe-svg:active{cursor:grabbing}
+.globe-hint{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#3a3a3a;margin-top:10px;text-align:center}
+body.light .globe-hint{color:#bbb}
+.globe-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:.1em;color:#444;text-transform:uppercase;pointer-events:none;text-align:center;padding:20px}
+
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:14px;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.03em;color:#888}
+body.light .legend-item{color:#666}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+/* conflict picker */
+.picker-scroll{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;margin-bottom:14px}
+.picker-scroll::-webkit-scrollbar{display:none}
+@media(min-width:860px){ .picker-scroll{flex-direction:column;overflow-x:visible;max-height:340px;overflow-y:auto;padding-right:4px} }
+.picker-chip{flex-shrink:0;text-align:left;padding:10px 14px;border-radius:10px;border:0.5px solid #1e1e1e;background:var(--surf-panel);color:#888;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap}
+@media(min-width:860px){ .picker-chip{white-space:normal} }
+.picker-chip:hover{border-color:#333;color:#ccc}
+.picker-chip.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.picker-chip .pc-num{font-family:'IBM Plex Mono',monospace;opacity:.5;margin-right:6px;font-size:10px}
+body.light .picker-chip{background:#fff;border-color:#e2e0d9;color:#888}
+body.light .picker-chip:hover{border-color:#ccc;color:#333}
+
+.info-card{border:0.5px solid #1c1c1c;border-radius:16px;padding:20px;background:var(--surf-panel)}
+body.light .info-card{background:#fff;border-color:#e2e0d9}
+.info-card-years{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--accent);letter-spacing:.06em;margin-bottom:6px}
+.info-card-title{font-family:'Fraunces',serif;font-size:20px;font-weight:500;margin-bottom:10px;line-height:1.2}
+.info-card-blurb{font-size:12.5px;color:#999;line-height:1.65;margin-bottom:14px}
+body.light .info-card-blurb{color:#666}
+.info-card-h{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#555;margin:14px 0 6px}
+.info-listen-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;border:0.5px solid #2a2a2a;background:var(--surf-panel-hi,#111);color:#999;font-size:11px;letter-spacing:.04em;cursor:pointer;margin-top:10px;font-family:'Inter',sans-serif}
+.info-listen-btn:hover{color:#fff;border-color:#555}
+body.light .info-listen-btn{border-color:#ddd;color:#555}
+body.light .info-listen-btn:hover{color:#111;border-color:#999}
+.tts-playing{color:var(--accent,#fff)!important;border-color:var(--accent,#fff)!important}
+.info-card ul{list-style:none;font-size:12px;color:#aaa;line-height:1.7}
+body.light .info-card ul{color:#555}
+.info-card ul li{padding-left:14px;position:relative}
+.info-card ul li::before{content:'—';position:absolute;left:0;color:#3a3a3a}
+.country-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.country-tag{display:flex;align-items:center;gap:5px;font-size:10.5px;padding:4px 9px;border-radius:20px;background:var(--surf-panel-hi);border:0.5px solid #222;color:#ccc}
+body.light .country-tag{background:#f2f0e9;border-color:#e2e0d9;color:#333}
+.country-tag .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.moments{display:flex;flex-direction:column;gap:12px}
+.moment-block{border-left:2px solid #222;padding-left:12px}
+body.light .moment-block{border-left-color:#e2e0d9}
+.moment-title{font-family:'Fraunces',serif;font-size:12.5px;font-weight:500;color:var(--accent);margin-bottom:4px;line-height:1.35}
+.moment-text{font-size:11.5px;color:#999;line-height:1.65}
+body.light .moment-text{color:#666}
+
+/* ── FLOWCHART ── */
+.flow-note{font-size:12px;color:#777;margin-bottom:18px;line-height:1.6;max-width:640px}
+body.light .flow-note{color:#888}
+.flow-wrap{border:0.5px solid #1c1c1c;border-radius:16px;padding:20px 8px;background:radial-gradient(circle at 50% 0%,#0d0d0d,var(--surf-bg) 65%);overflow-x:auto}
+body.light .flow-wrap{background:#fff;border-color:#e2e0d9}
+.mermaid{display:flex;justify-content:center}
+.mermaid svg .node rect,.mermaid svg .node polygon,.mermaid svg .node path{filter:drop-shadow(0 3px 10px rgba(0,0,0,.5));transition:filter .2s}
+.mermaid svg .node:hover rect,.mermaid svg .node:hover polygon,.mermaid svg .node:hover path{filter:drop-shadow(0 4px 14px rgba(0,0,0,.65))}
+.mermaid svg .nodeLabel{font-family:'Inter',sans-serif;line-height:1.4}
+.mermaid svg .edgeLabel{font-family:'IBM Plex Mono',monospace!important;font-size:10px!important;letter-spacing:.02em;border-radius:6px;padding:2px 6px}
+.mermaid svg .edgePath path{stroke-width:1.3px}
+body.light .mermaid svg .node rect,body.light .mermaid svg .node polygon,body.light .mermaid svg .node path{filter:drop-shadow(0 2px 6px rgba(0,0,0,.12))}
+
+/* flowchart trigger card (collapsed state, sits inline in the page) */
+.flow-trigger{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0.5px solid #1c1c1c;border-radius:16px;background:var(--surf-bg);color:inherit;padding:18px 20px;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .2s,background .2s}
+.flow-trigger:hover{border-color:var(--accent)}
+body.light .flow-trigger{background:#fff;border-color:#e2e0d9}
+.flow-trigger-icon{width:40px;height:40px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.flow-trigger-text{flex:1}
+.flow-trigger-title{font-size:13.5px;font-weight:500;margin-bottom:2px}
+.flow-trigger-sub{font-size:11.5px;color:#777}
+body.light .flow-trigger-sub{color:#888}
+.flow-trigger-arrow{font-size:16px;color:#555;flex-shrink:0}
+
+/* fullscreen flowchart overlay */
+.flow-overlay{position:fixed;inset:0;z-index:960;background:var(--surf-bg);display:none;flex-direction:column}
+.flow-overlay.open{display:flex}
+body.light .flow-overlay{background:#f5f5f0}
+.flow-overlay-bar{display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 20px 14px;border-bottom:0.5px solid var(--surf-line);flex-shrink:0}
+body.light .flow-overlay-bar{border-color:#e2e0d9}
+.flow-overlay-title{font-size:12px;letter-spacing:.06em;color:#999;font-family:'IBM Plex Mono',monospace}
+body.light .flow-overlay-title{color:#666}
+.flow-overlay-close{display:flex;align-items:center;gap:6px;border:0.5px solid #262626;background:none;color:inherit;padding:7px 13px;border-radius:8px;font-size:11.5px;letter-spacing:.04em;cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .2s,color .2s}
+.flow-overlay-close:hover{border-color:var(--accent);color:var(--accent)}
+body.light .flow-overlay-close{border-color:#ddd}
+.flow-overlay-body{flex:1;overflow:auto;padding:20px calc(16px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
+.flow-overlay-body .flow-wrap{border:none;background:none;padding:0}
+.flow-overlay-body .mermaid{min-width:900px}
+@media(max-width:640px){ .flow-overlay-body .mermaid{min-width:620px} }
+.mermaid svg .node{cursor:pointer}
+.flow-node-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;z-index:970;opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
+.flow-node-modal-bg.open{opacity:1;pointer-events:auto}
+.flow-node-modal{position:relative;background:var(--surf-modal,#0d0e10);border:0.5px solid #232427;border-radius:16px;padding:30px 26px 24px;width:min(440px,100%);max-height:80vh;overflow-y:auto;font-family:'Inter',sans-serif;color:#EDEDEE;text-align:center}
+.flow-node-modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:8px;border:0.5px solid #2a2a2a;background:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.flow-node-modal-close:hover{border-color:#666}
+.flow-node-modal-text{font-family:'Fraunces',serif;font-size:18px;line-height:1.55;color:#fff}
+body.light .flow-node-modal{background:#fff;border-color:#e2e0d9;color:#161512}
+body.light .flow-node-modal-close{border-color:#ddd;color:#161512}
+body.light .flow-node-modal-text{color:#161512}
+html.flow-lock,html.flow-lock body{overflow:hidden}
+
+/* ── SUMMARY ── */
+.summary-box{border-left:2px solid var(--accent);padding-left:18px;font-size:13.5px;line-height:1.8;color:#aaa;max-width:700px}
+body.light .summary-box{color:#555}
+
+/* ── NAMING MODAL ── */
+.nm-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;z-index:950;opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
+.nm-modal-bg.open{opacity:1;pointer-events:auto}
+.nm-modal{position:relative;background:var(--surf-modal);border:0.5px solid #232427;border-radius:16px;padding:26px 26px 22px;width:min(460px,100%);font-family:'Work Sans',sans-serif;color:#EDEDEE}
+body.light .nm-modal{background:#fff;border-color:#e2e0d9;color:#161512}
+.nm-modal-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:8px;border:0.5px solid #2a2a2a;background:none;color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.nm-modal-heading{font-family:'Fraunces',serif;font-size:19px;letter-spacing:-.01em;margin-bottom:4px}
+.nm-modal-assoc{font-size:11px;color:#666;letter-spacing:.04em;font-style:italic;margin-bottom:12px}
+.nm-modal-text{font-size:13px;color:#C7C8CB;line-height:1.7}
+body.light .nm-modal-text{color:#3A382F}
+
+footer.page-footer{margin-top:70px;padding-top:22px;border-top:0.5px solid #161616;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#444;letter-spacing:.04em}
+body.light footer.page-footer{border-color:#e2e0d9;color:#aaa}
+footer.page-footer a{text-decoration:none;color:var(--accent);display:inline-flex;align-items:center;gap:5px}
+
+@media(max-width:640px){
+  .nav-logo-wrap{display:none}
+  #app-nav{padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 16px calc(16px + env(safe-area-inset-left));background:linear-gradient(var(--surf-bg) 85%,transparent)}
+  body.light #app-nav{background:linear-gradient(#f5f5f0 85%,transparent)}
+  #page-wrap{padding-left:16px;padding-right:16px;padding-top:96px}
+  .nav-links{max-width:calc(100vw - 108px);gap:4px}
+  .nav-link{padding:9px 16px;font-size:14px;white-space:nowrap;flex-shrink:0}
+  .nav-fs{width:36px;height:36px;font-size:16px}
+  .nav-util{gap:6px}
+  .nav-menu-pop,.nav-accent-pop{top:64px}
+
+  .section{margin-top:40px}
+  .info-card{padding:16px}
+  .flow-trigger{padding:14px 16px;gap:10px}
+  .flow-trigger-icon{width:34px;height:34px;font-size:16px}
+  .flow-overlay-bar{padding:calc(14px + env(safe-area-inset-top)) 16px 14px}
+  .flow-overlay-body{padding:16px calc(12px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))}
+
+  .globe-stage{padding:14px}
+  .picker-chip{padding:11px 14px}
+  .country-tag{padding:6px 10px}
+
+  .nm-modal{padding:22px 20px 18px;max-height:85vh;overflow-y:auto}
+  .nm-modal-close{width:34px;height:34px}
+  .nm-info-btn{width:22px;height:22px}
+
+  footer.page-footer{flex-direction:column;align-items:flex-start;gap:10px}
+}
+@media(max-width:400px){
+  .nav-links{max-width:calc(100vw - 96px);gap:2px}
+  .nav-link{padding:8px 13px;font-size:13px}
+  .nav-fs{width:34px;height:34px;font-size:15px}
+  #page-wrap{padding-left:14px;padding-right:14px}
+  .info-card{padding:14px}
+  .globe-stage{padding:10px}
+}
+</style>
+</head>
+<body data-accent="white" data-track-feature="conflicts">
+<script src="retro-theme.js"></script>
+<script src="vhs-theme.js"></script>
+<script src="harsh-mode.js"></script>
+<script>
+(function(){try{
+  var t=localStorage.getItem('dayplan_theme'),a=localStorage.getItem('dayplan_accent'),s=localStorage.getItem('dayplan_surface');
+  if(t==='light')document.body.classList.add('light');
+  if(t!=='light'&&s==='grey')document.body.classList.add('grey');
+  if(a&&['white','blue','green','amber','pink'].indexOf(a)>=0)document.body.dataset.accent=a;
+}catch(e){}})();
+</script>
+
+<nav id="app-nav">
+  <a href="index.html" class="nav-logo-wrap">
+    <span class="nav-logo">Canopus</span>
+    <span class="nav-crumb">Conflicts</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html#focus">Focus</a>
+    <a class="nav-link" href="index.html#schedule">Schedule</a>
+    <a class="nav-link" href="index.html#progress">Progress</a>
+    <a class="nav-link" href="index.html#sky">Sky</a>
+    <a class="nav-link" href="index.html#capsule">Capsule</a>
+    <a class="nav-link" href="index.html#flight">Flight</a>
+    <a class="nav-link" href="index.html#passport">Passport</a>
+    <a class="nav-link" href="vault.html">Vault</a>
+    <a class="nav-link" href="empires.html">Empires</a>
+    <a class="nav-link active" href="conflicts.html">Conflicts</a>
+    <a class="nav-link" href="index.html#literature">Literature</a>
+    <a class="nav-link" href="sirius.html">Sirius</a>
+    <a class="nav-link" href="library.html">Library</a>
+    <a class="nav-link" href="index.html#features">Features</a>
+    <a class="nav-link" href="interests.html">Interests</a>
+    <a class="nav-link" href="index.html?openTerminal=1">Terminal</a>
+  </div>
+  <div class="nav-util">
+    <button class="nav-fs" id="accent-picker-btn" onclick="toggleAccentPicker(event)" aria-label="Accent color" title="Accent color"><i class="ti ti-palette"></i></button>
+    <button class="nav-fs" id="theme-toggle-btn" onclick="toggleAppTheme()" aria-label="Toggle theme" title="Light/dark"><i class="ti ti-sun"></i></button>
+    <button class="nav-fs" id="navMoreBtn" onclick="toggleNavMenu(event)" aria-label="More" title="More"><i class="ti ti-dots"></i></button>
+  </div>
+</nav>
+<script>
+/* ── Nav header: keep the open feature's tab centered in the scrollable
+   mobile strip, but leave it wherever the user scrolls it once they've
+   touched/dragged the strip themselves. ── */
+(function(){
+  function setup(){
+    var navLinks=document.querySelector('#app-nav .nav-links');
+    if(!navLinks) return;
+    var userTouching=false;
+    var releaseTimer=null;
+    function touchStart(){ userTouching=true; clearTimeout(releaseTimer); }
+    function touchEnd(){ clearTimeout(releaseTimer); releaseTimer=setTimeout(function(){ userTouching=false; },150); }
+    navLinks.addEventListener('touchstart',touchStart,{passive:true});
+    navLinks.addEventListener('touchend',touchEnd,{passive:true});
+    navLinks.addEventListener('touchcancel',touchEnd,{passive:true});
+    navLinks.addEventListener('mousedown',touchStart);
+    window.addEventListener('mouseup',touchEnd);
+    window.centerActiveNav=function(smooth){
+      if(userTouching) return;
+      var active=navLinks.querySelector('.nav-link.active');
+      if(!active) return;
+      active.scrollIntoView({behavior:smooth?'smooth':'auto',inline:'center',block:'nearest'});
+    };
+    window.centerActiveNav(false);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup);
+  else setup();
+})();
+</script>
+<div class="nav-accent-pop" id="navAccentPop">
+  <button class="accent-swatch" data-accent="white" onclick="setAppAccent('white')" title="White" aria-label="White accent"></button>
+  <button class="accent-swatch" data-accent="blue" onclick="setAppAccent('blue')" title="Blue" aria-label="Blue accent"></button>
+  <button class="accent-swatch" data-accent="green" onclick="setAppAccent('green')" title="Green" aria-label="Green accent"></button>
+  <button class="accent-swatch" data-accent="amber" onclick="setAppAccent('amber')" title="Amber" aria-label="Amber accent"></button>
+  <button class="accent-swatch" data-accent="pink" onclick="setAppAccent('pink')" title="Pink" aria-label="Pink accent"></button>
+  <span class="nav-pop-sep"></span>
+  <button class="surface-swatch" data-surface="black" onclick="setAppSurface('black')" title="Black" aria-label="Black surface"></button>
+  <button class="surface-swatch" data-surface="grey" onclick="setAppSurface('grey')" title="Grey" aria-label="Grey surface"></button>
+  <button class="surface-swatch" data-surface="white" onclick="setAppSurface('white')" title="White" aria-label="White surface"></button>
+</div>
+<div class="nav-menu-pop" id="navMenuPop">
+  <button class="nav-menu-item" onclick="window.location.href='index.html#flight'"><i class="ti ti-plane"></i>Flight tracker</button>
+  <button class="nav-menu-item" onclick="window.location.href='index.html#passport'"><i class="ti ti-book"></i>Passport</button>
+  <button class="nav-menu-item" onclick="window.location.href='sirius.html'"><i class="ti ti-quote"></i>Sirius (LOQ)</button>
+  <button class="nav-menu-item" onclick="window.location.href='library.html'"><i class="ti ti-language"></i>Library</button>
+  <button class="nav-menu-item" onclick="window.location.href='interests.html'"><i class="ti ti-chart-radar"></i>Interests</button>
+  <button class="nav-menu-item" onclick="toggleFS();closeNavMenu()"><i class="ti ti-maximize"></i>Fullscreen</button>
+  <button class="nav-menu-item" onclick="window.location.href='index.html'"><i class="ti ti-home"></i>Back to app</button>
+</div>
+
+<div id="page-wrap">
+
+  <div class="page-name-tag">
+    <span class="nm-heading">
+      <span class="nm-celestial">Antares</span><span class="nm-paren">(Conflicts)</span>
+      <button class="nm-info-btn" onclick="openNaming()" title="Why Antares?" aria-label="Why is this section named Antares?"><i class="ti ti-info-circle"></i></button>
+    </span>
+  </div>
+
+  <h1 class="title">Major World Conflicts</h1>
+  <p class="subtitle">From the World Wars to the present Iran–US war — a chronological, causal account of regions, causes, outcomes, and consequences.</p>
+  <p class="lede">Twenty-four conflicts, almost all of them part of one continuous chain of consequence — only the Falklands War stands apart. Pick an entry below to see who was drawn in, then trace how each war fed the next in the flowchart underneath.</p>
+
+  <!-- ============ GLOBE + PICKER ============ -->
+  <div class="section">
+    <div class="section-eyebrow">01 — Regions Affected</div>
+    <div class="section-title">Explore on the globe</div>
+    <p class="section-desc">Select a conflict to rotate the globe to its region and light up every country drawn into it. Drag the globe to look around; colors mark each side's role.</p>
+
+    <div class="globe-module">
+      <div class="globe-stage">
+        <svg id="globe-svg" viewBox="0 0 460 460"></svg>
+        <div class="globe-loading" id="globe-loading">Loading world data…</div>
+        <div class="globe-hint">Drag to rotate · tap a conflict to jump</div>
+        <div class="legend" id="legend"></div>
+      </div>
+
+      <div>
+        <div class="picker-scroll" id="picker"></div>
+        <div class="info-card" id="info-card"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FLOWCHART ============ -->
+  <div class="section">
+    <div class="section-eyebrow">02 — Cause &amp; Effect</div>
+    <div class="section-title">How these events caused one another</div>
+    <p class="flow-note">A branching map, not a single line — most events have more than one downstream consequence, and several later events (September 11, or Iran's 2025–2026 wars) are the product of two or more threads converging at once. Dotted arrows mark longer-range, indirect influence rather than immediate causation.</p>
+    <button class="flow-trigger" id="flow-trigger" onclick="openFlowchart()">
+      <span class="flow-trigger-icon"><i class="ti ti-sitemap"></i></span>
+      <span class="flow-trigger-text">
+        <div class="flow-trigger-title">View the full flowchart</div>
+        <div class="flow-trigger-sub">Opens fullscreen — 24 conflicts, one branching chain</div>
+      </span>
+      <span class="flow-trigger-arrow"><i class="ti ti-arrows-maximize"></i></span>
+    </button>
+  </div>
+
+  <!-- fullscreen flowchart overlay -->
+  <div class="flow-overlay" id="flow-overlay">
+    <div class="flow-overlay-bar">
+      <span class="flow-overlay-title">02 — Cause &amp; Effect · How these events caused one another</span>
+      <button class="flow-overlay-close" onclick="closeFlowchart()"><i class="ti ti-x"></i> Close</button>
+    </div>
+    <div class="flow-overlay-body">
+      <div class="flow-wrap">
+      <div class="mermaid" id="conflict-flowchart"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- flowchart node detail modal (centered) -->
+  <div class="flow-node-modal-bg" id="flow-node-modal-bg" onclick="if(event.target===this)closeFlowNode()">
+    <div class="flow-node-modal" id="flow-node-modal-content"></div>
+  </div>
+
+  <!-- ============ SUMMARY ============ -->
+  <div class="section">
+    <div class="section-eyebrow">03 — Summary</div>
+    <div class="section-title">The unfinished business of history</div>
+    <p class="summary-box">The punitive peace after WWI incubated WWII. WWII's aftermath produced the Cold War and decolonization. Decolonization produced both the partition of India — source of a Kashmir dispute that still triggers wars between two nuclear powers — and Israel's founding amid the Middle East's colonially-drawn borders. The Cold War's Afghan proxy war armed the movements behind 9/11; the response in Iraq handed Iran a regional foothold used for two decades, built through Hezbollah, Hamas, and allied militias — the machinery behind October 7. That war's aftermath left Iran weak enough that Israel and the US judged direct war winnable in 2025 and 2026. In January 2026, that same appetite for direct unilateral action reached the Western Hemisphere, when a two-hour US raid ended thirteen years of Maduro rule in Venezuela. Each conflict didn't just end a problem — it created the conditions for the next one.</p>
+  </div>
+
+  <footer class="page-footer">
+    <span>Compiled July 2026</span>
+    <a href="index.html"><i class="ti ti-arrow-left"></i> Back to Canopus</a>
+  </footer>
+</div>
+
+<!-- naming modal -->
+<div class="nm-modal-bg" id="nm-modal-bg" onclick="if(event.target===this)closeNaming()">
+  <div class="nm-modal">
+    <button class="nm-modal-close" onclick="closeNaming()"><i class="ti ti-x"></i></button>
+    <div class="nm-modal-heading"><span style="color:var(--accent)">Antares</span> <span style="opacity:.5;font-size:.7em">(Conflicts)</span></div>
+    <div class="nm-modal-assoc">Jyeshtha Nakshatra</div>
+    <div class="nm-modal-text">Antares is Scorpius's fiery red heart, and in Hindu astronomy it anchors Jyeshtha — "the eldest" — the nakshatra of seniority, protection, and hard-won authority, ruled by Indra, king of the gods and wielder of the thunderbolt against chaos. Conflicts is named <strong>Antares</strong> because every war mapped here is guarded ground fought over by rival claims to seniority and protection — each one, in some real sense, the unfinished business of the one before it.</div>
+  </div>
+</div>
+
+<script src="tracker.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+/* ============ THEME SYNC (matches Canopus) ============ */
+function currentAccentHex(){
+  var m={white:'#fff',blue:'#5a9fd4',green:'#4a9a6a',amber:'#c9952a'};
+  var a=document.body.dataset.accent||'white';
+  if(document.body.classList.contains('light')&&a==='white')return '#111';
+  return m[a]||'#fff';
+}
+
+/* ============ NAMING MODAL ============ */
+function openNaming(){document.getElementById('nm-modal-bg').classList.add('open');}
+function closeNaming(){document.getElementById('nm-modal-bg').classList.remove('open');}
+
+/* ============ NAV: more menu, fullscreen, click-outside ============ */
+function toggleNavMenu(e){
+  if(e)e.stopPropagation();
+  document.getElementById('navMenuPop').classList.toggle('open');
+  closeAccentPicker();
+}
+function closeNavMenu(){
+  document.getElementById('navMenuPop').classList.remove('open');
+}
+function toggleFS(){
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+document.addEventListener('click', function(e){
+  var menuPop=document.getElementById('navMenuPop');
+  var menuBtn=document.getElementById('navMoreBtn');
+  if(menuPop&&!menuPop.contains(e.target)&&menuBtn&&!menuBtn.contains(e.target))closeNavMenu();
+  var accentPop=document.getElementById('navAccentPop');
+  var accentBtn=document.getElementById('accent-picker-btn');
+  if(accentPop&&!accentPop.contains(e.target)&&accentBtn&&!accentBtn.contains(e.target))closeAccentPicker();
+});
+
+/* ============ NAV: theme & accent (shared prefs with index.html via localStorage) ============ */
+var THEME_KEY='dayplan_theme';
+var ACCENT_KEY='dayplan_accent';
+var SURFACE_KEY='dayplan_surface';
+var APP_SURFACES=['black','grey'];
+var appSurface='black';
+var APP_ACCENTS=['white','blue','green','amber','pink'];
+var appTheme='dark';
+var appAccent='white';
+function saveAppPreferences(){
+  try{
+    localStorage.setItem(THEME_KEY,appTheme);
+    localStorage.setItem(ACCENT_KEY,appAccent);
+    localStorage.setItem(SURFACE_KEY,appSurface);
+  }catch(e){}
+}
+function updateAccentSwatches(){
+  document.querySelectorAll('.accent-swatch').forEach(function(s){
+    s.classList.toggle('active',s.dataset.accent===appAccent);
+  });
+  document.querySelectorAll('.surface-swatch').forEach(function(s){
+    var isActive=(appTheme==='light'&&s.dataset.surface==='white')||(appTheme==='dark'&&s.dataset.surface===appSurface);
+    s.classList.toggle('active',isActive);
+  });
+}
+function applyAppPreferences(){
+  document.body.classList.toggle('light',appTheme==='light');
+  document.body.classList.toggle('grey',appTheme==='dark'&&appSurface==='grey');
+  document.body.dataset.accent=appAccent;
+  var icon=appTheme==='dark'?'<i class="ti ti-sun"></i>':'<i class="ti ti-moon"></i>';
+  document.querySelectorAll('[onclick="toggleAppTheme()"]').forEach(function(b){b.innerHTML=icon;});
+  updateAccentSwatches();
+  styleGlobe(); drawLand();
+}
+function loadAppPreferences(){
+  try{
+    var t=localStorage.getItem(THEME_KEY);
+    var a=localStorage.getItem(ACCENT_KEY);
+    var s=localStorage.getItem(SURFACE_KEY);
+    if(t==='light'||t==='dark') appTheme=t;
+    if(a&&APP_ACCENTS.indexOf(a)>=0) appAccent=a;
+    if(s&&APP_SURFACES.indexOf(s)>=0) appSurface=s;
+  }catch(e){}
+  applyAppPreferences();
+}
+function toggleAppTheme(){
+  appTheme=appTheme==='dark'?'light':'dark';
+  applyAppPreferences();
+  saveAppPreferences();
+}
+function setAppSurface(surface){
+  if(surface==='white'){
+    appTheme='light';
+  }else if(APP_SURFACES.indexOf(surface)>=0){
+    appTheme='dark';
+    appSurface=surface;
+  }else{
+    return;
+  }
+  applyAppPreferences();
+  saveAppPreferences();
+  closeAccentPicker();
+}
+function setAppAccent(accent){
+  if(APP_ACCENTS.indexOf(accent)<0) return;
+  appAccent=accent;
+  applyAppPreferences();
+  saveAppPreferences();
+  closeAccentPicker();
+}
+function toggleAccentPicker(e){
+  e.stopPropagation();
+  var pop=document.getElementById('navAccentPop');
+  var open=pop.classList.toggle('open');
+  if(open) closeNavMenu();
+}
+function closeAccentPicker(){
+  document.getElementById('navAccentPop').classList.remove('open');
+}
+
+/* ============ FULLSCREEN FLOWCHART ============ */
+var flowRendered = false;
+var conflictFlowchartDef = [
+'flowchart TD',
+'    A(["World War I (1914-1918)<br/>Alliances, nationalism, imperial rivalry"]) --> B("Versailles Treaty +<br/>Ottoman collapse redraws Middle East")',
+'    B --> C("Rise of Fascism / Nazism<br/>Germany, Italy, Japan")',
+'    B --> D("Sykes-Picot borders create<br/>an unstable Middle East")',
+'    C --> E("World War II (1939-1945)")',
+'    E --> F("US and USSR emerge as superpowers<br/>Europe divided")',
+'    E --> G("Colonial empires collapse<br/>leads to decolonization")',
+'    F --> H("Cold War proxy wars<br/>Korea, Vietnam, Afghanistan, Cuba")',
+'    H --> J("Soviet-Afghan War (1979-89)<br/>arms mujahideen, future al-Qaeda")',
+'    H --> K("USSR collapses (1991)")',
+'    G --> IP1("1947: Partition of India")',
+'    IP1 --> IP2("India-Pakistan wars over Kashmir<br/>1947, 1965, 1971, 1999, 2019, 2025")',
+'    G --> I("1948: British Mandate ends<br/>Israel founded, Arab-Israeli wars")',
+'    I --> L("Israeli-Palestinian conflict<br/>persists and escalates")',
+'    D --> M("1979: Iranian Revolution")',
+'    M --> N("Iran-Iraq War (1980-88)<br/>deterrence-by-proxy doctrine")',
+'    N --> O("Gulf War (1990-91)<br/>US troops based in Saudi Arabia")',
+'    O --> P("al-Qaeda radicalization<br/>vs US presence in the Gulf")',
+'    J --> P',
+'    P --> Q("9/11 Attacks (2001)")',
+'    Q --> R("War in Afghanistan (2001-2021)")',
+'    Q --> S("Iraq War (2003)<br/>Saddam toppled")',
+'    S --> T("Iran gains influence in Iraq")',
+'    S --> U("Power vacuum, rise of ISIS")',
+'    L --> V("Iran arms Hezbollah, Hamas,<br/>Houthis, Iraqi militias")',
+'    T --> V',
+'    Arab("Arab Spring (2010-12)") --> Syria("Syrian Civil War (2011-2024)")',
+'    Syria --> U',
+'    Syria --> W("Iran / Russia back Assad<br/>Syria = supply corridor to Hezbollah")',
+'    V --> X("Oct 7 2023: Hamas attacks Israel")',
+'    X --> Y("War widens: Hezbollah, Houthis,<br/>Iraqi militias join")',
+'    Y --> Z("2024: Israel weakens Hezbollah,<br/>trades direct strikes with Iran")',
+'    W --> AA("Dec 2024: Assad falls")',
+'    Z --> AB("Iran regional network weakened")',
+'    AA --> AB',
+'    AB --> AC("June 2025: Twelve-Day War<br/>Israel and US strike Iran nuclear sites")',
+'    AC --> AD("Sanctions and currency collapse<br/>Dec 2025 Iranian protests")',
+'    AD --> AE("Feb 2026: US and Israel strike Iran<br/>Khamenei killed")',
+'    AE --> AF("Iran retaliates region-wide<br/>Hormuz blocked, Lebanon reignites")',
+'    AF --> AG("April 2026: fragile ceasefire")',
+'    AG --> AH("June 2026: US-Iran MoU signed")',
+'    AH --> AI(["July 2026: ceasefire collapses again<br/>ongoing, unresolved"])',
+'    K -.->|"post-Cold War power vacuum"| M',
+'    R -.->|"drains US resources/attention"| S',
+'    H -.->|"long-running US-Cuba/Venezuela tension"| VZ(["Jan 2026: Venezuela Liberation<br/>US captures Maduro"])',
+'',
+'    E --> CN("Chinese Civil War resumes (1946-49)<br/>Communists defeat the Nationalists")',
+'    CN --> KOR("Korean War (1950-53)<br/>China intervenes, ends in DMZ stalemate")',
+'    H --> KOR',
+'    H --> VN("Vietnam War (1955-75)<br/>Domino theory, North reunifies the country")',
+'    KOR -.->|"template for proxy containment"| VN',
+'    VN --> KHM("1975: Khmer Rouge takes power<br/>in Cambodia")',
+'',
+'    FLK(["Falklands War (1982)<br/>UK vs Argentina over the islands"])',
+'',
+'    G --> RW("1994: Rwandan Genocide<br/>~800,000 killed in 100 days")',
+'    RW --> CG("Congo Wars (1996-2003)<br/>nine nations drawn in, 3-5M dead")',
+'',
+'    K --> YU("Yugoslav Wars (1991-2001)<br/>Breakup along ethnic lines, Srebrenica, Kosovo")',
+'',
+'    G --> SL("Sri Lankan Civil War (1983-2009)<br/>Tamil Tigers vs the state")',
+'',
+'    classDef origin fill:#2a2213,stroke:#c9952a,color:#f3e2b0,stroke-width:1.5px;',
+'    classDef coldwar fill:#152230,stroke:#5a9fd4,color:#cfe7f8,stroke-width:1.5px;',
+'    classDef southasia fill:#122a1e,stroke:#4a9a6a,color:#cdeedc,stroke-width:1.5px;',
+'    classDef mideast fill:#301c10,stroke:#d1793a,color:#f7dcc0,stroke-width:1.5px;',
+'    classDef israelpal fill:#301526,stroke:#e0629c,color:#f9d2e3,stroke-width:1.5px;',
+'    classDef post911 fill:#2c1414,stroke:#c25454,color:#f6d1d1,stroke-width:1.5px;',
+'    classDef modern fill:#1f1830,stroke:#9370d8,color:#e0d3f9,stroke-width:1.5px;',
+'    classDef venezuela fill:#0d2b28,stroke:#3ec9bd,color:#c9f4ef,stroke-width:1.5px;',
+'    classDef civilwar fill:#3d0f0f,stroke:#8b1a1a,color:#f2b8b8,stroke-width:1.5px;',
+'    classDef proxyext fill:#12281f,stroke:#2e6b2e,color:#c8e6c9,stroke-width:1.5px;',
+'    classDef unresolved fill:#1a1a1a,stroke:#5a5a5a,color:#cccccc,stroke-width:1.5px;',
+'    classDef legacy fill:#2e1c0a,stroke:#a06a2e,color:#e8caa0,stroke-width:1.5px;',
+'',
+'    class A,B,C,E origin',
+'    class F,G,H,J,K coldwar',
+'    class IP1,IP2 southasia',
+'    class D,M,N,O,P mideast',
+'    class I,L,X,Y,Z israelpal',
+'    class Q,R,S,U post911',
+'    class T,V,Arab,Syria,W,AA,AB,AC,AD,AE,AF,AG,AH,AI modern',
+'    class VZ venezuela',
+'    class CN,RW civilwar',
+'    class KOR,VN proxyext',
+'    class KHM,CG,FLK unresolved',
+'    class YU,SL legacy'
+].join('\n');
+
+function flowEsc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+function flowNodeText(el){
+  var tspans = el.querySelectorAll('tspan');
+  var lines = [];
+  if(tspans.length){
+    tspans.forEach(function(t){ var s=t.textContent.trim(); if(s) lines.push(s); });
+  } else {
+    var raw = (el.textContent||'').trim();
+    if(raw) lines.push(raw);
+  }
+  return lines.join(' ');
+}
+function bindFlowNodeClicks(){
+  var nodes = document.querySelectorAll('#conflict-flowchart .node');
+  nodes.forEach(function(n){
+    n.addEventListener('click', function(){
+      openFlowNode(flowNodeText(n));
+    });
+  });
+}
+function openFlowNode(text){
+  if(!text) return;
+  document.getElementById('flow-node-modal-content').innerHTML =
+    '<button class="flow-node-modal-close" onclick="closeFlowNode()"><i class="ti ti-x"></i></button>'+
+    '<div class="flow-node-modal-text">'+flowEsc(text)+'</div>';
+  document.getElementById('flow-node-modal-bg').classList.add('open');
+}
+function closeFlowNode(){ document.getElementById('flow-node-modal-bg').classList.remove('open'); }
+
+function openFlowchart(){
+  document.getElementById('flow-overlay').classList.add('open');
+  document.documentElement.classList.add('flow-lock');
+  if(!flowRendered){
+    flowRendered = true;
+    var doRender = function(){
+      mermaid.render('conflict-flowchart-svg', conflictFlowchartDef).then(function(result){
+        document.getElementById('conflict-flowchart').innerHTML = result.svg;
+        if(result.bindFunctions) result.bindFunctions(document.getElementById('conflict-flowchart'));
+        bindFlowNodeClicks();
+      }).catch(function(err){
+        console.error('Mermaid render error:', err);
+        document.getElementById('conflict-flowchart').textContent = 'Could not render flowchart.';
+      });
+    };
+    if(document.fonts && document.fonts.ready){
+      document.fonts.ready.then(doRender);
+    } else {
+      doRender();
+    }
+  }
+  if(window.CanopusTrack) CanopusTrack.event('article','conflicts-flowchart','Conflicts flowchart');
+}
+function closeFlowchart(){
+  document.getElementById('flow-overlay').classList.remove('open');
+  document.documentElement.classList.remove('flow-lock');
+  closeFlowNode();
+}
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){
+    if(document.getElementById('flow-node-modal-bg').classList.contains('open')){ closeFlowNode(); return; }
+    if(document.getElementById('flow-overlay').classList.contains('open')) closeFlowchart();
+  }
+});
+
+/* ============ CONFLICT DATA ============ */
+var ROLE_COLOR = { a:'#d9534f', b:'#5a9fd4', c:'#c9952a', x:'#4dd0e1' };
+var ROLE_LABEL = { a:'Primary belligerent', b:'Opposing side / ally', c:'Drawn in / affected' };
+
+var CONFLICTS = [
+{ num:1, id:'ww1', title:'World War I', years:'1914–1918', target:[15,50],
+  regions:'Europe (primarily), the Middle East (Ottoman fronts), Africa (colonial theaters), and indirectly the whole world through colonial empires.',
+  blurb:'A regional assassination in Sarajevo detonated a continent-wide war within a week, because a tangle of alliances meant no major power could stay out once the first shot was fired. Over a million troops of the British Indian Army fought overseas for the Entente, from the Western Front to Mesopotamia and Gallipoli.',
+  causes:['Rival alliance blocs (Entente vs. Central Powers)','Balkan nationalism and imperial rivalry','An arms race and deep militarism','Assassination of Archduke Franz Ferdinand, June 1914'],
+  moments:[
+    {t:'The July Crisis: one assassination becomes a world war', x:'After Archduke Franz Ferdinand was assassinated in Sarajevo on June 28, 1914, Austria-Hungary issued Serbia a deliberately harsh ultimatum on July 23 with a 48-hour deadline. Serbia accepted nearly all the terms but balked at letting Austro-Hungarian officials investigate on its own soil — Austria-Hungary judged this insufficient and declared war on July 28, shelling Belgrade the next day. Russia, bound by a defense pact with Serbia, ordered general mobilization on July 30. Germany, treaty-bound to Austria-Hungary, declared war on Russia on August 1 and on France on August 3, activating the Schlieffen Plan through neutral Belgium. Germany\'s invasion of Belgium on August 4 violated an 1839 treaty Britain had co-signed, and Britain declared war on Germany that same day. Within roughly a week, a Balkan dispute had pulled in Russia, Germany, France, and Britain — and their colonial empires — because the tangle of alliances meant to deter aggression instead guaranteed no power could stay out once the first shot was fired.'}
+  ],
+  outcome:'An estimated 16–20 million people died. The Treaty of Versailles (1919) imposed harsh reparations, territorial losses, and a humiliating "war guilt" clause on Germany. The Ottoman and Austro-Hungarian empires collapsed entirely, redrawing the Middle East and Central Europe. The League of Nations was created but lacked real enforcement power, and Russia exited the war after the 1917 Bolshevik Revolution, founding what became the Soviet Union.',
+  forward:'The punitive Versailles terms crushed Germany\'s economy and fed the resentment Hitler and the Nazi Party later exploited. The dismantling of the Ottoman Empire led Britain and France to carve up the Middle East under Sykes-Picot, creating artificial borders — Iraq, Syria, Lebanon, Jordan, Palestine — whose instability still drives conflict today. The Bolshevik Revolution set up the ideological rivalry that would define the twentieth century.',
+  countries:[
+    {c:'276',r:'a'},{c:'040',r:'a'},{c:'348',r:'a'},{c:'792',r:'a'},
+    {c:'250',r:'b'},{c:'826',r:'b'},{c:'643',r:'b'},{c:'688',r:'b'},{c:'380',r:'b'},{c:'056',r:'b'},{c:'356',r:'b'},
+    {c:'840',r:'c'}
+  ]},
+{ num:2, id:'interwar', title:'Interwar Period & Rise of Fascism', years:'1918–1939', target:[20,42],
+  regions:'Germany, Italy, Japan, Spain, and by extension the colonial world.',
+  blurb:'Economic devastation and disillusionment with democracy let expansionist ideologies take hold in Germany, Italy, and Japan, while appeasement failed to stop them.',
+  causes:['Economic devastation, worsened by the Great Depression','A fragile Weimar Republic','Disillusionment with liberal democracy','Expansionist ideologies: Nazism, Fascism, militarism'],
+  moments:[
+    {t:'Munich and the failure of appeasement (Sept 1938)', x:'Hoping to avoid another war, Britain\'s Neville Chamberlain and France\'s Édouard Daladier met Hitler and Mussolini in Munich and let Germany annex the Sudetenland without consulting Czechoslovakia. Chamberlain returned home declaring he had secured "peace for our time." Six months later, in March 1939, Hitler broke the agreement and occupied the rest of Czechoslovakia, convincing Britain and France that further German expansion had to be met with force.'},
+    {t:'The Danzig pretext and the Molotov-Ribbentrop Pact', x:'Hitler next demanded the return of the Free City of Danzig and a corridor through Poland to East Prussia. Britain guaranteed Poland\'s independence, and to deter Soviet involvement on Poland\'s side, Germany and the USSR shocked the world on August 23, 1939 by signing a non-aggression pact with a secret protocol dividing Poland and Eastern Europe into German and Soviet spheres.'},
+    {t:'Operation Himmler: the false-flag trigger', x:'On the night of August 31, 1939, German SS operatives staged a fake Polish attack on a German radio station at Gleiwitz, dressing drugged concentration-camp prisoners in Polish uniforms and leaving them dead at the scene. This and similar staged incidents gave Hitler a fabricated pretext for war.'},
+    {t:'Fall Weiss: the invasion of Poland (Sept 1, 1939)', x:'At dawn on September 1, Germany invaded Poland from the north, west, and south without a formal declaration, combining fast tank divisions, motorized infantry, and dive-bombers in a new style of warfare that became known as blitzkrieg. The USSR invaded from the east on September 17 under the secret pact, and Poland was partitioned between the two powers within weeks; Warsaw fell by September 27–28. Britain and France, honoring their guarantee to Poland, declared war on Germany on September 3, 1939, formally starting the Second World War — though large-scale fighting on the Western Front did not begin for months, a lull nicknamed the "Phoney War."'}
+  ],
+  outcome:'Hitler rose to power in 1933, rapidly rearmed Germany in violation of Versailles, and expanded into the Rhineland, Austria, and the Sudetenland. Mussolini invaded Ethiopia in 1935; Japan invaded Manchuria in 1931 and then China in 1937. The policy of appeasement, most notably the 1938 Munich Agreement, failed to stop Hitler, who invaded Poland in September 1939.',
+  forward:'Poland\'s invasion triggered British and French declarations of war on Germany — the start of the Second World War.',
+  countries:[ {c:'276',r:'a'},{c:'380',r:'a'},{c:'392',r:'a'}, {c:'231',r:'c'},{c:'156',r:'c'},{c:'724',r:'c'} ]},
+{ num:3, id:'chinese-civil-war', title:'The Chinese Civil War', years:'1927–1949', target:[104,35],
+  regions:'China, with spillover influence across East Asia.',
+  blurb:'A decades-long struggle between the Nationalist KMT and the Communist Party resumed the moment Japan surrendered in 1945, ending four years later with a Communist victory that reshaped the balance of power in Asia overnight.',
+  causes:['A violent 1927 split between the Nationalist KMT and the Communist Party','Deep rural inequality and warlordism the Communists exploited for peasant support','A wartime truce during the 1937–45 Japanese invasion that collapsed the moment Japan surrendered','US backing for the Nationalists versus Soviet support for the Communists in Manchuria'],
+  moments:[
+    {t:'Civil war resumes and the Communists sweep the mainland (1946–49)', x:'Fighting resumed almost immediately after Japan\'s 1945 defeat, and despite US-brokered mediation attempts, full-scale war broke out by 1946. The Communists, benefiting from strong rural organization, land-reform promises, and Nationalist corruption and hyperinflation that alienated much of the population, steadily gained ground. Mao proclaimed the People\'s Republic of China on October 1, 1949, after taking Beijing and sweeping through the mainland; Chiang Kai-shek and the Nationalist remnant fled to Taiwan, where they maintained a rival government — a division between Beijing and Taipei that remains unresolved today.'}
+  ],
+  outcome:'A Communist-run China aligned with the Soviet Union reshaped the balance of power in Asia overnight, alarming Washington and hardening US Cold War containment policy across the Pacific.',
+  forward:'Within a year, Chinese backing for North Korea\'s Kim Il-sung, and Mao\'s willingness to intervene directly once US-led forces neared the Chinese border, turned a Korean civil war into a much larger conflict.',
+  countries:[ {c:'156',r:'a'},{c:'840',r:'c'},{c:'643',r:'c'} ]},
+{ num:4, id:'ww2', title:'World War II', years:'1939–1945', target:[20,45],
+  regions:'Nearly global — Europe, North Africa, East Asia, the Pacific, and the Atlantic, plus the Soviet Union.',
+  blurb:'The deadliest conflict in history, pitting the Axis powers against a global Allied coalition and ending with two new superpowers and the collapse of colonial empires. Roughly 2.5 million soldiers of the British Indian Army — the largest all-volunteer force in history — fought for the Allies across North Africa, Italy, and the Burma campaign against Japan.',
+  causes:['Nazi and Fascist expansionism','The staged Gleiwitz incident and invasion of Poland','Failed appeasement policy','Japanese expansion in Asia and the Pacific'],
+  moments:[
+    {t:'Pearl Harbor (Dec 7, 1941)', x:'Seeking to knock out US naval power before seizing resource-rich Southeast Asia, Japan launched a surprise carrier-based air raid on the US Pacific Fleet at Pearl Harbor using more than 350 aircraft in two waves. The attack sank or damaged eight battleships and killed roughly 2,400 Americans, but missed the US aircraft carriers, which were at sea. The US declared war on Japan the next day; Germany and Italy then honored their alliance with Japan and declared war on the US, bringing America fully into both the European and Pacific theaters.'},
+    {t:'D-Day (June 6, 1944)', x:'To open a decisive second front in Western Europe, the Western Allies launched Operation Overlord, landing roughly 156,000 troops across five Normandy beaches (Utah, Omaha, Gold, Juno, Sword) in a single day, backed by naval bombardment, overnight airborne drops, and a deception campaign (Operation Fortitude) that convinced German commanders the real invasion would come further north at Calais. Despite heavy casualties, especially at Omaha Beach, the Allies secured a foothold and broke out of Normandy within weeks.'},
+    {t:'Hiroshima and Nagasaki (Aug 6 and 9, 1945)', x:'After Germany surrendered in May 1945, Japan fought on despite a deteriorating position. To force an end without a costly invasion of the home islands, the US dropped an atomic bomb on Hiroshima on August 6, killing tens of thousands instantly, and a second on Nagasaki on August 9. The Soviet Union also declared war on Japan and invaded Manchuria on August 8. Japan announced its surrender on August 15, 1945, formally signed on September 2, ending the war.'}
+  ],
+  outcome:'An estimated 70–85 million deaths occurred, including the Holocaust, in which Nazi Germany systematically murdered six million Jews and millions of others. Germany and Japan were occupied and rebuilt under Allied administration, the United Nations was founded in 1945 to replace the League of Nations, and Europe split into Western (US-aligned) and Eastern (Soviet-aligned) spheres, formalized by the Iron Curtain. The war catastrophically weakened the European colonial powers, accelerating decolonization across Asia and Africa.',
+  forward:'The wartime alliance between the US and USSR collapsed into ideological rivalry almost immediately, producing the Cold War. The weakening of Britain and France triggered the collapse of empires, including the 1947 partition of British India and the 1948 end of the British Mandate for Palestine — both of which directly produced conflicts (the India-Pakistan wars, and the Arab-Israeli conflict) that still shape the world today.',
+  countries:[ {c:'276',r:'a'},{c:'380',r:'a'},{c:'392',r:'a'}, {c:'840',r:'b'},{c:'826',r:'b'},{c:'643',r:'b'},{c:'250',r:'b'},{c:'156',r:'b'},{c:'356',r:'b'}, {c:'616',r:'c'} ]},
+{ num:5, id:'coldwar', title:"The Cold War & Its Proxy Wars", years:'1947–1991', target:[50,25],
+  regions:'Korea, Vietnam, Cuba, Afghanistan, Latin America, Africa — essentially a global ideological battlefield.',
+  blurb:'Rather than fight directly, the US and USSR waged their rivalry through proxy conflicts across Asia and the Americas for over four decades.',
+  causes:['Ideological rivalry between capitalism and communism','Nuclear deterrence between two superpowers','Competing spheres of influence after WWII'],
+  moments:[
+    {t:'Korean War (1950–1953)', x:'Before dawn on June 25, 1950, North Korean troops backed by Soviet tanks and artillery crossed the 38th parallel in a coordinated assault and captured Seoul within days. With the Soviet delegate boycotting the UN Security Council, the US led a multinational force under General MacArthur. A daring amphibious landing at Inchon in September 1950 reversed the tide, but China\'s entry that November pushed the front back to roughly the original line, where it stalemated for two more years until the 1953 armistice. Korea remains divided today.'},
+    {t:'Cuban Missile Crisis (1962)', x:'A US U-2 spy plane photographed Soviet nuclear-missile sites under construction in Cuba in October 1962, just 90 miles from Florida. Rather than strike or invade, President Kennedy announced a naval "quarantine" on October 22. Over 13 tense days, with US forces at their highest alert short of war, Soviet leader Khrushchev agreed to remove the missiles in exchange for a public US pledge not to invade Cuba and a secret agreement to remove US missiles from Turkey.'},
+    {t:'Vietnam War (1955–1975)', x:'Direct large-scale US involvement escalated after the August 1964 Gulf of Tonkin incident, in which US destroyers reported an attack later shown to be partly based on faulty intelligence. Congress\'s Gulf of Tonkin Resolution gave President Johnson broad authority to expand the war without a formal declaration; US ground troops arrived in large numbers in 1965. The war ended in American withdrawal in 1973 and communist victory in 1975 — a major blow to US Cold War credibility.'},
+    {t:'Soviet-Afghan War (1979–1989)', x:'On December 24–27, 1979, Soviet airborne troops seized Kabul\'s airport, and special forces stormed the presidential palace in Operation Storm-333, killing Afghan leader Hafizullah Amin and installing a more pliant government. What Moscow expected as a short stabilization operation triggered a nationwide insurgency; the CIA\'s Operation Cyclone funneled billions of dollars in weapons — including Stinger missiles that neutralized Soviet air superiority after 1986 — to mujahideen fighters through Pakistan\'s intelligence service. The Soviets withdrew in defeat in 1989.'}
+  ],
+  outcome:'The Soviet-Afghan War armed the mujahideen networks that fed into al-Qaeda. Economic stagnation, the costly Afghan war, and reform movements (glasnost and perestroika) led to the USSR\'s collapse in 1991, ending the Cold War and leaving the US as the sole superpower.',
+  forward:'The Cold War\'s end also removed the stabilizing superpower patronage that had propped up many Middle Eastern, South Asian, and African regimes, contributing to later regional instability — including in the newly nuclear-armed subcontinent of India and Pakistan.',
+  countries:[ {c:'840',r:'b'},{c:'643',r:'a'}, {c:'408',r:'c'},{c:'410',r:'c'},{c:'704',r:'c'},{c:'004',r:'c'},{c:'192',r:'c'} ]},
+{ num:6, id:'india', title:"India's Wars: Partition to the Present", years:'1947–2025', target:[72,28],
+  regions:'The Indian subcontinent — India, Pakistan, Bangladesh (formerly East Pakistan), the disputed Jammu & Kashmir region, and the Himalayan frontier with China.',
+  blurb:'Britain\'s abrupt 1947 withdrawal from India split the subcontinent into India and Pakistan along religious lines, triggering one of the largest mass migrations in history and communal violence that killed an estimated one to two million people. The princely state of Jammu & Kashmir, with a Muslim-majority population but a Hindu ruler, acceded to India under contested circumstances — planting the seed of a dispute that has driven most Indo-Pakistani wars since.',
+  causes:['1947 partition of British India along religious lines','Unresolved sovereignty over Kashmir','Recurring border skirmishes and cross-border militancy'],
+  moments:[
+    {t:'First Kashmir War (1947–48)', x:'Pakistani tribal militias, later backed by the Pakistani army, invaded Kashmir shortly after Partition; the Maharaja of Kashmir acceded to India in exchange for military assistance. A UN-brokered ceasefire in 1949 established the Line of Control dividing Kashmir between Indian- and Pakistani-administered portions — a division that remains in place today and has never been resolved by a final settlement.'},
+    {t:'Sino-Indian War (1962)', x:'An unresolved and poorly demarcated Himalayan border (the McMahon Line), India\'s assertive forward-deployment policy, and India granting asylum to the Dalai Lama after Tibet\'s 1959 uprising enraged China. China inflicted a swift and humiliating defeat on Indian forces before declaring a unilateral ceasefire and withdrawing to pre-war positions. The war deeply shocked India, prompting a massive expansion and modernization of its military and a long-lasting distrust of China that persists in border stand-offs to this day.'},
+    {t:'Second Kashmir War (1965)', x:'Pakistan launched covert infiltration (Operation Gibraltar) into Indian-administered Kashmir, hoping to spark a local uprising; India responded with a full conventional counter-offensive across the international border. The war ended in a military stalemate after major tank battles; the Soviet-brokered Tashkent Agreement (1966) restored the pre-war status quo.'},
+    {t:'Bangladesh Liberation War (1971)', x:'West Pakistan\'s political and economic domination of East Pakistan, combined with a brutal crackdown (Operation Searchlight) on Bengali civilians after East Pakistan\'s Awami League won a 1970 election, triggered a mass refugee crisis into India. After months of India arming and sheltering the Bengali "Mukti Bahini" guerrilla movement, Pakistan attempted a preemptive strike, Operation Chengiz Khan, on the night of December 3, 1971, bombing eleven Indian airbases — modeled loosely on Israel\'s 1967 strike. Rather than crippling India\'s air force, it gave India public justification to formally enter a war it was already fighting covertly; Indian forces launched a rapid two-front campaign, driving deep into East Pakistan, and Dhaka fell just thirteen days later. Over 90,000 Pakistani troops surrendered — the largest surrender since World War II — and East Pakistan became the independent nation of Bangladesh.'},
+    {t:'Kargil War (1999)', x:'Pakistani soldiers and militants covertly occupied high-altitude Indian military posts in Kargil, exploiting their seasonal winter vacancy, shortly after both countries had openly tested nuclear weapons in 1998. Local shepherds first detected unfamiliar movement on the ridgelines in May 1999. India launched Operation Vijay, committing tens of thousands of troops to retake peaks above 16,000 feet — among the highest combat ever fought — using artillery and, for the first time in the Kashmir conflict, the Indian Air Force in a close-support role (Operation Safed Sagar). India recaptured the peaks after months of high-altitude combat, and US pressure forced Pakistan to withdraw — the first open military conflict between two declared nuclear powers.'},
+    {t:'The terrorism-era crises (2001–2019)', x:'A 2001 militant attack on the Indian Parliament, blamed on Pakistan-based groups, brought the two nations to the brink of war during a tense year-long standoff. The 2008 Mumbai attacks, carried out by the Pakistan-based group Lashkar-e-Taiba and killing over 160 people, further poisoned relations. After a 2016 attack on an army base in Uri, India conducted publicized "surgical strikes" across the Line of Control. A 2019 suicide bombing in Pulwama that killed 40 Indian paramilitary personnel led India to strike an alleged militant camp inside Pakistan at Balakot — the first cross-border use of airpower by either country since 1971 — followed by a brief dogfight and the capture and release of an Indian pilot.'},
+    {t:'Operation Sindoor (2025)', x:'On April 22, 2025, militants killed 26 civilians, most of them Hindu tourists, at Pahalgam in Indian-administered Kashmir; India accused Pakistan-based Lashkar-e-Taiba and its front, The Resistance Front. On the night of May 6–7, 2025, India launched Operation Sindoor, a tri-service campaign of missile and drone strikes on alleged terrorist infrastructure in Pakistan and Pakistan-administered Kashmir, explicitly avoiding Pakistani military targets. Pakistan retaliated with Operation Bunyan-un-Marsoos, and the two sides fought an intense four-day exchange involving fighter jets, drones, cruise missiles, and artillery — including the first large-scale drone battle and the first combat use of India\'s S-400 air-defense system and BrahMos cruise missiles. A ceasefire was reached on May 10, 2025 after direct contact between the two militaries, with US officials mediating behind the scenes. India asserted a new doctrine that any future major terror attack traced to Pakistan would be treated as an act by the Pakistani state itself, inviting direct retaliation; Pakistan claimed to have shot down Indian aircraft using Chinese-made defense systems.'}
+  ],
+  outcome:'Wars in 1947–48, 1962, 1965, 1971, 1999, and 2025, plus repeated terrorism-driven crises in between — the Kashmir dispute remains unresolved and both nations are now nuclear powers. As of mid-2026 the 2025 ceasefire has held but relations remain deeply strained.',
+  forward:'The 2025 conflict marked a new, more assertive Indian doctrine of rapid, calibrated retaliation for terrorism — a template India\'s leadership has said will apply to any future attack. It also demonstrated, alongside other conflicts of this era, how modern regional crises increasingly involve drone warfare, precision missiles, and rapid US-mediated de-escalation, echoing patterns seen later in the 2026 Iran war.',
+  countries:[ {c:'356',r:'b'},{c:'586',r:'a'} ]},
+{ num:7, id:'israel-palestine', title:'The Israeli-Palestinian Conflict', years:'1948–Present', target:[35,31],
+  regions:'Israel, the West Bank, the Gaza Strip, and by extension the wider Middle East (Lebanon, Syria, Egypt, Jordan).',
+  blurb:'The end of the British Mandate and the founding of Israel triggered a cycle of war and displacement that has persisted and escalated for over seven decades.',
+  causes:['End of the British Mandate for Palestine, 1948','Competing national claims to the same land','Repeated regional Arab-Israeli wars'],
+  moments:[
+    {t:'The 1948 war', x:'David Ben-Gurion declared the State of Israel on May 14, 1948, the day the British Mandate formally expired. Within hours, the armies of Egypt, Jordan, Syria, Lebanon, and Iraq invaded from multiple directions, intending to prevent partition from taking effect. Despite being outnumbered, Israeli forces — better organized and increasingly well-armed, including with weapons smuggled from Czechoslovakia — held the invasion off and expanded their territory well beyond the UN partition lines by the time armistice agreements were signed in 1949. Roughly 700,000 Palestinians were displaced in what is known as the Nakba.'},
+    {t:'The Six-Day War (June 1967)', x:'Egypt\'s Gamal Abdel Nasser expelled UN peacekeepers from Sinai, remilitarized the peninsula, and blockaded the Straits of Tiran, cutting off Israeli shipping — an act Israel considered a casus belli. On the morning of June 5, 1967, Israel launched Operation Focus, a surprise strike destroying most of the Egyptian air force while it sat on the ground, then struck Jordan\'s and Syria\'s air forces too. With air superiority secured within hours, Israeli ground forces overran the Sinai Peninsula, the West Bank, East Jerusalem, and the Golan Heights in just six days, more than tripling the territory under Israeli control.'},
+    {t:'The Yom Kippur War (October 1973)', x:'On October 6, 1973 — Yom Kippur, Judaism\'s holiest day — Egypt and Syria launched a coordinated surprise attack to reclaim territory lost in 1967, catching Israeli intelligence off guard. Egyptian forces crossed the Suez Canal and breached Israel\'s fortified Bar Lev Line, while Syrian forces pushed into the Golan Heights. Israel, after suffering early losses and rushing a full mobilization, counterattacked on both fronts, crossing back over the Suez Canal into Egypt proper and pushing Syrian forces back before a UN-brokered ceasefire took hold later in October.'}
+  ],
+  outcome:'Egypt and Israel made peace in 1979; Jordan followed in 1994. The Oslo Accords of 1993 created limited Palestinian self-rule but did not resolve final-status issues such as borders, Jerusalem, refugees, and settlements. Gaza has since 2007 been controlled by Hamas, an Islamist militant group, while the West Bank is administered by the more moderate Palestinian Authority — a split that has weakened a unified Palestinian negotiating position.',
+  forward:'This conflict became the central grievance used by regional actors, including Iran, to justify their own military build-ups through what is often called the "Axis of Resistance" — Hezbollah in Lebanon, Hamas and Islamic Jihad in Gaza, the Houthis in Yemen, and Iraqi militias. It is the thread connecting almost every subsequent Middle Eastern conflict in this record, and it directly precipitated the October 7, 2023 Hamas attack and the Gaza war that reshaped the entire Iran-Israel-US confrontation.',
+  countries:[ {c:'376',r:'b'},{c:'275',r:'a'}, {c:'818',r:'c'},{c:'400',r:'c'},{c:'760',r:'c'},{c:'422',r:'c'} ]},
+{ num:8, id:'korean-war', title:'The Korean War', years:'1950–1953', target:[127,38],
+  regions:'The Korean Peninsula, with major US, Chinese, and Soviet involvement.',
+  blurb:'A Soviet-backed North Korean invasion of the US-backed South escalated into a major Cold War battlefield once China entered, ending in an armistice and a still-divided peninsula.',
+  causes:['Korea split at the 38th parallel after Japan\'s 1945 defeat','Both Korean governments claiming to be the legitimate government of the whole peninsula','Kim Il-sung\'s belief, with Stalin\'s approval and Mao\'s promised support, that a quick invasion could reunify Korea before the US responded'],
+  moments:[
+    {t:'Invasion, Inchon, and Chinese intervention', x:'North Korea invaded the South on June 25, 1950, rapidly overrunning most of the peninsula. With the Soviet Union boycotting the UN Security Council, the US led a multinational force under General Douglas MacArthur. A daring amphibious landing at Inchon in September 1950 cut off North Korean forces and let UN troops push deep into the North toward the Chinese border — until China, alarmed at a US-aligned force on its doorstep, entered the war that October with hundreds of thousands of troops, driving UN forces back and turning the war into a grinding stalemate near the original 38th parallel. An armistice was signed on July 27, 1953, establishing a demilitarized zone but no formal peace treaty — the two Koreas remain technically at war today.'}
+  ],
+  outcome:'Roughly 3 million people, mostly Korean civilians, died. The war cemented a permanent US military presence in South Korea and Japan and hardened the Cold War\'s Asian front.',
+  forward:'The war confirmed to US policymakers that Communist expansion would be met with force by proxy rather than direct superpower confrontation — a template applied at far greater cost in Vietnam.',
+  countries:[ {c:'408',r:'a'},{c:'410',r:'b'},{c:'840',r:'b'},{c:'156',r:'a'},{c:'643',r:'c'} ]},
+{ num:9, id:'vietnam-war', title:'The Vietnam War', years:'1955–1975', target:[106,16],
+  regions:'Vietnam, Laos, and Cambodia, with major US, Soviet, and Chinese involvement.',
+  blurb:'US "domino theory" logic drove a decades-long effort to prop up South Vietnam against a Communist insurgency backed by the North, ending in American withdrawal and Communist reunification of the country.',
+  causes:['Vietnam split after France\'s 1954 defeat at Dien Bien Phu into a Communist North and anti-Communist South','US "domino theory" fears that one country falling to communism would trigger its neighbors to follow','Corruption and unpopularity that undercut successive South Vietnamese governments\' own legitimacy'],
+  moments:[
+    {t:'Escalation, Tet, and withdrawal', x:'US involvement escalated from military advisors in the late 1950s to full combat troops after the disputed August 1964 Gulf of Tonkin incident, eventually peaking at over 500,000 American troops. The North\'s 1968 Tet Offensive, a coordinated surprise assault on cities across the South, was a military defeat for the Communists but a turning point in US public opinion, which increasingly saw the war as unwinnable. The US withdrew combat troops by 1973 under the Paris Peace Accords; North Vietnamese forces overran Saigon on April 30, 1975, reunifying the country under Communist rule.'}
+  ],
+  outcome:'The war killed an estimated 2–3 million people, including roughly 58,000 American service members, and spilled into neighboring Cambodia and Laos, where US bombing campaigns and civil war contributed to the conditions that let the Khmer Rouge seize power in Cambodia in 1975.',
+  forward:'Vietnam left the US public deeply wary of open-ended foreign interventions for a generation (the "Vietnam syndrome"), while the chaos in Cambodia opened the door to the Khmer Rouge\'s genocidal rule — and reinforced, for both Washington and Moscow, that Cold War rivalry would be fought through costly regional proxy wars rather than direct confrontation.',
+  countries:[ {c:'704',r:'a'},{c:'840',r:'b'},{c:'418',r:'c'},{c:'116',r:'c'},{c:'156',r:'c'},{c:'643',r:'c'} ]},
+{ num:10, id:'iran-iraq', title:'Iran: Revolution & the Iran-Iraq War', years:'1979–1988', target:[46,33],
+  regions:'Iran, Iraq, and the wider Persian Gulf.',
+  blurb:'The 1979 Iranian Revolution overthrew the Shah and installed a theocracy, which Iraq invaded the following year, starting an eight-year war.',
+  causes:['1979 overthrow of the Shah of Iran','Formation of an Islamist theocracy','Saddam Hussein\'s invasion of Iran in 1980'],
+  moments:[
+    {t:'The invasion (Sept 22, 1980)', x:'Iraqi aircraft struck Iranian airbases in a surprise attack modeled partly on Israel\'s 1967 opening move, followed the same day by a ground invasion into Iran\'s oil-rich, ethnically Arab province of Khuzestan. Saddam Hussein expected a swift victory while Iran\'s military was still disorganized from the revolution, and Iraq made rapid early gains, besieging the city of Khorramshahr. But Iran rallied through mass mobilization — including large numbers of ideologically driven volunteer Basij militia, some used in costly human-wave assaults — recaptured Khorramshahr in 1982, and pushed the front back into Iraqi territory.'},
+    {t:'The "War of the Cities" and chemical weapons', x:'From 1982 onward, with front lines largely stalemated, both sides settled into years of static, First World War-style trench warfare with human-wave infantry assaults, punctuated by periodic ballistic-missile and air bombardment of each other\'s capitals and civilian centers. Iraq made extensive, documented use of chemical weapons, including nerve and mustard gas, against Iranian troops and, in 1988, against Iraqi Kurdish civilians at Halabja.'},
+    {t:'The Tanker War and the end (1984–1988)', x:'Beginning around 1984, both sides attacked oil tankers and shipping in the Persian Gulf to strangle each other\'s exports, drawing in a US naval presence and leading to direct US-Iran naval clashes in 1987–88, including the accidental US shootdown of an Iranian civilian airliner in July 1988. By mid-1988, with Iraq recapturing lost ground using chemical weapons and both sides\' economies and militaries exhausted, Ayatollah Khomeini accepted a UN-brokered ceasefire in August 1988, famously describing the decision as "drinking a chalice of poison." The pre-war border was essentially restored.'}
+  ],
+  outcome:'Eight years of brutal trench warfare and chemical-weapons use killed an estimated 500,000 to 1 million people. Iran emerged deeply suspicious of both the West, which had backed Iraq, and its Sunni Arab neighbors, and committed to building asymmetric military capability, including missile programs and proxy militias, as insurance against future invasion.',
+  forward:'This war is the origin point of Iran\'s defense doctrine — deterrence through missiles, proxies, and eventually nuclear ambiguity — that shapes the 2025–2026 Iran war.',
+  countries:[ {c:'364',r:'a'},{c:'368',r:'b'} ]},
+{ num:11, id:'falklands', title:'The Falklands War', years:'1982', target:[-59,-51],
+  regions:'The Falkland Islands (South Atlantic), and the United Kingdom and Argentina.',
+  blurb:'Argentina\'s military junta seized the British-held Falkland Islands hoping to rally nationalist sentiment at home; Britain\'s naval task force retook them within weeks, hastening the junta\'s own collapse.',
+  causes:['A century-old sovereignty dispute over the Falklands (Malvinas)','Argentina\'s junta, facing economic collapse and unrest, gambling that a popular seizure would shore up its grip on power','A miscalculation that a distant Britain would not fight to defend a small, far-off territory'],
+  moments:[
+    {t:'Invasion and Britain\'s response', x:'Argentine forces invaded and occupied the Falklands on April 2, 1982. Britain, under Prime Minister Margaret Thatcher, dispatched a naval task force that sailed roughly 8,000 miles to retake the islands, and after weeks of naval, air, and ground combat, Argentine forces surrendered on June 14, 1982. Around 900 people died, the majority of them Argentine.'}
+  ],
+  outcome:'The defeat discredited Argentina\'s military junta, accelerating its collapse and the country\'s transition back to civilian democracy in 1983; in Britain, the victory considerably bolstered Thatcher\'s political standing.',
+  forward:'Unlike most conflicts in this record, the Falklands War did not set off a further chain of regional wars — it stands largely as its own episode, though it remains a live diplomatic irritant between the UK and Argentina and a case study in how domestic political weakness can push a government toward a war it ultimately cannot win.',
+  countries:[ {c:'032',r:'a'},{c:'826',r:'b'} ]},
+{ num:12, id:'sri-lanka', title:'The Sri Lankan Civil War', years:'1983–2009', target:[81,7],
+  regions:'Sri Lanka, primarily its northern and eastern provinces.',
+  blurb:'Decades of Sinhalese-majority policy marginalizing the Tamil minority fed a separatist insurgency that waged a 26-year war against the Sri Lankan state, ending in a bloody final offensive in 2009.',
+  causes:['British colonial administration favoring the minority Tamil population for civil-service jobs and education','Post-independence Sinhalese-majority governments reversing this after 1948 with Sinhala-only language laws and preferential university admission','July 1983 anti-Tamil riots, widely seen as the war\'s immediate trigger, radicalizing Tamil opinion toward armed struggle'],
+  moments:[
+    {t:'The Tamil Tigers, Indian intervention, and the final offensive', x:'The Liberation Tigers of Tamil Eelam (LTTE) emerged as the dominant separatist group, waging a guerrilla and at times conventional war for over two decades and pioneering the modern use of suicide bombing as a tactic. India briefly intervened with a peacekeeping force (1987–1990), but Indian troops ended up fighting the LTTE directly and withdrew without resolving the war; the LTTE was later blamed for the 1991 assassination of former Indian Prime Minister Rajiv Gandhi. A Norwegian-brokered ceasefire held uneasily from 2002 to 2006 before collapsing into renewed full-scale war. The Sri Lankan military\'s final offensive from 2006 to 2009 crushed the LTTE\'s remaining territory, killing its leader Velupillai Prabhakaran in May 2009 and ending the war, though the final months were marked by allegations of mass civilian casualties that UN investigators later said may have amounted to war crimes by both sides.'}
+  ],
+  outcome:'Total deaths across the 26-year war are estimated at 80,000–100,000.',
+  forward:'The war\'s end left Sri Lanka\'s Tamil minority with unresolved grievances over land, political autonomy, and wartime accountability that persist today, while its legacy — including the assassination of an Indian prime minister and one of the first large-scale uses of suicide bombing as an insurgent tactic — had ripple effects on regional security and counterterrorism thinking well beyond Sri Lanka\'s borders.',
+  countries:[ {c:'144',r:'a'},{c:'356',r:'c'} ]},
+{ num:13, id:'gulfwar', title:'The Gulf War', years:'1990–1991', target:[46,29],
+  regions:'Iraq, Kuwait, Saudi Arabia, and the wider Gulf.',
+  blurb:"Iraq's invasion of Kuwait triggered a US-led coalition response that expelled Iraqi forces and stationed American troops permanently in Saudi Arabia.",
+  causes:["Iraq's 1990 invasion and annexation of Kuwait", 'A UN-backed, US-led coalition response', "Iraq's regional overreach after the Iran-Iraq War"],
+  moments:[
+    {t:'The build-up: Desert Shield (Aug 1990 – Jan 1991)', x:'After Iraq\'s August 2, 1990 invasion of Kuwait, the UN Security Council imposed sanctions and, on November 29, 1990, passed a resolution authorizing "all necessary means" to force an Iraqi withdrawal if Saddam did not comply by January 15, 1991. Over the following months the US and its partners moved an enormous coalition force — eventually around 35 countries and roughly 700,000 troops, mostly American — into Saudi Arabia and the surrounding Gulf states.'},
+    {t:'The air campaign (Jan 17, 1991)', x:'When the deadline passed without an Iraqi withdrawal, the coalition opened Desert Storm in the early hours of January 17 with a massive air campaign. Stealth F-117 fighters and Tomahawk cruise missiles struck Baghdad\'s air defenses and command-and-control centers first, and coalition aircraft went on to fly over 1,000 sorties a day against Iraqi forces, establishing near-total air supremacy.'},
+    {t:'The ground war: Desert Sabre (Feb 24–28, 1991)', x:'With Iraqi forces pinned down and severely degraded from the air, the coalition launched its ground offensive on February 24. A feint by Marine and coalition forces pushed directly into Kuwait from the south, while the main US Army armored force executed a wide "left hook" flanking maneuver through the desert to the west, cutting off Iraqi troops before they could retreat. Iraqi forces collapsed quickly and tens of thousands surrendered. Kuwait City was liberated on February 26–27, and the retreating Iraqi column on the highway to Basra was devastated by coalition airpower in an episode known as the "Highway of Death." President Bush declared a ceasefire on February 28, 1991 — exactly 100 hours after the ground campaign began. Coalition deaths were fewer than 300, against tens of thousands of Iraqi military casualties.'}
+  ],
+  outcome:'Saddam remained in power, but Iraq was placed under sanctions and a no-fly zone. This war established a permanent US military presence in the Gulf (Saudi Arabia, Kuwait, Qatar, Bahrain), which became a major grievance for Osama bin Laden, who viewed Western troops on Saudi soil — home to Islam\'s holiest sites — as a desecration.',
+  forward:'Bin Laden\'s anger over the US military presence in Saudi Arabia was a founding motivation for al-Qaeda\'s campaign against the United States, culminating in the 1998 embassy bombings, the 2000 USS Cole attack, and eventually the September 11 attacks.',
+  countries:[ {c:'368',r:'a'},{c:'414',r:'c'}, {c:'840',r:'b'},{c:'682',r:'b'} ]},
+{ num:14, id:'yugoslav-wars', title:'The Yugoslav Wars', years:'1991–2001', target:[18,44],
+  regions:'The former Yugoslavia — Slovenia, Croatia, Bosnia and Herzegovina, Kosovo, and North Macedonia.',
+  blurb:'The collapse of Communism removed the glue holding a multi-ethnic federation together; Serbian nationalism under Slobodan Milošević accelerated its breakup into a decade of wars, including Europe\'s first genocide conviction since Nuremberg.',
+  causes:['A multi-ethnic federation held together by Tito\'s authoritarian rule and, after his 1980 death, an increasingly fragile power-sharing system','The collapse of Communism across Eastern Europe removing the external pressure keeping the federation intact','Serbian nationalist leader Slobodan Milošević\'s rise, which stoked ethnic nationalism and centralized power in Belgrade'],
+  moments:[
+    {t:'Independence wars and Srebrenica', x:'Slovenia and Croatia declared independence in 1991, triggering wars with the Serb-dominated Yugoslav army; Slovenia\'s lasted only ten days, but Croatia\'s fighting dragged on for years. Bosnia and Herzegovina\'s 1992 independence declaration triggered the war\'s bloodiest chapter: Bosnian Serb forces besieged Sarajevo for nearly four years and carried out the July 1995 Srebrenica massacre, killing more than 8,000 Bosniak men and boys — recognized by international courts as genocide. NATO airstrikes in 1995 forced the Bosnian Serbs to the table, producing the US-brokered Dayton Accords.'},
+    {t:'Kosovo (1998–99)', x:'A further war erupted over Kosovo, an ethnic-Albanian-majority province of Serbia, where a Serbian crackdown on Albanian separatists led to a 78-day NATO bombing campaign against Serbia in 1999 that forced a Serbian withdrawal from Kosovo.'}
+  ],
+  outcome:'Altogether the Yugoslav wars killed an estimated 130,000–140,000 people and displaced millions, fracturing Yugoslavia into seven independent states.',
+  forward:'NATO\'s Kosovo campaign was, for the first time, an offensive operation in Europe without a UN Security Council mandate — a precedent frequently invoked, and contested, in later debates over humanitarian intervention. Kosovo\'s disputed 2008 declaration of independence remains a point of friction with Serbia and its ally Russia to this day.',
+  countries:[ {c:'688',r:'a'},{c:'705',r:'b'},{c:'191',r:'b'},{c:'070',r:'b'},{c:'807',r:'c'} ]},
+{ num:15, id:'rwanda-genocide', title:'The Rwandan Genocide', years:'1994', target:[30,-2],
+  regions:'Rwanda, with major refugee and militia spillover into neighboring Zaire (later DR Congo), Burundi, and Uganda.',
+  blurb:'Colonial-era policy hardened Hutu-Tutsi identity into a rigid hierarchy; the 1994 assassination of Rwanda\'s president triggered a pre-planned campaign that killed roughly 800,000 people in about 100 days.',
+  causes:['Colonial-era policy, first German then Belgian, hardening a flexible pre-colonial distinction into a rigid, identity-card-enforced ethnic hierarchy','Periodic anti-Tutsi violence and refugee flight after 1962 independence flipped that hierarchy','A Tutsi-led rebel group\'s 1990 invasion from exile in Uganda, which hardline Hutu extremists used to whip up ethnic propaganda','The assassination of President Habyarimana on April 6, 1994, the immediate trigger for a pre-planned mass-killing campaign'],
+  moments:[
+    {t:'100 days of genocide', x:'Between April and July 1994, Hutu extremist militias (the Interahamwe) and government forces killed an estimated 800,000 people, overwhelmingly Tutsis and moderate Hutus, in one of the fastest mass killings of the twentieth century. The international community, including UN peacekeepers already on the ground, largely failed to intervene despite early warnings. The Tutsi-led RPF resumed its military offensive and took control of the country by July 1994, ending the genocide but triggering the flight of roughly two million Hutus, including many who had participated in the killings, into refugee camps in neighboring Zaire.'}
+  ],
+  outcome:'Rwanda\'s new RPF-led government viewed the armed Hutu militias embedded among refugees in Zaire\'s camps as a direct security threat and repeatedly intervened across the border to hunt them down.',
+  forward:'That cross-border pursuit became a direct trigger for two devastating wars in Congo later in the 1990s, pulling half a dozen African nations into what became the deadliest conflict in the world since World War II.',
+  countries:[ {c:'646',r:'a'},{c:'180',r:'c'},{c:'800',r:'c'},{c:'108',r:'c'} ]},
+{ num:16, id:'congo-wars', title:'The Congo Wars', years:'1996–2003', target:[23,-3],
+  regions:'The Democratic Republic of Congo (then Zaire), with direct military involvement from Rwanda, Uganda, Burundi, Angola, Zimbabwe, and Namibia — sometimes called "Africa\'s World War."',
+  blurb:'Refugees and armed militias fleeing Rwanda\'s genocide destabilized a hollowed-out Zairean state; two wars pulled in roughly nine African countries and killed more people than any conflict since World War II — most from disease and starvation rather than direct combat.',
+  causes:['Roughly two million Hutu refugees, including armed genocidal militias, fleeing into camps in eastern Zaire after the 1994 Rwandan genocide','A corrupt, hollowed-out Zairean state under Mobutu Sese Seko, unable to control its own borderlands','Vast mineral wealth in eastern Congo — gold, diamonds, and coltan — giving neighboring states and armed factions a financial incentive to intervene and stay'],
+  moments:[
+    {t:'Two wars, and the deadliest conflict since WWII', x:'The First Congo War (1996–97) saw Rwanda and Uganda back rebel leader Laurent-Désiré Kabila, whose forces swept across the country and toppled Mobutu in 1997. Kabila quickly fell out with his former backers, triggering the Second Congo War (1998–2003), in which Rwanda and Uganda backed rebel factions against Kabila\'s government while Angola, Zimbabwe, and Namibia intervened to support him — drawing in roughly nine African countries. An estimated 3–5 million people died, the vast majority from disease and starvation caused by the collapse of health and food systems rather than direct combat.'}
+  ],
+  outcome:'A 2002 peace deal and transitional government formally ended the broader war in 2003, though numerous armed groups have continued fighting in eastern Congo\'s mineral-rich provinces in the decades since, including a renewed M23 rebel offensive in the 2020s.',
+  forward:'The formal end of the war did not bring peace to eastern Congo, where weak state authority, ethnic militias, and competition over mineral resources have sustained low-level conflict and periodic flare-ups, making the region one of the world\'s longest-running, if underreported, conflict zones.',
+  countries:[ {c:'180',r:'a'},{c:'646',r:'c'},{c:'800',r:'c'},{c:'108',r:'c'},{c:'024',r:'c'},{c:'716',r:'c'},{c:'516',r:'c'} ]},
+{ num:17, id:'911', title:'September 11 & the War on Terror', years:'2001–2021', target:[50,30],
+  regions:'The United States, Afghanistan, Iraq, and eventually a global counterterrorism footprint spanning Pakistan, Yemen, Somalia, and the Sahel.',
+  blurb:'Al-Qaeda attacks on the US, radicalized in part by American military presence in the Gulf, led to a two-decade war in Afghanistan and the 2003 invasion of Iraq.',
+  causes:['al-Qaeda radicalization against US Gulf presence','Mujahideen networks armed during the Soviet-Afghan War','The September 11, 2001 attacks'],
+  moments:[
+    {t:'The attacks (Sept 11, 2001)', x:'Nineteen al-Qaeda hijackers, in four teams, seized control of four US domestic passenger flights shortly after takeoff. American Airlines Flight 11 struck the World Trade Center\'s North Tower at 8:46 a.m., and United Flight 175 struck the South Tower seventeen minutes later, live on television. American Flight 77 struck the Pentagon at 9:37 a.m. United Flight 93, believed headed for the Capitol or White House, crashed in a Pennsylvania field after passengers, aware of the other attacks by phone, stormed the cockpit. Both 110-story towers collapsed within two hours, and nearly 3,000 people were killed in total.'},
+    {t:'Operation Enduring Freedom (Oct 7, 2001)', x:'After the Taliban government refused to hand over Osama bin Laden, the US and allies opened the Afghanistan war with airstrikes on Taliban and al-Qaeda targets, paired with small numbers of US special forces and CIA officers working alongside the Northern Alliance militia. Kabul fell by mid-November 2001 and the Taliban regime collapsed within about two months — though bin Laden escaped, reportedly at Tora Bora, and was not killed until a separate US raid in Pakistan in 2011.'},
+    {t:'Operation Iraqi Freedom (March 20, 2003)', x:'After UN weapons inspectors found no confirmed evidence of the weapons-of-mass-destruction program the US and UK alleged, Washington and London assembled a smaller "coalition of the willing" without a second UN resolution explicitly authorizing force. The invasion opened with a "shock and awe" bombardment of Baghdad, followed almost immediately by a rapid armored push north from Kuwait; Baghdad fell just three weeks later, on April 9, 2003, and President Bush declared major combat operations over on May 1. Saddam Hussein was captured in December 2003 and later executed in 2006 — but the swift conventional victory gave way to a much longer, bloodier insurgency once the Iraqi army and government were dissolved.'}
+  ],
+  outcome:'War in Afghanistan (2001–2021), America\'s longest war, and the 2003 Iraq invasion, which toppled Saddam Hussein on since-disproven WMD claims and opened a lasting power vacuum.',
+  forward:'The Iraq invasion removed Iran\'s historic Sunni counterweight and empowered Iraq\'s Shia majority, dramatically expanding Iranian influence in Iraq — the beginning of Iran\'s post-2003 regional expansion through its "Axis of Resistance." The chaotic, de-Baathified Iraqi state also created the conditions for the rise of al-Qaeda in Iraq, the direct predecessor of ISIS.',
+  countries:[ {c:'840',r:'b'},{c:'004',r:'a'}, {c:'682',r:'c'},{c:'368',r:'c'} ]},
+{ num:18, id:'arabspring', title:'The Arab Spring & Its Aftermath', years:'2010–2012', target:[20,26],
+  regions:'Tunisia, Egypt, Libya, Syria, Yemen, Bahrain, and ripple effects across the Arab world.',
+  blurb:'A wave of pro-democracy uprisings swept the Arab world, toppling some governments outright and plunging others, like Syria, into prolonged civil war.',
+  causes:['Economic stagnation and youth unemployment','Authoritarian governance and repression','A self-immolation in Tunisia that sparked wider protest'],
+  moments:[
+    {t:'The spark: Tunisia (Dec 17, 2010)', x:'Street vendor Mohamed Bouazizi set himself on fire in the town of Sidi Bouzid after local officials confiscated his produce cart and, by his family\'s account, publicly humiliated him — an act that crystallized broader anger over unemployment, corruption, and police abuse. Protests spread to the capital, Tunis, within weeks. Bouazizi died of his injuries on January 4, 2011, and President Zine El Abidine Ben Ali, unable to suppress the unrest, fled the country on January 14, 2011, after 23 years in power.'},
+    {t:'Egypt (Jan–Feb 2011)', x:'Inspired by Tunisia, activists organized mass protests beginning January 25, 2011, centered on Cairo\'s Tahrir Square, where hundreds of thousands gathered for 18 days despite violent crackdowns by security forces and pro-government mobs. With the military ultimately declining to back him, President Hosni Mubarak, in power for nearly 30 years, resigned on February 11, 2011.'},
+    {t:'Libya (Feb–Oct 2011)', x:'Protests against Muammar Gaddafi that began in Benghazi in mid-February 2011 quickly turned into armed rebellion after Gaddafi\'s forces responded with lethal force. As his troops advanced on rebel-held Benghazi threatening a massacre, the UN Security Council authorized a no-fly zone and "all necessary measures" to protect civilians; NATO then conducted a months-long air campaign that decisively tipped the balance toward the rebels. Rebel fighters captured Tripoli in August and found and killed Gaddafi near his hometown of Sirte on October 20, 2011, but the absence of a strong post-war government left rival militias to fill the vacuum.'}
+  ],
+  outcome:'Tunisia transitioned to a fragile democracy. Egypt\'s Mubarak was eventually replaced by a military-backed government under Abdel Fattah el-Sisi. Libya fractured into competing factions and civil war after Gaddafi\'s death. Syria\'s Bashar al-Assad refused to step down, triggering a brutal civil war. Yemen descended into a multi-sided civil war, drawing in Saudi Arabia backing the government and Iran backing Houthi rebels.',
+  forward:'The Syrian and Yemeni civil wars became major fronts in the broader Iran-Saudi and Iran-Israel rivalry, and the resulting chaos in Syria and Iraq created fertile ground for the rise of ISIS.',
+  countries:[ {c:'788',r:'c'},{c:'818',r:'c'},{c:'434',r:'c'},{c:'887',r:'c'},{c:'048',r:'c'},{c:'760',r:'c'} ]},
+{ num:19, id:'syria', title:'The Syrian Civil War & Rise of ISIS', years:'2011–2024', target:[40,34],
+  regions:'Syria and Iraq, plus refugee flows into Turkey, Jordan, Lebanon, and Europe.',
+  blurb:'An Arab Spring uprising against Assad spiraled into a multi-sided civil war that let ISIS seize territory across Syria and Iraq before Assad finally fell in late 2024.',
+  causes:['Arab Spring protests against the Assad government','A power vacuum from the Iraq War exploited by ISIS','Iran and Russia intervening to prop up Assad'],
+  moments:[
+    {t:"ISIS's 2014 offensive", x:'In June 2014, a relatively small ISIS force, exploiting the collapse of morale and cohesion in Iraq\'s post-2003, largely Shia-officered army, seized Iraq\'s second-largest city, Mosul, in a matter of days — Iraqi units reportedly abandoned weapons and fled rather than fight. The stunning collapse of Iraqi defenses let ISIS seize a vast contiguous territory across eastern Syria and northern and western Iraq within weeks, culminating in the declaration of a "caliphate" by leader Abu Bakr al-Baghdadi at the Grand Mosque in Mosul in July 2014.'},
+    {t:'The end of the territorial caliphate (March 2019)', x:"ISIS's last significant territorial holdout, the village of Baghuz in eastern Syria, fell to Syrian Democratic Forces in March 2019, ending ISIS's territorial caliphate nearly five years after it was declared, though the group persisted afterward as a dispersed insurgency and clandestine network."},
+    {t:'The fall of Assad (December 2024)', x:'After years of a largely frozen front line, a rebel coalition led by Hayat Tahrir al-Sham under Ahmed al-Sharaa launched a surprise offensive from its stronghold in Idlib on November 27, 2024, codenamed "Deterrence of Aggression." With Russia distracted by Ukraine and Hezbollah and Iran freshly battered by Israel, Syrian army units collapsed with little resistance city by city — Aleppo, then Hama, then Homs — and rebels entered Damascus on December 8, 2024, just eleven days after the offensive began. Assad fled to Russia, ending over five decades of Assad family rule.'}
+  ],
+  outcome:'Roughly half a million people were killed in Syria, and over 12 million were displaced — one of the largest refugee crises since World War II. A US-led international coalition, alongside Kurdish-led forces, destroyed ISIS\'s territorial caliphate by 2019, though the group persists as an insurgency. Iran had used the Syrian corridor as a critical supply line to arm Hezbollah in Lebanon; Assad\'s fall in late 2024 severed this route and significantly weakened Iran\'s regional position.',
+  forward:'The loss of Syria as a land bridge, combined with Israel\'s devastating campaign against Hezbollah in 2024, left Iran and its "Axis of Resistance" network critically weakened heading into 2025 — a weakness that Israeli and US planners later judged made direct military action against Iran\'s nuclear program more viable.',
+  countries:[ {c:'760',r:'a'},{c:'368',r:'c'}, {c:'643',r:'b'},{c:'364',r:'b'}, {c:'792',r:'c'},{c:'840',r:'c'} ]},
+{ num:20, id:'ukraine', title:"Russia's Invasion of Ukraine", years:'2014 / 2022–Present', target:[31,49],
+  regions:'Ukraine, Russia, and — through energy markets, grain exports, and NATO posture — Europe and the world.',
+  blurb:"Russia's annexation of Crimea in 2014 escalated into a full-scale invasion in 2022, becoming the largest land war in Europe since World War II.",
+  causes:["Russian objections to Ukraine's westward alignment", '2014 annexation of Crimea', 'Full-scale invasion launched in February 2022'],
+  moments:[
+    {t:'The opening assault (Feb 24, 2022)', x:'After months of denying any invasion plan while massing well over 100,000 troops along Ukraine\'s borders, Vladimir Putin announced a "special military operation" before dawn, falsely claiming it aimed to "denazify" and "demilitarize" Ukraine. Russia attacked on multiple axes simultaneously: south from Belarus toward Kyiv, including a helicopter assault that seized Hostomel Airport as a staging point for a rapid decapitation strike; east from Russia toward Kharkiv; and north from Crimea toward Kherson and the land bridge to the Donbas.'},
+    {t:'The failed assault on Kyiv', x:'Russian planners reportedly expected to take Kyiv within days and replace Ukraine\'s government, but a roughly 40-mile Russian armored column advancing on the capital stalled outside the city amid fierce Ukrainian resistance, ambushes using Western-supplied anti-tank weapons like the Javelin, and severe Russian logistics failures. By late March 2022, Russia abandoned the assault on Kyiv entirely and withdrew its forces from northern Ukraine, refocusing the war into a grinding attrition fight in the east and south.'}
+  ],
+  outcome:'Ukraine, backed by extensive Western military aid, repelled the initial assault on Kyiv and has fought Russia to a grinding, high-casualty war of attrition. Hundreds of thousands of casualties have occurred on both sides, and millions of Ukrainian refugees fled to Europe. Sweeping Western sanctions on Russia reshaped global energy and financial markets, and Finland and Sweden abandoned neutrality to join NATO. As of mid-2026 the war continues without a comprehensive peace settlement.',
+  forward:"The war strained US and European military stockpiles and attention, deepened Russia's alignment with Iran (which supplied Russia with drones for use in Ukraine) and North Korea, and became a template other powers watched closely when calculating the costs and risks of major interstate war — including in the 2025–2026 Iran conflict, where Russia later fed Iran targeting intelligence on US forces.",
+  countries:[ {c:'643',r:'a'},{c:'804',r:'b'} ]},
+{ num:21, id:'israel-hamas', title:'The Israel-Hamas War & Regional Escalation', years:'Oct 2023–Present', target:[35,31],
+  regions:'Gaza, Israel, Lebanon, the West Bank, and by extension Iran, Yemen, Syria, and Iraq.',
+  blurb:"Hamas's October 7 attack on Israel triggered a devastating war in Gaza that widened into direct exchanges with Iran and its regional allies.",
+  causes:['Iran arming Hezbollah, Hamas, Houthis, and Iraqi militias', 'The October 7, 2023 Hamas attack on Israel', "Israel's large-scale military response in Gaza"],
+  moments:[
+    {t:'October 7, 2023', x:"In the early morning, Hamas fired a barrage of thousands of rockets into Israel to saturate its Iron Dome air-defense system, while roughly 3,000 fighters breached the Gaza border fence at more than two dozen points simultaneously — bulldozing through sections, using explosives, and sending in paragliders — before fanning out into nearby Israeli communities, an army base, and the Nova music festival, where over 300 people were killed. The multi-pronged assault caught Israel's intelligence, border defenses, and standing army almost completely by surprise, killing about 1,200 people and taking roughly 250 hostages — the deadliest single day for Jews since the Holocaust."},
+    {t:'The Gaza campaign', x:'Israel declared war and launched Operation Swords of Iron, opening with intense airstrikes and a full siege, then launched a ground invasion in late October 2023, initially concentrated in northern Gaza before expanding south, encircling Gaza City. Israeli forces conducted repeated offensives against Hamas\'s extensive underground tunnel network, and the campaign proceeded in phases over roughly two years, punctuated by hostage-for-prisoner truces in late November 2023 and early 2025, amid mounting Palestinian civilian casualties and a widely documented humanitarian and famine crisis.'},
+    {t:"The war widens and Iran's network is broken (2024)", x:"Hezbollah opened a front from Lebanon in solidarity with Hamas, the Houthis in Yemen attacked international shipping in the Red Sea, and Iran-aligned militias in Iraq and Syria attacked US bases. In 2024, Israel struck back decisively: it assassinated Hamas leader Ismail Haniyeh in Tehran itself, killed most of Hezbollah's senior leadership including Hassan Nasrallah, and severely degraded Hezbollah's arsenal. Israel and Iran also exchanged direct missile strikes for the first time in their history, in April and October 2024."}
+  ],
+  outcome:"Israel's military campaign killed tens of thousands of Palestinians and caused a severe humanitarian crisis in Gaza, while by the end of 2024 severely degrading Iran's regional proxy network.",
+  forward:"By late 2024, Iran's 'Axis of Resistance' had been battered on every front — Hezbollah decapitated, Hamas devastated, Assad's Syria collapsing — leaving Iran more exposed than at any point since the 1980s. Israeli and US officials increasingly saw this weakness as a rare window to strike Iran's nuclear program directly, setting the stage for 2025's Twelve-Day War.",
+  countries:[ {c:'376',r:'b'},{c:'275',r:'a'}, {c:'422',r:'c'},{c:'887',r:'c'},{c:'364',r:'c'},{c:'368',r:'c'} ]},
+{ num:22, id:'12day', title:'The Twelve-Day War', years:'June 2025', target:[45,32],
+  regions:'Iran, Israel, and US bases across the Gulf, including Qatar.',
+  blurb:"With Iran's regional network critically weakened, Israel and the US struck Iran's nuclear sites directly in a short, intense war.",
+  causes:["Iran's regional proxy network critically weakened by 2024", "Continued concern over Iran's nuclear program", 'A decision to strike Iranian nuclear infrastructure directly'],
+  moments:[
+    {t:'Israel strikes first (June 13, 2025)', x:'Israel launched large-scale strikes on Iranian nuclear facilities, military sites, and senior commanders and scientists, opening with a wave of airstrikes and, reportedly, covertly pre-positioned drones and sabotage teams operating from inside Iranian territory that hit air-defense systems and missile launchers in the campaign\'s opening hours, intended to clear a path for follow-on Israeli air force strikes. Iran retaliated with missile and drone attacks on Israel.'},
+    {t:'The US strikes Fordow, Natanz, and Isfahan (June 22, 2025)', x:'The US struck Iran\'s most fortified nuclear sites using bunker-buster bombs. Iran retaliated against a US base in Qatar, with no American casualties reported. A ceasefire took hold on June 24, 2025. The actual damage done to Iran\'s nuclear program remained disputed — a leaked preliminary US intelligence assessment suggested it had only been set back by months, though officials publicly insisted the damage was severe.'}
+  ],
+  outcome:"The war did not resolve the underlying nuclear dispute; it only paused it. Sanctions, including a 'snapback' mechanism reimposed by European powers in August 2025, further crushed Iran's economy, triggering a currency collapse and, by December 2025, mass anti-government protests over soaring prices — protests met with a violent government crackdown.",
+  forward:'This domestic unrest, combined with continued failed negotiations, set the stage for a far larger war just eight months later.',
+  countries:[ {c:'376',r:'b'},{c:'364',r:'a'},{c:'840',r:'c'} ]},
+{ num:23, id:'venezuela', title:"Venezuela's Liberation — Capture of Maduro", years:'Jan 2026', target:[-67,10],
+  regions:'Venezuela and the southern Caribbean.',
+  blurb:'A US special-forces raid, Operation Absolute Resolve, struck Venezuelan air defenses and captured President Nicolás Maduro at his Caracas compound in just over two hours — one of the shortest wars on record.',
+  causes:["Nicolás Maduro's disputed 2024 re-election and thirteen years of authoritarian rule", 'A US military buildup in the southern Caribbean through 2025, framed as anti-narcotics', 'A decision to launch a direct capture operation rather than continue sanctions pressure'],
+  outcome:"Maduro and his wife were flown to New York to face narcoterrorism charges; Vice President Delcy Rodríguez became acting president, oil sanctions were lifted, and a fragile, contested transition began without dismantling the regime's underlying structures.",
+  countries:[ {c:'840',r:'a'},{c:'862',r:'b'},{c:'192',r:'c'} ]},
+{ num:24, id:'iranwar2026', title:'The 2026 Iran War', years:'Feb 2026–Present', target:[50,28],
+  regions:'Iran, Israel, Lebanon, Iraq, and Gulf Arab states including the UAE, Saudi Arabia, Kuwait, Bahrain, and Qatar, plus global oil markets via the Strait of Hormuz.',
+  blurb:'US and Israeli strikes killed Iran\'s Supreme Leader and triggered region-wide retaliation, a blocked Strait of Hormuz, and a ceasefire that has repeatedly collapsed.',
+  causes:['Continued fallout from the Twelve-Day War', 'Operation Epic Fury / Roaring Lion strikes on Iran', "Khamenei's death and a contested succession"],
+  moments:[
+    {t:'Operation Epic Fury / Roaring Lion (Feb 28, 2026)', x:"The US and Israel launched coordinated strikes, opening with near-simultaneous stealth and stand-off attacks intended to blind Iranian air defenses and command networks before follow-on waves hit leadership and nuclear targets — mirroring, but going further than, the pattern set in June 2025. Unlike the 2025 war, this campaign explicitly targeted Iran's leadership: Supreme Leader Ali Khamenei, the IRGC commander, and the defense minister were killed within the opening hours."},
+    {t:"Iran's retaliation and regional escalation", x:"Iran, under a decentralized command structure built to survive exactly this kind of decapitation strike, retaliated with Operation True Promise IV — missile and drone attacks on Israel and on US bases and Gulf-state targets in Bahrain, Kuwait, Qatar, the UAE, and Saudi Arabia — and by disrupting shipping through the Strait of Hormuz, a chokepoint for roughly a fifth of the world's oil trade. Hezbollah reopened its front against Israel from Lebanon within two days. The UAE, Saudi Arabia, and Kuwait, targeted by Iranian strikes, in turn struck Iran and clashed with Iran's Iraqi militia allies. The US sank Iranian naval vessels, including a submarine, and conducted a bombing campaign using B-2 stealth bombers alongside cyberwarfare against Iranian nuclear infrastructure. Khamenei's son Mojtaba took over as Supreme Leader amid the crisis."},
+    {t:'A ceasefire that keeps collapsing', x:"A ceasefire reached April 7–8, 2026, mediated by Pakistan, was violated within hours by an Israeli assault on Lebanon that killed hundreds, since Israel insisted the truce did not cover Hezbollah. Negotiations dragged on through the spring, centered on control of the Strait of Hormuz and the fate of Iran's nuclear program and enriched uranium stockpile. On June 17, 2026, the US and Iranian presidents signed a Memorandum of Understanding meant to end the war within 60 days. The truce collapsed again in early July 2026 when Iranian strikes on commercial vessels in the Strait of Hormuz prompted fresh, heavy US airstrikes on roughly 90 targets on July 8–9; Iran retaliated against US-linked targets in Kuwait and Bahrain."}
+  ],
+  outcome:"As of mid-July 2026, President Trump has declared the ceasefire 'over' while agreeing to continue talks; Qatari and Pakistani mediators are shuttling between the parties. Iran's economy is in freefall with inflation above 50 percent and estimated war damage nearing its entire annual GDP. The war's ultimate resolution — a durable peace deal, a prolonged low-intensity conflict, or a fresh escalation — remains genuinely unresolved.",
+  forward:"This conflict has effectively fused several older, previously separate threads of Middle Eastern history into a single crisis: the Israeli-Palestinian conflict, the Iran-Iraq War legacy of Iranian deterrence doctrine, the post-2003 Iraq power vacuum that empowered Iran, the Arab Spring-era collapse of Syria as Iran's supply corridor, and three decades of nuclear brinkmanship dating back to the 2000s. Its outcome will shape Middle Eastern geopolitics for a generation, much as the 1919 Versailles settlement and the 1979 Iranian Revolution did for theirs.",
+  countries:[ {c:'364',r:'a'}, {c:'376',r:'b'},{c:'840',r:'b'}, {c:'784',r:'c'},{c:'682',r:'c'},{c:'414',r:'c'},{c:'048',r:'c'},{c:'634',r:'c'},{c:'422',r:'c'},{c:'586',r:'c'} ]}
+];
+
+/* ============ RENDER PICKER + LEGEND ============ */
+var pickerEl = document.getElementById('picker');
+CONFLICTS.forEach(function(cf){
+  var chip = document.createElement('button');
+  chip.className = 'picker-chip';
+  chip.id = 'chip-'+cf.id;
+  chip.innerHTML = '<span class="pc-num">'+String(cf.num).padStart(2,'0')+'</span>'+cf.title;
+  chip.onclick = function(){ selectConflict(cf.id); };
+  pickerEl.appendChild(chip);
+});
+
+function renderLegend(cf){
+  var roles = {};
+  cf.countries.forEach(function(c){ roles[c.r]=true; });
+  var html='';
+  Object.keys(roles).forEach(function(r){
+    html += '<div class="legend-item"><span class="legend-dot" style="background:'+ROLE_COLOR[r]+'"></span>'+ROLE_LABEL[r]+'</div>';
+  });
+  document.getElementById('legend').innerHTML = html;
+}
+
+/* ============ READ ALOUD (text-to-speech, female voice) ============ */
+var __ttsVoices = [];
+var __ttsActiveBtn = null;
+function __ttsLoadVoices(){ __ttsVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){ __ttsLoadVoices(); window.speechSynthesis.onvoiceschanged = __ttsLoadVoices; }
+function __ttsFemaleVoice(){
+  if(!__ttsVoices.length) __ttsLoadVoices();
+  var pref = /female|zira|samantha|victoria|karen|moira|tessa|susan|fiona|kate|serena|allison|ava|salli|joanna|kimberly|amy|emma|ivy|jenny/i;
+  return __ttsVoices.find(function(v){ return pref.test(v.name) && /^en/i.test(v.lang); })
+      || __ttsVoices.find(function(v){ return pref.test(v.name); })
+      || __ttsVoices.find(function(v){ return /^en/i.test(v.lang) && !/male/i.test(v.name); })
+      || __ttsVoices[0] || null;
+}
+function __ttsResetBtn(btn){ if(!btn) return; btn.classList.remove('tts-playing'); btn.innerHTML = btn.dataset.ttsLabel || '<i class="ti ti-volume"></i>Listen'; }
+function ttsStripHtml(html){ var d=document.createElement('div'); d.innerHTML = html==null?'':String(html); return (d.textContent||d.innerText||'').replace(/\s+/g,' ').trim(); }
+function ttsToggle(text, btn){
+  if(!('speechSynthesis' in window)){
+    if(window.median && window.median.window && typeof window.median.window.open==='function'){
+      if(confirm('Read-aloud isn\'t available inside the app. Open this page in your browser to listen?')){
+        window.median.window.open(window.location.href, 'external');
+      }
+    } else {
+      alert('Read-aloud is not supported in this browser.');
+    }
+    return;
+  }
+  var synth = window.speechSynthesis;
+  if(synth.speaking){
+    var wasSameBtn = (__ttsActiveBtn === btn);
+    synth.cancel(); __ttsResetBtn(__ttsActiveBtn); __ttsActiveBtn = null;
+    if(wasSameBtn) return;
+  }
+  var utter = new SpeechSynthesisUtterance(text);
+  var voice = __ttsFemaleVoice();
+  if(voice) utter.voice = voice;
+  utter.rate = 0.98; utter.pitch = 1.05;
+  utter.onend = function(){ __ttsResetBtn(btn); if(__ttsActiveBtn===btn) __ttsActiveBtn=null; };
+  utter.onerror = function(){ __ttsResetBtn(btn); if(__ttsActiveBtn===btn) __ttsActiveBtn=null; };
+  synth.speak(utter);
+  if(btn){ if(!btn.dataset.ttsLabel) btn.dataset.ttsLabel = btn.innerHTML; btn.classList.add('tts-playing'); btn.innerHTML = '<i class="ti ti-player-stop"></i>Stop'; __ttsActiveBtn = btn; }
+}
+var cfCurrentConflictText = '';
+function cfConflictText(cf){
+  var parts = [cf.title, cf.years, ttsStripHtml(cf.blurb)];
+  if(cf.regions) parts.push('Regions affected. '+ttsStripHtml(cf.regions));
+  if(cf.causes && cf.causes.length) parts.push('Root causes. '+cf.causes.map(ttsStripHtml).join('. '));
+  if(cf.moments && cf.moments.length) parts.push('Key moments. '+cf.moments.map(function(m){return ttsStripHtml(m.t)+'. '+ttsStripHtml(m.x);}).join('. '));
+  parts.push('Outcome. '+ttsStripHtml(cf.outcome));
+  if(cf.forward) parts.push('How it led forward. '+ttsStripHtml(cf.forward));
+  return parts.join(' ');
+}
+function cfReadConflict(btn){ ttsToggle(cfCurrentConflictText, btn); }
+
+function renderInfo(cf){
+  var tagsHtml = cf.countries.map(function(c){
+    var name = COUNTRY_NAMES[c.c] || c.c;
+    return '<span class="country-tag"><span class="dot" style="background:'+ROLE_COLOR[c.r]+'"></span>'+name+'</span>';
+  }).join('');
+  var momentsHtml = '';
+  if(cf.moments && cf.moments.length){
+    momentsHtml =
+      '<div class="info-card-h">Key moments</div>'+
+      '<div class="moments">'+
+      cf.moments.map(function(m){
+        return '<div class="moment-block"><div class="moment-title">'+m.t+'</div><p class="moment-text">'+m.x+'</p></div>';
+      }).join('')+
+      '</div>';
+  }
+  var forwardHtml = cf.forward ? (
+    '<div class="info-card-h">How it led forward</div>'+
+    '<p style="font-size:12px;color:#999;line-height:1.6">'+cf.forward+'</p>'
+  ) : '';
+  var regionsHtml = cf.regions ? (
+    '<div class="info-card-h">Regions affected</div>'+
+    '<p style="font-size:12px;color:#999;line-height:1.6">'+cf.regions+'</p>'
+  ) : '';
+  cfCurrentConflictText = cfConflictText(cf);
+  document.getElementById('info-card').innerHTML =
+    '<div class="info-card-years">'+cf.years+'</div>'+
+    '<div class="info-card-title">'+cf.title+'</div>'+
+    '<button class="info-listen-btn" id="cfListenBtn" onclick="cfReadConflict(this)"><i class="ti ti-volume"></i>Listen</button>'+
+    '<div class="info-card-blurb">'+cf.blurb+'</div>'+
+    regionsHtml+
+    '<div class="info-card-h">Root causes</div>'+
+    '<ul>'+cf.causes.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>'+
+    '<div class="info-card-h">Countries drawn in</div>'+
+    '<div class="country-tags">'+tagsHtml+'</div>'+
+    momentsHtml+
+    '<div class="info-card-h">Outcome</div>'+
+    '<p style="font-size:12px;color:#999;line-height:1.6">'+cf.outcome+'</p>'+
+    forwardHtml;
+}
+
+/* ============ COUNTRY NAME MAP (subset used by dataset) ============ */
+var COUNTRY_NAMES = {
+  '276':'Germany','040':'Austria','348':'Hungary','792':'Turkey','250':'France','826':'United Kingdom',
+  '643':'Russia','688':'Serbia','380':'Italy','056':'Belgium','840':'United States','392':'Japan',
+  '231':'Ethiopia','156':'China','724':'Spain','616':'Poland','408':'North Korea','410':'South Korea',
+  '704':'Vietnam','004':'Afghanistan','192':'Cuba','356':'India','586':'Pakistan','376':'Israel',
+  '275':'Palestine','818':'Egypt','400':'Jordan','760':'Syria','422':'Lebanon','364':'Iran','368':'Iraq',
+  '414':'Kuwait','682':'Saudi Arabia','788':'Tunisia','434':'Libya','887':'Yemen','048':'Bahrain',
+  '804':'Ukraine','784':'United Arab Emirates','634':'Qatar','862':'Venezuela',
+  '418':'Laos','116':'Cambodia','032':'Argentina','646':'Rwanda','800':'Uganda','180':'DR Congo',
+  '108':'Burundi','024':'Angola','716':'Zimbabwe','516':'Namibia','705':'Slovenia','191':'Croatia',
+  '070':'Bosnia and Herzegovina','807':'North Macedonia','144':'Sri Lanka'
+};
+
+/* ============ COUNTRY GAZETTEER (for the terminal's `country <name>` command) ============
+   Extends COUNTRY_NAMES with the rest of the world and pairs every id with an
+   approximate center [lon,lat] so the globe can rotate to it even when the
+   country isn't part of any conflict dataset. Coordinates are rough centers
+   (good enough to bring the right region into view), not surveyed centroids. */
+Object.assign(COUNTRY_NAMES, {
+  '008':'Albania','012':'Algeria','020':'Andorra','051':'Armenia','036':'Australia',
+  '031':'Azerbaijan','044':'Bahamas','050':'Bangladesh','052':'Barbados','112':'Belarus',
+  '084':'Belize','204':'Benin','064':'Bhutan','068':'Bolivia','072':'Botswana','076':'Brazil',
+  '096':'Brunei','100':'Bulgaria','854':'Burkina Faso','120':'Cameroon','124':'Canada',
+  '132':'Cape Verde','140':'Central African Republic','148':'Chad','152':'Chile','170':'Colombia',
+  '174':'Comoros','178':'Congo','188':'Costa Rica','196':'Cyprus','203':'Czech Republic',
+  '208':'Denmark','262':'Djibouti','212':'Dominica','214':'Dominican Republic','626':'Timor-Leste',
+  '218':'Ecuador','222':'El Salvador','226':'Equatorial Guinea','232':'Eritrea','233':'Estonia',
+  '748':'Eswatini','242':'Fiji','246':'Finland','266':'Gabon','270':'Gambia','268':'Georgia',
+  '288':'Ghana','300':'Greece','308':'Grenada','320':'Guatemala','324':'Guinea','624':'Guinea-Bissau',
+  '328':'Guyana','332':'Haiti','340':'Honduras','352':'Iceland','372':'Ireland','388':'Jamaica',
+  '398':'Kazakhstan','404':'Kenya','296':'Kiribati','417':'Kyrgyzstan','428':'Latvia','426':'Lesotho',
+  '430':'Liberia','438':'Liechtenstein','440':'Lithuania','442':'Luxembourg','450':'Madagascar',
+  '454':'Malawi','458':'Malaysia','462':'Maldives','466':'Mali','470':'Malta','584':'Marshall Islands',
+  '478':'Mauritania','480':'Mauritius','484':'Mexico','583':'Micronesia','498':'Moldova','492':'Monaco',
+  '496':'Mongolia','499':'Montenegro','504':'Morocco','508':'Mozambique','104':'Myanmar',
+  '520':'Nauru','524':'Nepal','528':'Netherlands','554':'New Zealand','558':'Nicaragua','562':'Niger',
+  '566':'Nigeria','578':'Norway','512':'Oman','585':'Palau','591':'Panama','598':'Papua New Guinea',
+  '600':'Paraguay','604':'Peru','608':'Philippines','620':'Portugal','642':'Romania','659':'Saint Kitts and Nevis',
+  '662':'Saint Lucia','670':'Saint Vincent and the Grenadines','882':'Samoa','674':'San Marino',
+  '678':'Sao Tome and Principe','686':'Senegal','690':'Seychelles','694':'Sierra Leone','702':'Singapore',
+  '703':'Slovakia','090':'Solomon Islands','706':'Somalia','710':'South Africa','728':'South Sudan',
+  '729':'Sudan','740':'Suriname','752':'Sweden','756':'Switzerland','158':'Taiwan','762':'Tajikistan',
+  '834':'Tanzania','764':'Thailand','768':'Togo','776':'Tonga','780':'Trinidad and Tobago',
+  '795':'Turkmenistan','798':'Tuvalu','858':'Uruguay','860':'Uzbekistan','548':'Vanuatu',
+  '336':'Vatican City','894':'Zambia'
+});
+
+var COUNTRY_COORDS = {
+  '004':[67.71,33.93],'008':[20.17,41.15],'012':[1.66,28.03],'020':[1.52,42.55],'024':[17.87,-11.2],
+  '032':[-63.6,-38.4],'036':[133.78,-25.27],'040':[14.55,47.52],'031':[47.58,40.14],'044':[-77.4,25.03],
+  '048':[50.55,26.07],'050':[90.36,23.68],'052':[-59.54,13.19],'112':[27.95,53.71],'056':[4.47,50.5],
+  '084':[-88.5,17.19],'204':[2.32,9.31],'064':[90.43,27.51],'068':[-63.6,-16.29],'070':[17.68,43.92],
+  '072':[24.68,-22.33],'076':[-51.93,-14.24],'096':[114.73,4.54],'100':[25.49,42.73],'854':[-1.56,12.24],
+  '108':[29.92,-3.37],'116':[104.99,12.57],'120':[12.35,7.37],'124':[-106.35,56.13],'132':[-24.01,16.0],
+  '140':[20.94,6.61],'148':[18.73,15.45],'152':[-71.54,-35.68],'156':[104.2,35.86],'170':[-74.3,4.57],
+  '174':[43.87,-11.6],'178':[15.83,-0.23],'180':[21.76,-4.04],'188':[-83.75,9.75],'191':[15.2,45.1],
+  '192':[-77.78,21.52],'196':[33.43,35.13],'203':[15.47,49.82],'208':[9.5,56.26],'262':[42.59,11.83],
+  '212':[-61.37,15.41],'214':[-70.16,18.74],'626':[125.73,-8.87],'218':[-78.18,-1.83],'818':[30.8,26.82],
+  '222':[-88.9,13.79],'226':[10.27,1.65],'232':[39.78,15.18],'233':[25.01,58.6],'748':[31.47,-26.52],
+  '231':[40.49,9.15],'242':[179.41,-17.71],'246':[25.75,61.92],'250':[2.21,46.23],'266':[11.61,-0.8],
+  '270':[-15.31,13.44],'268':[43.36,42.32],'276':[10.45,51.17],'288':[-1.02,7.95],'300':[21.82,39.07],
+  '308':[-61.68,12.11],'320':[-90.23,15.78],'324':[-9.7,9.95],'624':[-15.18,11.8],'328':[-58.93,4.86],
+  '332':[-72.29,18.97],'340':[-86.24,15.2],'348':[19.5,47.16],'352':[-19.02,64.96],'356':[78.96,20.59],
+  '360':[113.92,-0.79],'364':[53.69,32.43],'368':[43.68,33.22],'372':[-8.24,53.41],'376':[34.85,31.05],
+  '380':[12.57,41.87],'388':[-77.3,18.11],'392':[138.25,36.2],'400':[36.24,30.59],'398':[66.92,48.02],
+  '404':[37.91,-0.02],'296':[173.0,1.5],'414':[47.48,29.31],'417':[74.77,41.2],'418':[102.5,19.86],
+  '428':[24.6,56.88],'422':[35.86,33.85],'426':[28.23,-29.61],'430':[-9.43,6.43],'434':[17.23,26.34],
+  '438':[9.56,47.17],'440':[23.88,55.17],'442':[6.13,49.82],'450':[46.87,-18.77],'454':[34.3,-13.25],
+  '458':[101.98,4.21],'462':[73.22,3.2],'466':[-3.996,17.57],'470':[14.38,35.94],'584':[171.18,7.13],
+  '478':[-10.94,21.01],'480':[57.55,-20.35],'484':[-102.55,23.63],'583':[150.55,7.43],'498':[28.37,47.41],
+  '492':[7.42,43.75],'496':[103.85,46.86],'499':[19.37,42.71],'504':[-7.09,31.79],'508':[35.53,-18.67],
+  '104':[95.96,21.91],'516':[18.49,-22.96],'520':[166.93,-0.52],'524':[84.12,28.39],'528':[5.29,52.13],
+  '554':[174.89,-40.9],'558':[-85.2,12.87],'562':[8.08,17.61],'566':[8.68,9.08],'408':[127.51,40.34],
+  '807':[21.75,41.61],'578':[8.47,60.47],'512':[55.92,21.51],'586':[69.35,30.38],'585':[134.58,7.51],
+  '591':[-80.78,8.54],'598':[143.96,-6.31],'600':[-58.44,-23.44],'604':[-75.02,-9.19],'608':[121.77,12.88],
+  '616':[19.15,51.92],'620':[-8.22,39.4],'634':[51.18,25.35],'642':[24.97,45.94],'643':[105,61.52],
+  '646':[29.87,-1.94],'659':[-62.75,17.36],'662':[-60.98,13.91],'670':[-61.2,12.98],'882':[-172.1,-13.76],
+  '674':[12.46,43.94],'678':[6.61,0.19],'682':[45.08,23.89],'686':[-14.45,14.5],'688':[21.01,44.02],
+  '690':[55.49,-4.68],'694':[-11.78,8.46],'702':[103.82,1.35],'703':[19.7,48.67],'705':[14.99,46.15],
+  '090':[160.16,-9.65],'706':[46.2,5.15],'710':[22.94,-30.56],'410':[127.77,35.91],'728':[31.31,6.88],
+  '724':[-3.75,40.46],'144':[80.77,7.87],'729':[30.22,12.86],'740':[-56.03,3.92],'752':[18.64,60.13],
+  '756':[8.23,46.82],'760':[38.997,34.8],'158':[120.96,23.7],'762':[71.28,38.86],'834':[34.89,-6.37],
+  '764':[100.99,15.87],'768':[0.82,8.62],'776':[-175.2,-21.18],'780':[-61.22,10.69],'788':[9.54,33.89],
+  '792':[35.24,38.96],'795':[59.56,38.97],'798':[179.19,-7.11],'800':[32.29,1.37],'804':[31.17,48.38],
+  '784':[53.85,23.42],'826':[-3.44,55.38],'840':[-98.58,39.83],'858':[-55.77,-32.52],'860':[64.59,41.38],
+  '548':[166.96,-15.38],'336':[12.45,41.9],'862':[-66.59,6.42],'704':[108.28,14.06],'887':[48.52,15.55],
+  '894':[27.85,-13.13],'716':[29.15,-19.02],'275':[35.23,31.95]
+};
+
+/* common alternate names/abbreviations a person is likely to type */
+var COUNTRY_ALIASES = {
+  'usa':'united states','us':'united states','u.s.':'united states','u.s.a.':'united states','america':'united states',
+  'uk':'united kingdom','britain':'united kingdom','great britain':'united kingdom','england':'united kingdom',
+  'uae':'united arab emirates','emirates':'united arab emirates',
+  'russia':'russia','russian federation':'russia',
+  'south korea':'south korea','korea, south':'south korea','republic of korea':'south korea',
+  'north korea':'north korea','korea, north':'north korea',
+  'czechia':'czech republic',
+  'burma':'myanmar',
+  'ivory coast':'ivory coast',"cote d'ivoire":'ivory coast','cote divoire':'ivory coast',
+  'drc':'dr congo','congo-kinshasa':'dr congo','democratic republic of congo':'dr congo','democratic republic of the congo':'dr congo',
+  'congo-brazzaville':'congo','republic of congo':'congo','republic of the congo':'congo',
+  'vatican':'vatican city','holy see':'vatican city',
+  'macedonia':'north macedonia',
+  'swaziland':'eswatini',
+  'timor':'timor-leste','east timor':'timor-leste',
+  'palestine':'palestine','gaza':'palestine','west bank':'palestine'
+};
+
+function findCountry(query){
+  if(!query) return null;
+  var q = query.trim().toLowerCase();
+  if(COUNTRY_ALIASES[q]) q = COUNTRY_ALIASES[q];
+  var idsByName = {};
+  Object.keys(COUNTRY_NAMES).forEach(function(id){ idsByName[COUNTRY_NAMES[id].toLowerCase()] = id; });
+  if(idsByName[q]) return { id:idsByName[q], name:COUNTRY_NAMES[idsByName[q]] };
+  var names = Object.keys(idsByName);
+  var starts = names.find(function(n){ return n.indexOf(q)===0; });
+  if(starts) return { id:idsByName[starts], name:COUNTRY_NAMES[idsByName[starts]] };
+  var contains = names.find(function(n){ return n.indexOf(q)!==-1; });
+  if(contains) return { id:idsByName[contains], name:COUNTRY_NAMES[idsByName[contains]] };
+  return null;
+}
+
+function renderCountryInfo(entry, found){
+  document.getElementById('legend').innerHTML =
+    '<div class="legend-item"><span class="legend-dot" style="background:'+ROLE_COLOR.x+'"></span>Located via terminal</div>';
+  document.getElementById('info-card').innerHTML = found ?
+    ('<div class="info-card-years">TERMINAL LOOKUP</div>'+
+     '<div class="info-card-title">'+entry.name+'</div>'+
+     '<p style="font-size:12px;color:#999;line-height:1.6">Rotated the globe to '+entry.name+' — jump back to any conflict below to see its role in these events.</p>')
+    :
+    ('<div class="info-card-years">TERMINAL LOOKUP</div>'+
+     '<div class="info-card-title">Country not found</div>'+
+     '<p style="font-size:12px;color:#999;line-height:1.6">No match for "'+entry+'" — try a common English name, e.g. "france" or "south korea".</p>');
+}
+
+function pointToCountry(query){
+  document.querySelectorAll('.picker-chip').forEach(function(el){el.classList.remove('active');});
+  var match = findCountry(query);
+  if(!match){
+    renderCountryInfo(query, false);
+    return;
+  }
+  activeCountries = {};
+  activeCountries[match.id] = 'x';
+  activeCountries[String(Number(match.id))] = 'x';
+  drawLand();
+  renderCountryInfo(match, true);
+  var coords = COUNTRY_COORDS[match.id];
+  if(coords) animateRotateTo(coords);
+}
+
+/* ============ GLOBE (D3 orthographic) ============ */
+var svg = d3.select('#globe-svg'), W=460, H=460;
+var projection = d3.geoOrthographic().scale(215).translate([W/2,H/2]).clipAngle(90).precision(0.5);
+var path = d3.geoPath(projection);
+var rotation = [-15,-50]; // [lambda, phi] — negative of target lon/lat
+projection.rotate(rotation);
+
+var gSphere = svg.append('path').attr('class','sphere');
+var gGrat   = svg.append('path').attr('class','graticule');
+var gLand   = svg.append('g').attr('class','land');
+
+var graticule = d3.geoGraticule10();
+var worldFeatures = null;
+var activeCountries = {};
+
+function styleGlobe(){
+  var isLight = document.body.classList.contains('light');
+  gSphere.datum({type:'Sphere'}).attr('d',path)
+    .attr('fill', isLight ? '#e9e6dc' : '#0a0a0a')
+    .attr('stroke', isLight ? '#d3cfc2' : 'var(--surf-line)');
+  gGrat.datum(graticule).attr('d',path)
+    .attr('fill','none').attr('stroke', isLight ? '#d8d4c8' : '#161616').attr('stroke-width',0.4);
+}
+styleGlobe();
+
+function drawLand(){
+  if(!worldFeatures) return;
+  var sel = gLand.selectAll('path').data(worldFeatures, function(d){return d.id;});
+  var isLight = document.body.classList.contains('light');
+  sel.enter().append('path')
+    .merge(sel)
+    .attr('d', path)
+    .attr('stroke', isLight ? '#ccc7b8' : '#222')
+    .attr('stroke-width',0.4)
+    .attr('fill', function(d){
+      return activeCountries[d.id] ? ROLE_COLOR[activeCountries[d.id]] : (isLight ? '#cfcabb' : '#232323');
+    });
+  sel.exit().remove();
+}
+
+function loadWorldData(url){
+  return fetch(url).then(function(r){ if(!r.ok) throw new Error('bad response'); return r.json(); });
+}
+/* Try the CDN first, then fall back to a copy bundled alongside this page —
+   some APK/WebView wrappers block fetches to third-party domains even with
+   internet access, which otherwise leaves the globe stuck on "Loading…". */
+loadWorldData('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+  .catch(function(){ return loadWorldData('countries-110m.json'); })
+  .then(function(topo){
+    worldFeatures = topojson.feature(topo, topo.objects.countries).features;
+    document.getElementById('globe-loading').style.display='none';
+    drawLand();
+    var wantedCountry = new URLSearchParams(window.location.search).get('country');
+    if(wantedCountry) pointToCountry(wantedCountry);
+    else selectConflict(CONFLICTS[0].id, true);
+    autoRotate();
+  })
+  .catch(function(){
+    document.getElementById('globe-loading').textContent = 'Globe needs an internet connection to load — country lists below still work.';
+    selectConflict(CONFLICTS[0].id, true);
+  });
+
+/* auto-rotate when idle */
+var autoTimer=null, dragging=false, idleAfter=null;
+function autoRotate(){
+  autoTimer = d3.timer(function(elapsed){
+    if(dragging || document.hidden) return;
+    rotation[0] += 0.035;
+    projection.rotate(rotation);
+    gSphere.attr('d',path); gGrat.attr('d',path); drawLand();
+  });
+}
+document.addEventListener('visibilitychange', function(){
+  /* when returning from background, restart cleanly instead of animating a big catch-up jump */
+  if(!document.hidden && autoTimer){ autoTimer.stop(); autoRotate(); }
+});
+
+/* drag to rotate */
+var dragStart, rotStart;
+svg.call(d3.drag()
+  .on('start', function(event){ dragging=true; dragStart=[event.x,event.y]; rotStart=rotation.slice(); })
+  .on('drag', function(event){
+    var dx=event.x-dragStart[0], dy=event.y-dragStart[1];
+    rotation = [rotStart[0]+dx*0.35, Math.max(-90,Math.min(90,rotStart[1]-dy*0.35))];
+    projection.rotate(rotation);
+    gSphere.attr('d',path); gGrat.attr('d',path); drawLand();
+  })
+  .on('end', function(){ dragging=false; })
+);
+
+function animateRotateTo(target){
+  var to = [-target[0], -target[1]];
+  var from = rotation.slice();
+  d3.transition().duration(900).ease(d3.easeCubicInOut).tween('rotate', function(){
+    var i = d3.interpolate(from,to);
+    return function(t){
+      rotation = i(t);
+      projection.rotate(rotation);
+      gSphere.attr('d',path); gGrat.attr('d',path); drawLand();
+    };
+  });
+}
+
+function selectConflict(id, skipScroll){
+  var cf = CONFLICTS.find(function(x){return x.id===id;});
+  if(!cf) return;
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  document.querySelectorAll('.picker-chip').forEach(function(el){el.classList.remove('active');});
+  var chip = document.getElementById('chip-'+id);
+  if(chip){ chip.classList.add('active'); if(!skipScroll) chip.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }
+  activeCountries = {};
+  cf.countries.forEach(function(c){ activeCountries[c.c]=c.r; });
+  drawLand();
+  renderLegend(cf);
+  renderInfo(cf);
+  animateRotateTo(cf.target);
+}
+
+/* re-style on theme toggle (in case user changes it via index.html in another tab) */
+window.addEventListener('storage', function(){ styleGlobe(); drawLand(); });
+
+/* ============ MERMAID ============ */
+mermaid.initialize({
+  startOnLoad:false,
+  theme:'dark',
+  themeVariables:{
+    background:'#050505', primaryColor:'#161616', primaryTextColor:'#eee',
+    primaryBorderColor:'#3a3a3a', lineColor:'#4a4a4a', secondaryColor:'var(--surf-line)', tertiaryColor:'#111',
+    fontFamily:'Inter, sans-serif', fontSize:'13px',
+    edgeLabelBackground:'#0d0e10'
+  },
+  flowchart:{ curve:'basis', padding:28, nodeSpacing:42, rankSpacing:64, htmlLabels:false }
+});
+
+/* sync nav theme/accent state now that the globe + mermaid are set up */
+loadAppPreferences();
+</script>
+<script>
+/* ---- Canopus global terminal shortcut: redirects into index.html's Terminal page ---- */
+(function(){
+  var SC_KEY='canopus_term_shortcut';
+  function getShortcut(){
+    try{var raw=localStorage.getItem(SC_KEY);if(raw)return JSON.parse(raw);}catch(e){}
+    return {alt:true,ctrl:false,shift:false,meta:false,key:'`'};
+  }
+  function matches(e,sc){
+    if(!sc||!sc.key)return false;
+    return !!sc.ctrl===e.ctrlKey&&!!sc.alt===e.altKey&&!!sc.shift===e.shiftKey&&!!sc.meta===e.metaKey&&(e.key||'').toLowerCase()===sc.key.toLowerCase();
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(matches(e,getShortcut())){
+      e.preventDefault();
+      window.location.href='index.html?openTerminal=1';
+    }
+  },true);
+})();
+</script>
+<script>
+/* ---- Canopus: local keyboard shortcut to hide/show this page's header (persists across all Canopus pages) ---- */
+(function(){
+  var nav=document.getElementById('app-nav')||document.querySelector('header');
+  if(!nav)return;
+  function setHidden(hidden){
+    document.documentElement.classList.toggle('chdr-hidden',hidden);
+    try{localStorage.setItem('canopusHeaderHidden',hidden?'1':'0');}catch(e){}
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key||'').toLowerCase()==='h'){
+      e.preventDefault();
+      setHidden(!document.documentElement.classList.contains('chdr-hidden'));
+    }
+  },true);
+})();
+</script>
+</body>
+</html>

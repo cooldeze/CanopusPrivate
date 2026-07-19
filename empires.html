@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Regulus — Empires · Canopus</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="retro-theme.css">
+<link rel="stylesheet" href="vhs-theme.css">
+<link rel="stylesheet" href="harsh-mode.css">
+<style>
+:root{
+  --void:#000;
+  --void2:#0a0a0a;
+  --void3:#111;
+  --gold:#d9a441;
+  --gold-soft:rgba(217,164,65,.14);
+  --cyan:#4fb8c9;
+  --cyan-soft:rgba(79,184,201,.14);
+  --ivory:#f2efe6;
+  --muted:rgba(242,239,230,.5);
+  --line:rgba(255,255,255,.12);
+  --accent:#fff;--accent-hover:#ddd;--accent-on:#000;--accent-muted:#2a2a2a;--accent-soft:rgba(255,255,255,.06);
+}
+body.grey{
+  --void:#0A0A0B;--void2:#111214;--void3:#17181B;
+}
+body[data-accent="blue"]{
+  --accent:#5a9fd4;--accent-hover:#4a8fc4;--accent-on:#000;--accent-muted:#2a4a6a;--accent-soft:rgba(90,159,212,.12);
+}
+body[data-accent="green"]{
+  --accent:#4a9a6a;--accent-hover:#3a8a5a;--accent-on:#000;--accent-muted:#1a3a2a;--accent-soft:rgba(74,154,106,.12);
+}
+body[data-accent="amber"]{
+  --accent:#c9952a;--accent-hover:#b8851a;--accent-on:#000;--accent-muted:#4a3a1a;--accent-soft:rgba(201,149,42,.12);
+}
+body[data-accent="pink"]{
+  --accent:#e0629c;--accent-hover:#cf4f8a;--accent-on:#000;--accent-muted:#4a1a32;--accent-soft:rgba(224,98,156,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--void);color:var(--ivory);font-family:'Inter',sans-serif;height:100%;overflow:hidden}
+a{color:inherit;text-decoration:none}
+
+/* ── SHARED APP NAV (matches index.html across all Canopus pages) ── */
+#app-nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) 14px calc(24px + env(safe-area-inset-left));z-index:100;background:linear-gradient(var(--void) 70%,transparent);pointer-events:none}
+#app-nav>*{pointer-events:auto}
+.nav-logo{font-size:11px;font-weight:500;letter-spacing:.18em;color:rgba(255,255,255,.7);text-transform:uppercase}
+.nav-links{display:flex;gap:2px;padding:2px}
+.nav-link{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;color:#333;transition:color .2s,background .2s;border:none;background:none;letter-spacing:.06em;font-family:'Inter',sans-serif}
+.nav-link.active{color:var(--accent);background:var(--accent-soft)}
+.nav-link:hover:not(.active){color:#666}
+.nav-util{display:flex;align-items:center;gap:4px}
+.nav-fs{width:30px;height:30px;border-radius:7px;background:transparent;border:none;color:#333;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:color .2s}
+.nav-fs:hover{color:#888}
+.nav-menu-pop{position:fixed;right:24px;top:52px;background:var(--void2);border:0.5px solid #1a1a1a;border-radius:10px;padding:4px;min-width:168px;z-index:110;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.nav-menu-pop.open{display:block}
+.nav-menu-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;font-size:11px;color:#555;background:none;border:none;width:100%;text-align:left;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.04em;transition:background .12s,color .12s}
+.nav-menu-item:hover{background:var(--void3);color:#aaa}
+.nav-menu-item i{font-size:13px;width:14px;color:#333}
+.nav-accent-pop{position:fixed;right:62px;top:52px;background:var(--void2);border:0.5px solid #1a1a1a;border-radius:10px;padding:8px 10px;z-index:110;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:7px}
+.nav-accent-pop.open{display:flex}
+.accent-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--swatch);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.accent-swatch:hover{transform:scale(1.08)}
+.accent-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--swatch)}
+.accent-swatch[data-accent="white"]{--swatch:#fff}
+.accent-swatch[data-accent="blue"]{--swatch:#5a9fd4}
+.accent-swatch[data-accent="green"]{--swatch:#4a9a6a}
+.accent-swatch[data-accent="amber"]{--swatch:#c9952a}
+.accent-swatch[data-accent="pink"]{--swatch:#e0629c}
+.nav-pop-sep{width:0.5px;align-self:stretch;background:#222;margin:0 1px}
+.surface-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--sw);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.surface-swatch:hover{transform:scale(1.08)}
+.surface-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--sw)}
+.surface-swatch[data-surface="black"]{--sw:#000;border-color:#444}
+.surface-swatch[data-surface="grey"]{--sw:#3a3b3e}
+.surface-swatch[data-surface="white"]{--sw:#fff}
+@media(max-width:900px){
+  #app-nav{padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 16px calc(16px + env(safe-area-inset-left));background:linear-gradient(var(--void) 85%,transparent)}
+  body.light #app-nav{background:linear-gradient(#f5f5f0 85%,transparent)}
+  .nav-logo-wrap{display:none}
+  .nav-links{max-width:calc(100vw - 148px);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:4px}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-link{padding:9px 16px;font-size:14px;white-space:nowrap;flex-shrink:0}
+  .nav-fs{width:36px;height:36px;font-size:16px}
+  .nav-util{gap:6px}
+  .nav-menu-pop,.nav-accent-pop{top:calc(64px + env(safe-area-inset-top))}
+}
+@media(max-width:480px){
+  .nav-links{max-width:calc(100vw - 128px);gap:2px}
+  .nav-link{padding:8px 13px;font-size:13px}
+  .nav-fs{width:34px;height:34px;font-size:15px}
+}
+
+/* ── EMPIRES SUB-HEADER (page-specific controls, sits just under the shared nav) ── */
+#em-top{position:fixed;top:52px;left:0;right:0;z-index:59;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px 8px;pointer-events:none}
+#em-top>*{pointer-events:auto}
+.em-heading{display:flex;align-items:center;gap:8px}
+.em-celestial{font-family:'Fraunces',serif;font-weight:600;font-size:15px;letter-spacing:.02em;color:var(--gold)}
+.em-paren{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.04em}
+.em-info-btn{width:20px;height:20px;border-radius:50%;border:0.5px solid rgba(255,255,255,.4);background:none;color:rgba(255,255,255,.6);font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+.em-info-btn:hover{color:#fff;border-color:#fff}
+.em-icon-btn{font-size:11px;letter-spacing:.06em;color:rgba(255,255,255,.6);border:0.5px solid var(--line);border-radius:20px;padding:6px 13px;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.em-icon-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+.em-top-actions{display:flex;gap:8px}
+
+/* ── CONTROL STRIP ── */
+#em-controls{position:fixed;top:100px;left:0;right:0;z-index:59;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 16px;pointer-events:none;flex-wrap:wrap}
+#em-controls>*{pointer-events:auto}
+.em-tabs{display:flex;gap:6px;background:rgba(8,8,10,.55);border:0.5px solid var(--line);border-radius:20px;padding:3px;backdrop-filter:blur(8px)}
+.em-tab{font-size:10.5px;letter-spacing:.05em;padding:6px 11px;border-radius:16px;color:rgba(255,255,255,.5);cursor:pointer;transition:color .2s,background .25s;white-space:nowrap}
+.em-tab.active[data-cat="india"]{background:var(--gold-soft);color:var(--gold)}
+.em-tab.active[data-cat="global"]{background:var(--cyan-soft);color:var(--cyan)}
+.em-tab.active[data-cat="all"]{background:rgba(255,255,255,.12);color:#fff}
+.em-modeswitch{display:flex;gap:2px;background:rgba(8,8,10,.55);border:0.5px solid var(--line);border-radius:20px;padding:3px;backdrop-filter:blur(8px)}
+.em-mode-opt{font-size:10.5px;letter-spacing:.05em;padding:6px 12px;border-radius:16px;color:rgba(255,255,255,.5);cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .2s,background .25s;white-space:nowrap}
+.em-mode-opt.active{background:rgba(255,255,255,.14);color:#fff}
+.em-mode-opt i{font-size:12px}
+
+/* ── GLOBE ── */
+#em-globe-wrap{position:absolute;inset:0;transition:background 1s ease}
+#em-globe-wrap.cat-india{background:radial-gradient(ellipse at 50% 40%,rgba(217,164,65,.07),transparent 60%)}
+#em-globe-wrap.cat-global{background:radial-gradient(ellipse at 50% 40%,rgba(79,184,201,.07),transparent 60%)}
+#em-canvas{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
+#em-canvas.dragging{cursor:grabbing}
+#em-hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);font-size:10.5px;letter-spacing:.1em;color:rgba(255,255,255,.28);z-index:40;text-align:center;pointer-events:none}
+#em-loading{position:fixed;top:52%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.1em;z-index:40}
+
+/* ── EMPIRE RAIL (left vertical panel) ── */
+#em-rail-wrap{position:fixed;top:0;left:0;bottom:0;z-index:55;width:290px;max-width:82vw;padding:150px 8px 18px 16px;display:flex;flex-direction:column;background:linear-gradient(100deg,rgba(5,6,10,.88) 0%,rgba(5,6,10,.78) 55%,rgba(5,6,10,.35) 90%,transparent 100%);border-right:0.5px solid rgba(255,255,255,.06);backdrop-filter:blur(6px);transition:transform .38s cubic-bezier(.2,.8,.2,1)}
+#em-rail-wrap.collapsed{transform:translateX(calc(-100% + 30px))}
+.em-rail-toggle{position:absolute;top:50%;right:2px;transform:translateY(-50%);width:26px;height:52px;border-radius:0 12px 12px 0;border:0.5px solid var(--line);border-left:none;background:rgba(10,11,14,.85);backdrop-filter:blur(8px);color:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:color .2s}
+.em-rail-toggle:hover{color:#fff}
+.em-rail-toggle i{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+#em-rail-wrap.collapsed .em-rail-toggle i{transform:rotate(180deg)}
+#em-rail-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding-right:8px;margin-right:-8px}
+#em-rail-scroll::-webkit-scrollbar{width:4px}
+#em-rail-scroll::-webkit-scrollbar-track{background:transparent}
+#em-rail-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:2px}
+.em-rail-group-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.34);margin:16px 0 8px 2px;display:flex;align-items:center;gap:8px}
+.em-rail-group-label:first-child{margin-top:0}
+.em-rail-group-label:after{content:'';flex:1;height:0.5px;background:rgba(255,255,255,.1)}
+#em-rail{display:flex;flex-direction:column}
+.em-rail-row{display:flex;flex-direction:column;gap:7px}
+.em-chip{flex:0 0 auto;display:flex;flex-direction:column;gap:3px;padding:10px 12px 10px 13px;border-radius:10px;border:0.5px solid rgba(255,255,255,.09);border-left:2.5px solid var(--chip-c,var(--gold));background:rgba(255,255,255,.025);cursor:pointer;transition:border-color .2s,background .2s,transform .18s,box-shadow .2s}
+.em-chip:hover{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.055);transform:translateX(3px)}
+.em-chip.active{background:var(--chip-bg,var(--gold-soft));box-shadow:0 4px 20px -8px var(--chip-c,var(--gold)), inset 0 0 0 0.5px var(--chip-c,var(--gold))}
+.em-chip .em-chip-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.em-chip .em-chip-name{font-size:12.5px;font-weight:500;color:#eee;line-height:1.3}
+.em-chip .em-chip-era{font-size:9.5px;color:rgba(255,255,255,.4);letter-spacing:.03em;white-space:nowrap;flex:0 0 auto}
+.em-chip.active .em-chip-name{color:var(--chip-c,var(--gold))}
+.em-chip .em-chip-meta{font-size:9.5px;color:rgba(255,255,255,.32);letter-spacing:.02em}
+.em-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+
+/* ── DETAIL DRAWER ── */
+#em-drawer{position:fixed;top:0;right:0;width:min(400px,92vw);height:100%;background:rgba(6,6,7,.94);backdrop-filter:blur(14px);border-left:0.5px solid rgba(255,255,255,.12);z-index:70;transform:translateX(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1),max-height .32s cubic-bezier(.2,.8,.2,1),border-radius .32s ease;overflow-y:auto;padding:70px 22px 40px}
+#em-drawer.open{transform:translateX(0)}
+#em-drawer::-webkit-scrollbar{width:3px}
+#em-drawer::-webkit-scrollbar-thumb{background:#222}
+/* ── minimized state: collapse to just the title area so the globe stays usable underneath ── */
+#em-drawer.minimized{max-height:210px;overflow:hidden;border-bottom:0.5px solid rgba(255,255,255,.12);border-radius:0 0 16px 16px;box-shadow:0 16px 40px -12px rgba(0,0,0,.65)}
+#em-drawer.minimized .em-d-stats,
+#em-drawer.minimized .em-d-section-h,
+#em-drawer.minimized .em-gdp-bar-wrap,
+#em-drawer.minimized .em-gdp-caption,
+#em-drawer.minimized .em-d-text,
+#em-drawer.minimized .em-d-list,
+#em-drawer.minimized .em-source-note{display:none}
+.em-drawer-close,.em-drawer-min{position:fixed;top:calc(76px + env(safe-area-inset-top));right:calc(16px + env(safe-area-inset-right));width:30px;height:30px;border-radius:8px;border:0.5px solid rgba(255,255,255,.2);background:rgba(0,0,0,.5);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:75}
+.em-drawer-min{right:calc(54px + env(safe-area-inset-right))}
+.em-drawer-min i{transition:transform .25s ease}
+.em-drawer-min.is-min i{transform:rotate(180deg)}
+.em-listen-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;border:0.5px solid rgba(255,255,255,.2);background:rgba(0,0,0,.4);color:rgba(255,255,255,.75);font-size:11px;letter-spacing:.04em;cursor:pointer;margin-top:10px;font-family:'Inter',sans-serif}
+.em-listen-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+.tts-playing{color:var(--accent,#fff)!important;border-color:var(--accent,#fff)!important;background:rgba(255,255,255,.08)!important}
+.em-d-region{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.em-d-name{font-family:'Fraunces',serif;font-size:26px;font-weight:500;letter-spacing:-.01em;margin-bottom:4px;color:#fff}
+.em-d-era{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:18px}
+.em-d-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.em-d-stat{border:0.5px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px}
+.em-d-stat-label{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:3px}
+.em-d-stat-val{font-size:13px;color:#eee;line-height:1.35}
+.em-d-section-h{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:20px 0 8px;padding-top:14px;border-top:0.5px solid rgba(255,255,255,.09)}
+.em-d-section-h:first-of-type{border-top:none;padding-top:0}
+.em-d-text{font-size:13.5px;line-height:1.75;color:#c9cacc}
+.em-d-list{list-style:none;padding:0}
+.em-d-list li{font-size:13px;line-height:1.6;color:#c9cacc;padding:5px 0 5px 16px;position:relative}
+.em-d-list li:before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;border-radius:50%;background:var(--chip-c,var(--gold))}
+.em-gdp-bar-wrap{margin-top:8px}
+.em-gdp-bar-track{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.em-gdp-bar-fill{height:100%;border-radius:3px}
+.em-gdp-caption{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:6px;line-height:1.5}
+.em-source-note{font-size:10px;color:rgba(255,255,255,.32);margin-top:22px;line-height:1.6;border-top:0.5px solid rgba(255,255,255,.09);padding-top:12px}
+
+/* ── COMPARE MODAL ── */
+#em-compare-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:90;display:none;align-items:center;justify-content:center;padding:20px}
+#em-compare-bg.open{display:flex}
+#em-compare-modal{width:min(560px,100%);max-height:82vh;overflow-y:auto;background:var(--void2);border:0.5px solid #232427;border-radius:16px;padding:24px 24px 20px}
+#em-compare-modal::-webkit-scrollbar{width:3px}
+#em-compare-modal::-webkit-scrollbar-thumb{background:#222}
+.em-cmp-title{font-family:'Fraunces',serif;font-size:18px;margin-bottom:4px}
+.em-cmp-sub{font-size:11.5px;color:rgba(255,255,255,.45);margin-bottom:20px;line-height:1.5}
+.em-cmp-row{margin-bottom:14px}
+.em-cmp-row-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.em-cmp-row-label{font-size:12.5px;color:#ddd}
+.em-cmp-row-label small{color:rgba(255,255,255,.4);font-size:10.5px;margin-left:4px}
+.em-cmp-row-val{font-size:12.5px;font-weight:500;color:var(--gold);font-family:'IBM Plex Mono',monospace}
+.em-cmp-track{height:8px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden}
+.em-cmp-fill{height:100%;border-radius:4px;background:var(--cyan)}
+.em-cmp-fill.india{background:var(--gold)}
+.em-compare-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:8px;border:0.5px solid #2a2a2a;background:none;color:#fff;cursor:pointer}
+#em-compare-modal{position:relative}
+
+/* ── TIMELINE MODAL ── */
+#em-timeline-bg{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:90;display:none;align-items:center;justify-content:center;padding:16px}
+#em-timeline-bg.open{display:flex}
+#em-timeline-modal{position:relative;width:min(720px,100%);max-height:86vh;background:var(--void2);border:0.5px solid #232427;border-radius:16px;padding:24px 20px 20px;display:flex;flex-direction:column}
+.em-tl-title{font-family:'Fraunces',serif;font-size:18px;margin-bottom:4px}
+.em-tl-sub{font-size:11.5px;color:rgba(255,255,255,.45);margin-bottom:14px;line-height:1.5}
+#em-tl-scroll{overflow-x:auto;overflow-y:hidden;border-radius:10px;background:rgba(255,255,255,.02)}
+#em-tl-scroll::-webkit-scrollbar{height:6px}
+#em-tl-scroll::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px}
+.em-tl-bar-label{font-family:'Inter',sans-serif;cursor:pointer}
+.em-tl-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:8px;border:0.5px solid #2a2a2a;background:none;color:#fff;cursor:pointer}
+
+/* ── NAMING INFO MODAL ── */
+#em-info-bg{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:95;display:none;align-items:center;justify-content:center;padding:20px}
+#em-info-bg.open{display:flex}
+#em-info-modal{position:relative;width:min(460px,100%);background:var(--void3);border:0.5px solid #232427;border-radius:16px;padding:24px}
+.em-info-heading{font-family:'Fraunces',serif;font-size:18px;margin-bottom:4px}
+.em-info-heading span{color:var(--gold)}
+.em-info-assoc{font-size:11px;color:#666;font-style:italic;margin-bottom:12px}
+.em-info-text{font-size:13px;line-height:1.7;color:#C7C8CB}
+.em-info-close{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:8px;border:0.5px solid #2a2a2a;background:none;color:#fff;cursor:pointer}
+
+@media (max-width:640px){
+  .em-d-stats{grid-template-columns:1fr}
+  #em-drawer{padding-top:calc(84px + env(safe-area-inset-top));padding-bottom:calc(40px + env(safe-area-inset-bottom));width:min(400px,94vw)}
+  #em-drawer.minimized{max-height:calc(84px + env(safe-area-inset-top) + 130px)}
+  #em-top{top:calc(48px + env(safe-area-inset-top));padding-left:calc(16px + env(safe-area-inset-left));padding-right:calc(16px + env(safe-area-inset-right))}
+  #em-controls{top:calc(116px + env(safe-area-inset-top));padding-left:calc(16px + env(safe-area-inset-left));padding-right:calc(16px + env(safe-area-inset-right))}
+  .em-icon-btn span.em-btn-label{display:none}
+  .em-icon-btn{padding:6px 10px}
+  #em-rail-wrap{width:82vw;padding-top:190px;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+  #em-rail-wrap.collapsed{transform:translateX(calc(-100% + 26px))}
+  #em-hint{bottom:calc(16px + env(safe-area-inset-bottom));font-size:9.5px;padding:0 10px}
+  .em-celestial{font-size:13.5px}
+  .em-tabs{flex:1 1 auto;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;justify-content:flex-start}
+  .em-tabs::-webkit-scrollbar{display:none}
+  .em-tab{white-space:nowrap}
+}
+
+/* ── Small phones ── */
+@media (max-width:400px){
+  #em-top{top:calc(44px + env(safe-area-inset-top))}
+  #em-controls{top:calc(108px + env(safe-area-inset-top));flex-direction:column;align-items:stretch}
+  .em-tabs,.em-modeswitch{width:100%}
+  .em-tabs{justify-content:flex-start}
+  .em-tab{padding:6px 9px;font-size:10px}
+  .em-mode-opt{padding:6px 10px;font-size:10px;flex:1;justify-content:center}
+  .em-celestial{font-size:12.5px}
+  .em-paren{font-size:10px}
+  .em-icon-btn{padding:5px 8px;font-size:10px}
+  .em-d-name{font-size:22px}
+  #em-rail-wrap{width:86vw}
+  #em-info-modal{padding:20px 18px}
+}
+</style>
+<script>
+(function(){try{
+  var t=localStorage.getItem('dayplan_theme'),a=localStorage.getItem('dayplan_accent'),s=localStorage.getItem('dayplan_surface');
+  if(t==='light')document.documentElement.classList.add('dp-light');
+  if(t!=='light'&&s==='grey')document.documentElement.classList.add('dp-grey');
+  if(a&&['white','blue','green','amber','pink'].indexOf(a)>=0)document.documentElement.dataset.accent=a;
+}catch(e){}})();
+</script>
+</head>
+<body data-accent="white" data-track-feature="empires">
+<script src="tracker.js"></script>
+<script src="retro-theme.js"></script>
+<script src="vhs-theme.js"></script>
+<script src="harsh-mode.js"></script>
+<script>
+(function(){
+  if(document.documentElement.classList.contains('dp-light'))document.body.classList.add('light');
+  if(document.documentElement.classList.contains('dp-grey'))document.body.classList.add('grey');
+  if(document.documentElement.dataset.accent)document.body.dataset.accent=document.documentElement.dataset.accent;
+  document.documentElement.classList.remove('dp-light','dp-grey');
+})();
+</script>
+
+
+<nav id="app-nav">
+  <span class="nav-logo-wrap">
+    <a href="index.html" style="text-decoration:none"><span class="nav-logo">Canopus</span></a>
+  </span>
+  <div class="nav-links">
+    <button class="nav-link" onclick="location.href='index.html#focus'">Focus</button>
+    <button class="nav-link" onclick="location.href='index.html#schedule'">Schedule</button>
+    <button class="nav-link" onclick="location.href='index.html#progress'">Progress</button>
+    <button class="nav-link" onclick="location.href='index.html#sky'">Sky</button>
+    <button class="nav-link" onclick="location.href='index.html#capsule'">Capsule</button>
+    <button class="nav-link" onclick="location.href='index.html#flight'">Flight</button>
+    <button class="nav-link" onclick="location.href='index.html#passport'">Passport</button>
+    <button class="nav-link" onclick="location.href='vault.html'">Vault</button>
+    <button class="nav-link active" data-page="empires">Empires</button>
+    <button class="nav-link" onclick="location.href='conflicts.html'">Conflicts</button>
+    <button class="nav-link" onclick="location.href='index.html#literature'">Literature</button>
+    <button class="nav-link" onclick="location.href='sirius.html'">Sirius</button>
+    <button class="nav-link" onclick="location.href='library.html'">Library</button>
+    <button class="nav-link" onclick="location.href='index.html#features'">Features</button>
+    <button class="nav-link" onclick="location.href='interests.html'">Interests</button>
+    <button class="nav-link" onclick="location.href='index.html?openTerminal=1'">Terminal</button>
+  </div>
+  <div class="nav-util">
+    <button class="nav-fs" id="accent-picker-btn" onclick="toggleAccentPicker(event)" aria-label="Accent color" title="Accent color"><i class="ti ti-palette"></i></button>
+    <button class="nav-fs" id="theme-toggle-btn" onclick="toggleAppTheme()" aria-label="Toggle theme" title="Light/dark"><i class="ti ti-sun"></i></button>
+    <button class="nav-fs" id="navMoreBtn" onclick="toggleNavMenu(event)" aria-label="More" title="More"><i class="ti ti-dots"></i></button>
+  </div>
+</nav>
+<script>
+/* ── Nav header: keep the open feature's tab centered in the scrollable
+   mobile strip, but leave it wherever the user scrolls it once they've
+   touched/dragged the strip themselves. ── */
+(function(){
+  function setup(){
+    var navLinks=document.querySelector('#app-nav .nav-links');
+    if(!navLinks) return;
+    var userTouching=false;
+    var releaseTimer=null;
+    function touchStart(){ userTouching=true; clearTimeout(releaseTimer); }
+    function touchEnd(){ clearTimeout(releaseTimer); releaseTimer=setTimeout(function(){ userTouching=false; },150); }
+    navLinks.addEventListener('touchstart',touchStart,{passive:true});
+    navLinks.addEventListener('touchend',touchEnd,{passive:true});
+    navLinks.addEventListener('touchcancel',touchEnd,{passive:true});
+    navLinks.addEventListener('mousedown',touchStart);
+    window.addEventListener('mouseup',touchEnd);
+    window.centerActiveNav=function(smooth){
+      if(userTouching) return;
+      var active=navLinks.querySelector('.nav-link.active');
+      if(!active) return;
+      active.scrollIntoView({behavior:smooth?'smooth':'auto',inline:'center',block:'nearest'});
+    };
+    window.centerActiveNav(false);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup);
+  else setup();
+})();
+</script>
+<div class="nav-accent-pop" id="navAccentPop">
+  <button class="accent-swatch" data-accent="white" onclick="setAppAccent('white')" title="White" aria-label="White accent"></button>
+  <button class="accent-swatch" data-accent="blue" onclick="setAppAccent('blue')" title="Blue" aria-label="Blue accent"></button>
+  <button class="accent-swatch" data-accent="green" onclick="setAppAccent('green')" title="Green" aria-label="Green accent"></button>
+  <button class="accent-swatch" data-accent="amber" onclick="setAppAccent('amber')" title="Amber" aria-label="Amber accent"></button>
+  <button class="accent-swatch" data-accent="pink" onclick="setAppAccent('pink')" title="Pink" aria-label="Pink accent"></button>
+  <span class="nav-pop-sep"></span>
+  <button class="surface-swatch" data-surface="black" onclick="setAppSurface('black')" title="Black" aria-label="Black surface"></button>
+  <button class="surface-swatch" data-surface="grey" onclick="setAppSurface('grey')" title="Grey" aria-label="Grey surface"></button>
+  <button class="surface-swatch" data-surface="white" onclick="setAppSurface('white')" title="White" aria-label="White surface"></button>
+</div>
+<div class="nav-menu-pop" id="navMenuPop">
+  <button class="nav-menu-item" onclick="location.href='index.html#flight'"><i class="ti ti-plane"></i>Flight tracker</button>
+  <button class="nav-menu-item" onclick="location.href='index.html#passport'"><i class="ti ti-book"></i>Passport</button>
+  <button class="nav-menu-item" onclick="location.href='sirius.html'"><i class="ti ti-quote"></i>Sirius (LOQ)</button>
+  <button class="nav-menu-item" onclick="location.href='interests.html'"><i class="ti ti-chart-radar"></i>Interests</button>
+  <button class="nav-menu-item" onclick="toggleFS();closeNavMenu()"><i class="ti ti-maximize"></i>Fullscreen</button>
+</div>
+
+<div id="em-top">
+  <div class="em-heading">
+    <span class="em-celestial">Regulus</span><span class="em-paren">(Empires)</span>
+    <button class="em-info-btn" onclick="emOpenInfo()" title="Why Regulus?"><i class="ti ti-info-circle"></i></button>
+  </div>
+  <div class="em-top-actions">
+    <button class="em-icon-btn" onclick="emOpenTimeline()"><i class="ti ti-timeline"></i><span class="em-btn-label">Timeline</span></button>
+    <button class="em-icon-btn" onclick="emOpenCompare()"><i class="ti ti-chart-bar"></i><span class="em-btn-label">Compare GDP</span></button>
+  </div>
+</div>
+
+<div id="em-controls">
+  <div class="em-tabs" id="em-cat-tabs">
+    <div class="em-tab active" data-cat="all" onclick="emSetCategory('all')">All empires</div>
+    <div class="em-tab" data-cat="india" onclick="emSetCategory('india')">Indian empires</div>
+    <div class="em-tab" data-cat="global" onclick="emSetCategory('global')">Global empires</div>
+  </div>
+  <div class="em-modeswitch" id="em-mode-switch">
+    <div class="em-mode-opt active" data-mode="all" onclick="emSetMode('all')"><i class="ti ti-layers-intersect"></i>Overlay</div>
+    <div class="em-mode-opt" data-mode="single" onclick="emSetMode('single')"><i class="ti ti-focus-2"></i>Focus</div>
+  </div>
+</div>
+
+<div id="em-globe-wrap">
+  <canvas id="em-canvas"></canvas>
+</div>
+<div id="em-loading">loading world map…</div>
+<div id="em-hint" id="em-hint-text">drag to rotate · every empire's peak extent is overlaid in its own colour — tap one below to spotlight it</div>
+
+<div id="em-rail-wrap">
+  <button class="em-rail-toggle" id="em-rail-toggle" onclick="emToggleRail()" title="Collapse list"><i class="ti ti-chevron-left"></i></button>
+  <div id="em-rail-scroll"><div id="em-rail"></div></div>
+</div>
+
+<button class="em-drawer-min" id="em-drawer-min" onclick="emToggleMinimize()" style="display:none" title="Minimize"><i class="ti ti-chevron-down"></i></button>
+<button class="em-drawer-close" id="em-drawer-close" onclick="emCloseDrawer()" style="display:none"><i class="ti ti-x"></i></button>
+<div id="em-drawer"></div>
+
+<div id="em-compare-bg" onclick="if(event.target===this)emCloseCompare()">
+  <div id="em-compare-modal">
+    <button class="em-compare-close" onclick="emCloseCompare()"><i class="ti ti-x"></i></button>
+    <div class="em-cmp-title">Share of world GDP, by era</div>
+    <div class="em-cmp-sub">Civilization-wide estimates (Angus Maddison's historical national-accounts project, in 1990 international dollars) for the era each highlighted empire dominated. Pre-1000&nbsp;CE empires predate reliable GDP estimates and are omitted here — see their individual pages for qualitative context instead.</div>
+    <div id="em-cmp-rows"></div>
+  </div>
+</div>
+
+<div id="em-timeline-bg" onclick="if(event.target===this)emCloseTimeline()">
+  <div id="em-timeline-modal">
+    <button class="em-tl-close" onclick="emCloseTimeline()"><i class="ti ti-x"></i></button>
+    <div class="em-tl-title">Empires across time</div>
+    <div class="em-tl-sub">Every empire on this map, positioned by founding and end date. Bar length is lifespan; the bright dot marks its territorial peak. Tap a bar to open it.</div>
+    <div id="em-tl-scroll"></div>
+  </div>
+</div>
+
+<div id="em-info-bg" onclick="if(event.target===this)emCloseInfo()">
+  <div id="em-info-modal">
+    <button class="em-info-close" onclick="emCloseInfo()"><i class="ti ti-x"></i></button>
+    <div class="em-info-heading"><span>Regulus</span> — Empires</div>
+    <div class="em-info-assoc">Hindu association: Magha Nakshatra</div>
+    <div class="em-info-text">Regulus, "the little king," has been read as a royal star across nearly every ancient sky-watching tradition. In Hindu astronomy it anchors <strong>Magha</strong> — "the mighty one" — the nakshatra of thrones, ancestry, and inherited authority, ruled by the Pitrs, the spirits of one's forebears. Magha's symbol is a palanquin: power carried forward by those who came before. This section is named Regulus because every empire mapped here is exactly that — authority built on what preceded it, extending outward until it reshaped the map, and eventually passing, as all thrones do, to something else.</div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   GLOBE ENGINE — orthographic projection & GeoJSON basemap
+   ============================================================ */
+let canvas, ctx, W, H;
+let lambda = 1.35, phi = 0.35, targetLambda = 1.35, targetPhi = 0.35;
+let zoom = 1, dragging = false, dragLast = null, autoRotate = true;
+let geoData = null, geoError = false, animFrame = null;
+let tGlobal = 0;
+let stars = [];
+
+function orthoProject(lat, lon, R, cx, cy){
+  const lam = lon*Math.PI/180 - lambda;
+  const la = lat*Math.PI/180;
+  const cosLa=Math.cos(la), sinLa=Math.sin(la);
+  const cosLam=Math.cos(lam), sinLam=Math.sin(lam);
+  const cosPhi=Math.cos(phi), sinPhi=Math.sin(phi);
+  const x0 = cosLa*sinLam, y0 = sinLa, z0 = cosLa*cosLam;
+  const y1 = y0*cosPhi - z0*sinPhi;
+  const z1 = y0*sinPhi + z0*cosPhi;
+  return { sx: cx + R*x0, sy: cy - R*y1, visible: z1 > 0.02 };
+}
+function ringPath(ctx, ring, R, cx, cy){
+  let penDown=false;
+  for(let i=0;i<ring.length;i++){
+    const [lat,lon]=ring[i];
+    const p=orthoProject(lat,lon,R,cx,cy);
+    if(!p.visible){ penDown=false; continue; }
+    if(!penDown){ ctx.moveTo(p.sx,p.sy); penDown=true; } else ctx.lineTo(p.sx,p.sy);
+  }
+}
+function drawTerritory(ctx, ring, R, cx, cy, color){
+  ctx.save();
+  ctx.beginPath();
+  ringPath(ctx, ring, R, cx, cy);
+  ctx.closePath();
+  ctx.fillStyle = color.fill; ctx.fill();
+  ctx.lineWidth = color.lw||1.3; ctx.strokeStyle = color.stroke; ctx.stroke();
+  ctx.restore();
+}
+
+async function loadGeoData(){
+  try{
+    const url='https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+    const res=await fetch(url);
+    if(!res.ok) throw new Error('fetch failed');
+    const topo=await res.json();
+    const obj=topo.objects.countries, arcs=topo.arcs;
+    const scale=topo.transform?topo.transform.scale:[1,1];
+    const translate=topo.transform?topo.transform.translate:[0,0];
+    function decodeArc(arcIdx){
+      const reversed=arcIdx<0;
+      const arc=arcs[reversed?~arcIdx:arcIdx];
+      let x=0,y=0;
+      const pts=arc.map(([dx,dy])=>{x+=dx;y+=dy;return[x*scale[0]+translate[0],y*scale[1]+translate[1]];});
+      return reversed?pts.reverse():pts;
+    }
+    function assembleRing(arcIndices){
+      const pts=[];
+      for(const idx of arcIndices){ const arc=decodeArc(idx); if(pts.length) arc.shift(); pts.push(...arc); }
+      return pts;
+    }
+    function toGeom(geom){
+      if(geom.type==='Polygon') return {type:'Polygon',coordinates:geom.arcs.map(assembleRing)};
+      if(geom.type==='MultiPolygon') return {type:'MultiPolygon',coordinates:geom.arcs.map(g=>g.map(assembleRing))};
+      return null;
+    }
+    geoData = obj.geometries.map(g=>({geometry:toGeom(g)})).filter(f=>f.geometry);
+  }catch(e){ console.warn('geo load failed',e); geoError=true; }
+  const l=document.getElementById('em-loading'); if(l) l.style.display='none';
+}
+
+function initStars(){
+  stars = [];
+  const n = Math.floor((W*H)/9000);
+  for(let i=0;i<n;i++){
+    stars.push({x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.1+0.25, phase:Math.random()*Math.PI*2, speed:0.4+Math.random()*0.8});
+  }
+}
+function drawStars(){
+  for(const s of stars){
+    const a = 0.15 + 0.45*Math.max(0,Math.sin(tGlobal*s.speed + s.phase));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+    ctx.fill();
+  }
+}
+
+function currentEmpireList(){
+  return category==='all' ? EMPIRES : EMPIRES.filter(e=>e.category===category);
+}
+
+function drawGlobe(){
+  W=canvas.width; H=canvas.height;
+  const cx=W/2, cy=H/2, R=Math.min(W,H)*0.42*zoom;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+  drawStars();
+
+  // ocean sphere
+  const ocean=ctx.createRadialGradient(cx-R*0.15,cy-R*0.2,R*0.05,cx,cy,R);
+  ocean.addColorStop(0,'#141a1f'); ocean.addColorStop(1,'#050506');
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fillStyle=ocean; ctx.fill();
+
+  // faint glow ring
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,R*1.01,0,Math.PI*2);
+  ctx.lineWidth = 8; ctx.strokeStyle = 'rgba(217,164,65,.04)'; ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+
+  // graticule
+  ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=0.5;
+  for(let lat=-80;lat<=80;lat+=20){
+    ctx.beginPath();
+    for(let lon=-180;lon<=180;lon+=2){
+      const p=orthoProject(lat,lon,R,cx,cy);
+      if(!p.visible) continue;
+      lon===-180 ? ctx.moveTo(p.sx,p.sy) : ctx.lineTo(p.sx,p.sy);
+    }
+    ctx.stroke();
+  }
+  for(let lon=-180;lon<180;lon+=20){
+    ctx.beginPath();
+    for(let lat=-88;lat<=88;lat+=2){
+      const p=orthoProject(lat,lon,R,cx,cy);
+      if(!p.visible) continue;
+      lat===-88 ? ctx.moveTo(p.sx,p.sy) : ctx.lineTo(p.sx,p.sy);
+    }
+    ctx.stroke();
+  }
+
+  // countries (basemap)
+  if(geoData){
+    for(const feat of geoData){
+      const geom=feat.geometry;
+      const polys = geom.type==='Polygon' ? [geom.coordinates] : geom.type==='MultiPolygon' ? geom.coordinates : [];
+      for(const poly of polys){
+        ctx.beginPath();
+        for(const ring of poly){
+          let penDown=false;
+          for(let i=0;i<ring.length;i++){
+            const [lon,lat]=ring[i];
+            const p=orthoProject(lat,lon,R,cx,cy);
+            if(!p.visible){ penDown=false; continue; }
+            if(!penDown){ ctx.moveTo(p.sx,p.sy); penDown=true; } else ctx.lineTo(p.sx,p.sy);
+          }
+        }
+        ctx.fillStyle='rgba(255,255,255,.045)'; ctx.fill();
+        ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=0.6; ctx.stroke();
+      }
+    }
+  }
+
+  // empire territory overlay
+  if(viewMode==='all'){
+    const list = currentEmpireList();
+    for(const e of list){
+      const isSel = selectedEmpire && selectedEmpire.id===e.id;
+      const hasSel = !!selectedEmpire;
+      const fa = isSel ? 0.4 : (hasSel ? 0.05 : 0.17);
+      const sa = isSel ? 0.95 : (hasSel ? 0.18 : 0.5);
+      const lw = isSel ? 1.7 : 1.1;
+      (e.territories||[]).forEach((ring,i)=>{
+        const damp = i===0 ? 1 : 0.75; // primary/home region drawn slightly bolder than overseas regions
+        drawTerritory(ctx, ring, R, cx, cy, {
+          fill:`rgba(${e.color.r},${e.color.g},${e.color.b},${fa*damp})`,
+          stroke:`rgba(${e.color.r},${e.color.g},${e.color.b},${sa*damp})`, lw:lw*(i===0?1:0.85)
+        });
+      });
+    }
+  } else if(selectedEmpire){
+    const col = EMPIRE_COLOR;
+    (selectedEmpire.territories||[]).forEach((ring,i)=>{
+      const damp = i===0 ? 1 : 0.65;
+      drawTerritory(ctx, ring, R, cx, cy, {
+        fill: `rgba(${col.r},${col.g},${col.b},${0.3*damp})`,
+        stroke: `rgba(${col.r},${col.g},${col.b},${0.92*damp})`, lw:i===0?1.8:1.4
+      });
+    });
+  }
+
+  ctx.restore();
+  ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.stroke();
+}
+
+function animLoop(){
+  tGlobal += 0.016;
+  if(!dragging){
+    lambda += (targetLambda - lambda) * 0.055;
+    phi += (targetPhi - phi) * 0.055;
+    if(autoRotate && !selectedEmpire) lambda -= 0.0012;
+  }
+  drawGlobe();
+  animFrame = requestAnimationFrame(animLoop);
+}
+
+function initGlobe(){
+  canvas = document.getElementById('em-canvas');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  ctx = canvas.getContext('2d');
+  initStars();
+  window.addEventListener('resize', ()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; initStars(); });
+
+  const onDown=e=>{ dragging=true; autoRotate=false; canvas.classList.add('dragging'); const t=e.touches?e.touches[0]:e; dragLast={x:t.clientX,y:t.clientY}; };
+  const onMove=e=>{
+    if(!dragging) return;
+    const t=e.touches?e.touches[0]:e;
+    lambda -= (t.clientX-dragLast.x)*0.005;
+    phi += (t.clientY-dragLast.y)*0.005;
+    phi = Math.max(-1.4, Math.min(1.4, phi));
+    targetLambda=lambda; targetPhi=phi;
+    dragLast={x:t.clientX,y:t.clientY};
+  };
+  const onUp=()=>{ dragging=false; canvas.classList.remove('dragging'); };
+  canvas.addEventListener('mousedown',onDown);
+  canvas.addEventListener('touchstart',onDown,{passive:true});
+  window.addEventListener('mousemove',onMove);
+  window.addEventListener('touchmove',onMove,{passive:true});
+  window.addEventListener('mouseup',onUp);
+  window.addEventListener('touchend',onUp);
+  canvas.addEventListener('wheel',e=>{ e.preventDefault(); zoom=Math.max(0.6,Math.min(2.2,zoom-e.deltaY*0.001)); },{passive:false});
+
+  loadGeoData().then(()=>{ if(!animFrame) animLoop(); });
+  animLoop();
+}
+
+/* ============================================================
+   EMPIRE DATA
+   Extents are stylized, illustrative outlines of peak territory —
+   not survey-accurate historical borders (which are, for most of
+   these empires, genuinely contested among historians anyway).
+   Coordinates are [lat, lon] to match this file's ringPath().
+   yStart/yEnd/yPeak are astronomical year numbers (BCE negative)
+   used only to place empires on the timeline.
+   ============================================================ */
+const EMPIRES = [
+{ id:'maurya', name:'Maurya Empire', region:'India', category:'india', group:'Golden ages of India', color:{r:224,g:123,b:57},
+  founded:'c. 322 BCE', ended:'c. 185 BCE', peakYear:'c. 250 BCE', peakRuler:'Ashoka the Great',
+  yStart:-322, yEnd:-185, yPeak:-250,
+  capital:'Pataliputra (modern Patna)', area:'~5,000,000 km²', population:'~50–60 million (estimated)',
+  gdpNote:'Predates reliable GDP estimation. Greek envoy Megasthenes, who lived at the Mauryan court, described Pataliputra as larger and more fortified than any city he knew of west of India, including Persepolis.',
+  gdpPct:null,
+  summary:'Founded by Chandragupta Maurya with the strategic guidance of his advisor Chanakya, the Maurya Empire became the first political power to unify nearly the entire Indian subcontinent under one administration. Under Ashoka, its third ruler, it reached its greatest extent — stretching from Afghanistan to nearly the southern tip of India. Ashoka\'s reign is best remembered for a reversal: after the brutal Kalinga War, he renounced further military conquest and adopted Buddhist principles of non-violence, inscribing edicts on rocks and pillars across the empire promoting welfare, religious tolerance, and ethical governance — among the earliest surviving public policy documents in world history.',
+  achievements:['Unified nearly the entire Indian subcontinent for the first time','Built an extensive road and administrative network, including the precursor to the Grand Trunk Road','Ashoka\'s edicts are among the oldest deciphered public inscriptions in the world','Sponsored the spread of Buddhism across South and Central Asia'],
+  decline:'The empire fragmented within roughly 50 years of Ashoka\'s death, undermined by weaker successors, regional revolts, and the strain of administering such a vast territory without the centralizing force of its two strongest rulers.',
+  center:[24,82],
+  extent:[[34.438,71.75],[34.562,72.25],[34.641,72.75],[34.672,73.25],[34.656,73.75],[34.594,74.25],[34.484,74.75],[34.328,75.25],[34.125,75.75],[33.875,76.25],[33.609,76.766],[33.328,77.297],[33.031,77.844],[32.719,78.406],[32.391,78.984],[32.047,79.578],[31.688,80.188],[31.312,80.812],[30.938,81.438],[30.562,82.062],[30.188,82.688],[29.812,83.312],[29.438,83.938],[29.062,84.562],[28.688,85.188],[28.312,85.812],[27.938,86.422],[27.562,87.016],[27.188,87.594],[26.812,88.156],[26.438,88.703],[26.062,89.234],[25.688,89.75],[25.312,90.25],[24.922,90.609],[24.516,90.828],[24.094,90.906],[23.656,90.844],[23.203,90.641],[22.734,90.297],[22.25,89.812],[21.75,89.188],[21.25,88.562],[20.75,87.938],[20.25,87.312],[19.75,86.688],[19.25,86.062],[18.75,85.438],[18.25,84.812],[17.75,84.188],[17.266,83.578],[16.797,82.984],[16.344,82.406],[15.906,81.844],[15.484,81.297],[15.078,80.766],[14.688,80.25],[14.312,79.75],[13.953,79.281],[13.609,78.844],[13.281,78.438],[12.969,78.062],[12.672,77.719],[12.391,77.406],[12.125,77.125],[11.875,76.875],[11.688,76.625],[11.562,76.375],[11.5,76.125],[11.5,75.875],[11.562,75.625],[11.688,75.375],[11.875,75.125],[12.125,74.875],[12.391,74.641],[12.672,74.422],[12.969,74.219],[13.281,74.031],[13.609,73.859],[13.953,73.703],[14.312,73.562],[14.688,73.438],[15.078,73.281],[15.484,73.094],[15.906,72.875],[16.344,72.625],[16.797,72.344],[17.266,72.031],[17.75,71.688],[18.25,71.312],[18.766,70.938],[19.297,70.562],[19.844,70.188],[20.406,69.812],[20.984,69.438],[21.578,69.062],[22.188,68.688],[22.812,68.312],[23.438,67.969],[24.062,67.656],[24.688,67.375],[25.312,67.125],[25.938,66.906],[26.562,66.719],[27.188,66.562],[27.812,66.438],[28.422,66.391],[29.016,66.422],[29.594,66.531],[30.156,66.719],[30.703,66.984],[31.234,67.328],[31.75,67.75],[32.25,68.25],[32.703,68.75],[33.109,69.25],[33.469,69.75],[33.781,70.25],[34.047,70.75],[34.266,71.25],[34.438,71.75]]
+},
+{ id:'gupta', name:'Gupta Empire', region:'India', category:'india', group:'Golden ages of India', color:{r:201,g:149,b:42},
+  founded:'c. 320 CE', ended:'c. 550 CE', peakYear:'c. 400 CE', peakRuler:'Chandragupta II',
+  yStart:320, yEnd:550, yPeak:400,
+  capital:'Pataliputra', area:'~3,500,000 km²', population:'~30–40 million (estimated)',
+  gdpNote:'Predates reliable GDP estimation. The Chinese Buddhist pilgrim Faxian, who traveled through the empire around 400 CE, described a peaceful, prosperous realm with free hospitals and low taxation — a rare firsthand account of governance quality from the period.',
+  gdpPct:null,
+  summary:'Often called India\'s "Golden Age," the Gupta Empire presided over a period of extraordinary achievement in mathematics, astronomy, medicine, literature, and art. The concept of zero as a numeral and place-value notation — the foundation of the modern number system — was formalized during this era. The astronomer-mathematician Aryabhata calculated the length of the solar year and proposed that the Earth rotates on its axis, centuries before similar ideas took hold in Europe. Sanskrit literature flourished under royal patronage, most famously the plays and poetry of Kalidasa.',
+  achievements:['Formalized the decimal place-value system and the numeral zero','Aryabhata\'s astronomical and mathematical treatises, centuries ahead of comparable European work','Kalidasa\'s Sanskrit poetry and drama, considered the height of classical Indian literature','Relatively decentralized rule that allowed regional prosperity to flourish'],
+  decline:'Weakened by recurring invasions from the Hunas (Hephthalites) from Central Asia through the 5th century, combined with the gradual loss of control over outlying provinces, the empire fragmented into smaller successor kingdoms by the mid-6th century.',
+  center:[25,80],
+  extent:[[32.438,73.75],[32.562,74.25],[32.641,74.766],[32.672,75.297],[32.656,75.844],[32.594,76.406],[32.484,76.984],[32.328,77.578],[32.125,78.188],[31.875,78.812],[31.594,79.453],[31.281,80.109],[30.938,80.781],[30.562,81.469],[30.156,82.172],[29.719,82.891],[29.25,83.625],[28.75,84.375],[28.266,85.094],[27.797,85.781],[27.344,86.438],[26.906,87.062],[26.484,87.656],[26.078,88.219],[25.688,88.75],[25.312,89.25],[24.938,89.609],[24.562,89.828],[24.188,89.906],[23.812,89.844],[23.438,89.641],[23.062,89.297],[22.688,88.812],[22.312,88.188],[21.953,87.547],[21.609,86.891],[21.281,86.219],[20.969,85.531],[20.672,84.828],[20.391,84.109],[20.125,83.375],[19.875,82.625],[19.641,81.875],[19.422,81.125],[19.219,80.375],[19.031,79.625],[18.859,78.875],[18.703,78.125],[18.562,77.375],[18.438,76.625],[18.375,75.906],[18.375,75.219],[18.438,74.562],[18.562,73.938],[18.75,73.344],[19,72.781],[19.312,72.25],[19.688,71.75],[20.094,71.281],[20.531,70.844],[21,70.438],[21.5,70.062],[22.031,69.719],[22.594,69.406],[23.188,69.125],[23.812,68.875],[24.422,68.672],[25.016,68.516],[25.594,68.406],[26.156,68.344],[26.703,68.328],[27.234,68.359],[27.75,68.438],[28.25,68.562],[28.719,68.719],[29.156,68.906],[29.562,69.125],[29.938,69.375],[30.281,69.656],[30.594,69.969],[30.875,70.312],[31.125,70.688],[31.359,71.078],[31.578,71.484],[31.781,71.906],[31.969,72.344],[32.141,72.797],[32.297,73.266],[32.438,73.75]]
+},
+{ id:'chola', name:'Chola Empire', region:'India', category:'india', group:'Golden ages of India', color:{r:180,g:70,b:60},
+  founded:'c. 850 CE', ended:'1279 CE', peakYear:'c. 1030 CE', peakRuler:'Rajendra Chola I',
+  yStart:850, yEnd:1279, yPeak:1030,
+  capital:'Thanjavur, later Gangaikonda Cholapuram', area:'~3,600,000 km² (including naval sphere of influence)', population:'~15–20 million (estimated, core territories)',
+  gdpNote:'India as a subcontinent-wide economy is estimated at roughly 29% of world GDP around 1000 CE (Maddison Project). The Cholas ruled only the peninsula, not the whole subcontinent, but were the era\'s dominant Indian Ocean trading and naval power.',
+  gdpPct:null,
+  summary:'The Cholas built the most powerful navy in Indian history and used it not just to defend their coasts but to project power overseas — Rajendra Chola I launched a maritime campaign across the Bay of Bengal against the Srivijaya kingdom (in modern Indonesia and Malaysia), one of very few instances of a South Asian power conducting sustained overseas conquest. At home, they were extraordinary temple-builders and left behind some of the most sophisticated bronze sculpture in world art history, alongside an unusually well-documented system of village self-governance recorded on temple inscriptions.',
+  achievements:['Built and deployed the most capable navy in Indian history, projecting power into Southeast Asia','Brihadeeswarar Temple at Thanjavur — a UNESCO World Heritage site and engineering landmark','World-renowned Chola bronze sculpture, especially of Nataraja (Shiva as cosmic dancer)','Detailed inscriptional records of local self-government, some of the earliest evidence of structured village democracy'],
+  decline:'Sustained pressure from the rising Pandya and Hoysala kingdoms, combined with succession struggles, eroded Chola authority through the 13th century until the dynasty was absorbed by the Pandyas in 1279.',
+  center:[11,78],
+  extra:[[5,96.75],[5,97.25],[4.891,97.734],[4.672,98.203],[4.344,98.656],[3.906,99.094],[3.359,99.516],[2.703,99.922],[1.938,100.312],[1.062,100.688],[0.25,100.984],[-0.5,101.203],[-1.188,101.344],[-1.812,101.406],[-2.375,101.391],[-2.875,101.297],[-3.312,101.125],[-3.688,100.875],[-3.984,100.594],[-4.203,100.281],[-4.344,99.938],[-4.406,99.562],[-4.391,99.156],[-4.297,98.719],[-4.125,98.25],[-3.875,97.75],[-3.531,97.297],[-3.094,96.891],[-2.562,96.531],[-1.938,96.219],[-1.219,95.953],[-0.406,95.734],[0.5,95.562],[1.5,95.438],[2.375,95.391],[3.125,95.422],[3.75,95.531],[4.25,95.719],[4.625,95.984],[4.875,96.328],[5,96.75]],
+  extent:[[17,76.062],[17,76.938],[16.938,77.711],[16.812,78.383],[16.625,78.953],[16.375,79.422],[16.062,79.789],[15.688,80.055],[15.25,80.219],[14.75,80.281],[14.266,80.32],[13.797,80.336],[13.344,80.328],[12.906,80.297],[12.484,80.242],[12.078,80.164],[11.688,80.062],[11.312,79.938],[10.953,79.794],[10.609,79.631],[10.281,79.45],[9.969,79.25],[9.672,79.031],[9.391,78.794],[9.125,78.538],[8.875,78.263],[8.672,78.002],[8.516,77.755],[8.406,77.522],[8.344,77.303],[8.328,77.098],[8.359,76.908],[8.438,76.731],[8.562,76.569],[8.703,76.419],[8.859,76.281],[9.031,76.156],[9.219,76.044],[9.422,75.944],[9.641,75.856],[9.875,75.781],[10.125,75.719],[10.391,75.641],[10.672,75.547],[10.969,75.438],[11.281,75.312],[11.609,75.172],[11.953,75.016],[12.312,74.844],[12.688,74.656],[13.062,74.477],[13.438,74.305],[13.812,74.141],[14.188,73.984],[14.562,73.836],[14.938,73.695],[15.312,73.562],[15.688,73.438],[16.016,73.438],[16.297,73.562],[16.531,73.812],[16.719,74.188],[16.859,74.688],[16.953,75.312],[17,76.062]]
+},
+{ id:'delhi_sultanate', name:'Delhi Sultanate', region:'India', category:'india', group:'Golden ages of India', color:{r:110,g:130,b:150},
+  founded:'c. 1206 CE', ended:'1526 CE', peakYear:'c. 1330 CE', peakRuler:'Muhammad bin Tughlaq',
+  yStart:1206, yEnd:1526, yPeak:1330,
+  capital:'Delhi', area:'~3,800,000 km² (at peak under the Tughlaqs)', population:'~20–25 million (estimated)',
+  gdpNote:'Predates reliable GDP estimation, but Delhi under the Sultanate grew into one of the largest cities in the medieval world, and its control of overland and Gujarati coastal trade routes made it a major node linking Central Asia to the Indian Ocean economy.',
+  gdpPct:null,
+  summary:'A series of five dynasties (Mamluk, Khalji, Tughlaq, Sayyid, Lodi) ruled from Delhi for over three centuries, at its height under Muhammad bin Tughlaq extending across almost the entire subcontinent — the closest any single power came to uniting India between the Mauryas and the Mughals. It introduced Indo-Islamic architectural styles, most famously the Qutub Minar, and under Alauddin Khalji experimented with some of the most sophisticated market and price-control regulations recorded anywhere before the modern era. The Sultanate also withstood repeated Mongol invasions that devastated Central Asia and the Middle East, making Delhi one of very few major capitals the Mongols never captured. Its eventual fragmentation opened space for regional successor states, including Vijayanagara in the south.',
+  achievements:['Repelled repeated Mongol invasions that devastated much of Central Asia and the Middle East','Alauddin Khalji\'s market-control reforms are among the most sophisticated pre-modern price-regulation systems on record','Introduced Indo-Islamic architectural styles, including the Qutub Minar complex','At its Tughlaq-era peak, came closer to uniting the subcontinent than any power between the Mauryas and Mughals'],
+  decline:'Muhammad bin Tughlaq\'s costly and unpopular administrative experiments — including a disastrous attempt to relocate the capital to Daulatabad — weakened central authority, and the Sultanate never fully recovered. A devastating sack of Delhi by Timur in 1398 accelerated its fragmentation into regional sultanates, and the last Delhi dynasty fell to Babur at the First Battle of Panipat in 1526, giving rise to the Mughal Empire.',
+  center:[26,78],
+  extent:[[34.5,71.3],[34.603,71.677],[34.68,72.089],[34.73,72.531],[34.75,72.999],[34.736,73.487],[34.687,73.989],[34.6,74.5],[34.477,75.034],[34.322,75.599],[34.133,76.185],[33.908,76.779],[33.645,77.37],[33.343,77.948],[33.0,78.5],[32.591,79.026],[32.109,79.536],[31.58,80.035],[31.03,80.526],[30.483,81.015],[29.964,81.504],[29.5,82.0],[29.09,82.504],[28.713,83.015],[28.359,83.526],[28.019,84.035],[27.685,84.536],[27.348,85.026],[27.0,85.5],[26.638,85.964],[26.271,86.423],[25.902,86.873],[25.536,87.31],[25.178,87.73],[24.831,88.128],[24.5,88.5],[24.192,88.891],[23.907,89.319],[23.634,89.742],[23.366,90.115],[23.093,90.395],[22.808,90.538],[22.5,90.5],[22.173,90.248],[21.837,89.809],[21.49,89.232],[21.133,88.564],[20.765,87.854],[20.388,87.15],[20.0,86.5],[19.585,85.883],[19.136,85.251],[18.671,84.606],[18.207,83.955],[17.762,83.3],[17.354,82.647],[17.0,82.0],[16.685,81.348],[16.389,80.685],[16.121,80.019],[15.889,79.359],[15.703,78.713],[15.57,78.09],[15.5,77.5],[15.516,76.924],[15.618,76.348],[15.78,75.788],[15.975,75.259],[16.178,74.774],[16.362,74.35],[16.5,74.0],[16.571,73.741],[16.592,73.563],[16.592,73.447],[16.602,73.373],[16.653,73.321],[16.776,73.27],[17.0,73.2],[17.351,73.138],[17.81,73.112],[18.343,73.1],[18.913,73.083],[19.485,73.041],[20.026,72.953],[20.5,72.8],[20.918,72.566],[21.316,72.264],[21.694,71.916],[22.051,71.543],[22.388,71.169],[22.704,70.814],[23.0,70.5],[23.258,70.218],[23.472,69.944],[23.66,69.682],[23.84,69.434],[24.028,69.203],[24.242,68.99],[24.5,68.8],[24.796,68.631],[25.112,68.483],[25.449,68.352],[25.806,68.24],[26.184,68.144],[26.582,68.064],[27.0,68.0],[27.456,67.945],[27.956,67.898],[28.483,67.865],[29.017,67.853],[29.544,67.867],[30.044,67.914],[30.5,68.0],[30.918,68.133],[31.316,68.31],[31.694,68.522],[32.051,68.757],[32.388,69.006],[32.704,69.257],[33.0,69.5],[33.279,69.729],[33.542,69.952],[33.786,70.177],[34.008,70.415],[34.203,70.675],[34.368,70.967],[34.5,71.3]]
+},
+
+
+{ id:'vijayanagara', name:'Vijayanagara Empire', region:'India', category:'india', group:'Golden ages of India', color:{r:150,g:110,b:190},
+  founded:'1336 CE', ended:'1646 CE', peakYear:'c. 1520 CE', peakRuler:'Krishnadevaraya',
+  yStart:1336, yEnd:1646, yPeak:1520,
+  capital:'Vijayanagara (Hampi)', area:'~360,000 km²', population:'~20–25 million (estimated)',
+  gdpNote:'India as a subcontinent-wide economy is estimated at roughly 24–25% of world GDP around 1500 CE (Maddison Project). Vijayanagara controlled only the south, but was the peninsula\'s dominant power and a major node in Indian Ocean trade.',
+  gdpPct:null,
+  summary:'Founded explicitly to resist the northward expansion of the Delhi Sultanate, Vijayanagara became one of the wealthiest states of its era, built on control of the region\'s cotton textile and spice trade and, notably, its diamond mines. The Portuguese traveler Domingo Paes, who visited the capital in the 1520s, described a city larger and better provisioned than anything comparable he had seen in Europe, with markets overflowing with precious stones sold by weight in the open street. Under Krishnadevaraya, the empire reached its cultural and territorial peak, with the emperor himself a celebrated poet and patron of Telugu literature.',
+  achievements:['Controlled and taxed a major share of the era\'s diamond trade','Hampi\'s temple and market architecture, now a UNESCO World Heritage site','Sustained a multilingual literary court culture spanning Telugu, Kannada, and Sanskrit','Maintained one of the largest standing armies and cavalry forces in the region, funded by trade revenue'],
+  decline:'A coalition of neighboring Deccan Sultanates inflicted a decisive defeat at the Battle of Talikota in 1565. The capital was sacked and largely abandoned, and though the dynasty limped on from smaller capitals for another eight decades, it never recovered its former power.',
+  center:[15,77],
+  extent:[[16.438,75.75],[16.562,76.25],[16.648,76.723],[16.695,77.17],[16.703,77.591],[16.672,77.984],[16.602,78.352],[16.492,78.692],[16.344,79.006],[16.156,79.294],[15.953,79.548],[15.734,79.77],[15.5,79.959],[15.25,80.116],[14.984,80.239],[14.703,80.33],[14.406,80.388],[14.094,80.413],[13.773,80.419],[13.445,80.406],[13.109,80.375],[12.766,80.325],[12.414,80.256],[12.055,80.169],[11.688,80.062],[11.312,79.938],[10.953,79.794],[10.609,79.631],[10.281,79.45],[9.969,79.25],[9.672,79.031],[9.391,78.794],[9.125,78.538],[8.875,78.263],[8.672,78.002],[8.516,77.755],[8.406,77.522],[8.344,77.303],[8.328,77.098],[8.359,76.908],[8.438,76.731],[8.562,76.569],[8.719,76.411],[8.906,76.258],[9.125,76.109],[9.375,75.966],[9.656,75.827],[9.969,75.692],[10.312,75.562],[10.688,75.438],[11.055,75.312],[11.414,75.188],[11.766,75.062],[12.109,74.938],[12.445,74.812],[12.773,74.688],[13.094,74.562],[13.406,74.438],[13.703,74.328],[13.984,74.234],[14.25,74.156],[14.5,74.094],[14.734,74.047],[14.953,74.016],[15.156,74],[15.344,74],[15.523,74.062],[15.695,74.188],[15.859,74.375],[16.016,74.625],[16.164,74.938],[16.305,75.312],[16.438,75.75]]
+},
+{ id:'mughal', name:'Mughal Empire', region:'India', category:'india', group:'Golden ages of India', color:{r:20,g:130,b:110},
+  founded:'1526 CE', ended:'1857 CE', peakYear:'c. 1700 CE', peakRuler:'Aurangzeb',
+  yStart:1526, yEnd:1857, yPeak:1700,
+  capital:'Agra, later Delhi', area:'~4,000,000 km² (~90% of the Indian subcontinent)', population:'~150 million (estimated, roughly a quarter of the world population)',
+  gdpNote:'Estimated at roughly 24% of total world GDP in 1700 (Angus Maddison\'s widely-cited estimate, in 1990 international dollars) — larger than the combined economies of Western Europe at the time, and the largest single economy on Earth for much of the 17th century.',
+  gdpPct:24,
+  summary:'Founded by Babur, a Central Asian descendant of both Timur and Genghis Khan, the Mughal Empire became the wealthiest and most populous state in the world by the late 17th century. Its economy rested on an extraordinarily productive agrarian base, a sophisticated tax-administration system, and a textile industry — especially cotton and silk — so dominant that "Mughal muslin" and Bengal cotton were prized luxury imports across Europe long before the Industrial Revolution. Akbar\'s reign (1556–1605) built the administrative and religious-tolerance framework that let the empire absorb and govern an enormously diverse population; Aurangzeb\'s reign brought it to its largest territorial extent, though at growing military and fiscal cost. Contemporary European visitors routinely described Mughal cities as larger, richer, and more architecturally accomplished than their own capitals.',
+  achievements:['World\'s largest economy for much of the 17th century, per Maddison-based estimates','Produced an estimated quarter of global manufacturing output (chiefly textiles) into the mid-1700s','The Taj Mahal and a broader tradition of Indo-Islamic architecture still standing today','A uniform empire-wide currency and customs system across nearly the entire subcontinent'],
+  decline:'Aurangzeb\'s costly and prolonged wars in the Deccan, combined with weaker successors, regional governors asserting independence, and the rising commercial and military power of the British East India Company, fragmented central authority through the 18th century. The economy that had produced roughly a quarter of world GDP was substantially deindustrialized over the following century of British colonial rule.',
+  center:[26,78],
+  extent:[[34.562,72.188],[34.438,72.812],[34.297,73.438],[34.141,74.062],[33.969,74.688],[33.781,75.312],[33.578,75.938],[33.359,76.562],[33.125,77.188],[32.875,77.812],[32.594,78.484],[32.281,79.203],[31.938,79.969],[31.562,80.781],[31.156,81.641],[30.719,82.547],[30.25,83.5],[29.75,84.5],[29.25,85.438],[28.75,86.312],[28.25,87.125],[27.75,87.875],[27.25,88.562],[26.75,89.188],[26.25,89.75],[25.75,90.25],[25.25,90.609],[24.75,90.828],[24.25,90.906],[23.75,90.844],[23.25,90.641],[22.75,90.297],[22.25,89.812],[21.75,89.188],[21.266,88.562],[20.797,87.938],[20.344,87.312],[19.906,86.688],[19.484,86.062],[19.078,85.438],[18.688,84.812],[18.312,84.188],[17.953,83.578],[17.609,82.984],[17.281,82.406],[16.969,81.844],[16.672,81.297],[16.391,80.766],[16.125,80.25],[15.875,79.75],[15.672,79.25],[15.516,78.75],[15.406,78.25],[15.344,77.75],[15.328,77.25],[15.359,76.75],[15.438,76.25],[15.562,75.75],[15.719,75.25],[15.906,74.75],[16.125,74.25],[16.375,73.75],[16.656,73.25],[16.969,72.75],[17.312,72.25],[17.688,71.75],[18.094,71.266],[18.531,70.797],[19,70.344],[19.5,69.906],[20.031,69.484],[20.594,69.078],[21.188,68.688],[21.812,68.312],[22.422,67.969],[23.016,67.656],[23.594,67.375],[24.156,67.125],[24.703,66.906],[25.234,66.719],[25.75,66.562],[26.25,66.438],[26.75,66.328],[27.25,66.234],[27.75,66.156],[28.25,66.094],[28.75,66.047],[29.25,66.016],[29.75,66],[30.25,66],[30.734,66.062],[31.203,66.188],[31.656,66.375],[32.094,66.625],[32.516,66.938],[32.922,67.312],[33.312,67.75],[33.688,68.25],[34,68.766],[34.25,69.297],[34.438,69.844],[34.562,70.406],[34.625,70.984],[34.625,71.578],[34.562,72.188]]
+},
+{ id:'assyrian', name:'Neo-Assyrian Empire', region:'Middle East', category:'global', group:'Ancient & classical world', color:{r:140,g:90,b:55},
+  founded:'c. 911 BCE', ended:'609 BCE', peakYear:'c. 670 BCE', peakRuler:'Esarhaddon',
+  yStart:-911, yEnd:-609, yPeak:-670,
+  capital:'Nineveh (also Ashur, Kalhu)', area:'~1,400,000 km²', population:'~a few million across its provinces (no reliable census survives)',
+  gdpNote:'Predates any form of GDP estimation, but its systematic taxation of conquered provinces and control of Mesopotamian trade routes made it the wealthiest and most powerful state in the Near East for nearly three centuries.',
+  gdpPct:null,
+  summary:'The Neo-Assyrian Empire pioneered techniques of imperial administration that nearly every later Near Eastern empire would borrow: professional standing armies equipped with iron weapons, an extensive network of relay roads and royal messengers, mass deportation of conquered populations to discourage rebellion, and systematic provincial taxation. Under Esarhaddon it briefly conquered Egypt, becoming the first empire to control both Mesopotamia and the Nile Valley at once. Its royal library at Nineveh, assembled under Ashurbanipal, preserved tens of thousands of cuneiform tablets — including the Epic of Gilgamesh — and remains one of archaeology\'s richest windows into the ancient Near East.',
+  achievements:['First empire to briefly rule both Mesopotamia and Egypt at the same time','Pioneered relay-road messenger networks and provincial tax administration later copied by the Persians and others','Ashurbanipal\'s library at Nineveh preserved tens of thousands of cuneiform texts, including the Epic of Gilgamesh','Developed iron weaponry and advanced siege engineering that set the military standard for the era'],
+  decline:'A coalition of Babylonians and Medes exploited succession struggles and imperial overstretch, destroying Nineveh in 612 BCE; the last Assyrian remnants fell by 609 BCE, ending a state that had dominated the Near East for nearly three hundred years.',
+  center:[35,43],
+  extent:[[39.0,44.5],[38.891,43.856],[38.717,42.978],[38.497,41.95],[38.248,40.856],[37.987,39.777],[37.732,38.797],[37.5,38.0],[37.294,37.36],[37.101,36.794],[36.91,36.301],[36.713,35.878],[36.501,35.522],[36.267,35.23],[36.0,35.0],[35.694,34.89],[35.353,34.923],[34.988,35.04],[34.61,35.184],[34.229,35.297],[33.855,35.322],[33.5,35.2],[33.16,34.902],[32.825,34.469],[32.495,33.951],[32.168,33.396],[31.844,32.853],[31.522,32.371],[31.2,32.0],[30.887,31.72],[30.587,31.481],[30.292,31.286],[29.994,31.138],[29.684,31.039],[29.355,30.992],[29.0,31.0],[28.605,31.092],[28.172,31.276],[27.718,31.52],[27.258,31.796],[26.808,32.071],[26.383,32.316],[26.0,32.5],[25.622,32.593],[25.224,32.614],[24.837,32.601],[24.49,32.593],[24.214,32.631],[24.041,32.754],[24.0,33.0],[24.117,33.397],[24.372,33.917],[24.73,34.522],[25.157,35.172],[25.618,35.828],[26.077,36.45],[26.5,37.0],[26.907,37.49],[27.335,37.959],[27.777,38.408],[28.223,38.837],[28.665,39.245],[29.093,39.633],[29.5,40.0],[29.888,40.329],[30.265,40.615],[30.633,40.875],[30.99,41.125],[31.337,41.385],[31.673,41.671],[32.0,42.0],[32.334,42.376],[32.681,42.784],[33.023,43.216],[33.344,43.662],[33.625,44.114],[33.85,44.563],[34.0,45.0],[34.038,45.459],[33.966,45.959],[33.829,46.469],[33.671,46.959],[33.534,47.398],[33.462,47.755],[33.5,48.0],[33.655,48.121],[33.889,48.141],[34.182,48.083],[34.512,47.968],[34.856,47.818],[35.192,47.655],[35.5,47.5],[35.794,47.334],[36.101,47.13],[36.41,46.901],[36.713,46.66],[37.001,46.421],[37.267,46.197],[37.5,46.0],[37.7,45.827],[37.873,45.663],[38.025,45.51],[38.159,45.367],[38.28,45.235],[38.392,45.112],[38.5,45.0],[38.615,44.955],[38.738,44.996],[38.854,45.066],[38.952,45.108],[39.017,45.066],[39.038,44.882],[39.0,44.5]]
+},
+
+
+{ id:'achaemenid', name:'Achaemenid Persia', region:'Middle East', category:'global', group:'Ancient & classical world', color:{r:120,g:90,b:190},
+  founded:'c. 550 BCE', ended:'330 BCE', peakYear:'c. 500 BCE', peakRuler:'Darius I',
+  yStart:-550, yEnd:-330, yPeak:-500,
+  capital:'Persepolis', area:'~5,500,000 km²', population:'~35–50 million (estimated, ~44% of world population at the time)',
+  gdpNote:'Predates reliable GDP estimation, but by land area and share of world population it was almost certainly the largest economy of its era — the first empire to link Egypt, Mesopotamia, and the Indus Valley under a single administration and currency.',
+  gdpPct:null,
+  summary:'Founded by Cyrus the Great, the Achaemenid Empire was arguably history\'s first genuine "world empire," spanning three continents and dozens of distinct cultures and languages held together by an unusually pragmatic system of provincial governors (satraps), a standardized coinage, and the Royal Road — a state-maintained highway with relay stations that let messages cross the empire in days rather than weeks. Cyrus\'s reputation for relative religious and cultural tolerance, including his release of the Judean exiles held in Babylon, made a lasting impression that echoes through the Hebrew Bible.',
+  achievements:['First empire to administratively unify Egypt, Mesopotamia, Anatolia, and the Indus Valley','Built the Royal Road, one of the earliest state-run long-distance communication networks','Standardized coinage (the daric) across an enormous and culturally diverse territory','Comparatively tolerant governance of subject peoples and religions for its era'],
+  decline:'Conquered in a series of campaigns by Alexander the Great between 334 and 330 BCE, ending with the death of Darius III and the burning of Persepolis.',
+  center:[30,52],
+  extent:[[41.125,29.375],[40.875,30.625],[40.547,31.719],[40.141,32.656],[39.656,33.438],[39.094,34.062],[38.453,34.531],[37.734,34.844],[36.938,35],[36.062,35],[35.25,34.953],[34.5,34.859],[33.812,34.719],[33.188,34.531],[32.625,34.297],[32.125,34.016],[31.688,33.688],[31.312,33.312],[30.891,33.016],[30.422,32.797],[29.906,32.656],[29.344,32.594],[28.734,32.609],[28.078,32.703],[27.375,32.875],[26.625,33.125],[25.969,33.672],[25.406,34.516],[24.938,35.656],[24.562,37.094],[24.281,38.828],[24.094,40.859],[24,43.188],[24,45.812],[24.094,48.188],[24.281,50.312],[24.562,52.188],[24.938,53.812],[25.406,55.188],[25.969,56.312],[26.625,57.188],[27.375,57.812],[28.078,58.484],[28.734,59.203],[29.344,59.969],[29.906,60.781],[30.422,61.641],[30.891,62.547],[31.312,63.5],[31.688,64.5],[31.969,65.438],[32.156,66.312],[32.25,67.125],[32.25,67.875],[32.156,68.562],[31.969,69.188],[31.688,69.75],[31.312,70.25],[30.906,70.625],[30.469,70.875],[30,71],[29.5,71],[28.969,70.875],[28.406,70.625],[27.812,70.25],[27.188,69.75],[26.562,69.188],[25.938,68.562],[25.312,67.875],[24.688,67.125],[24.062,66.312],[23.438,65.438],[22.812,64.5],[22.188,63.5],[21.719,62.469],[21.406,61.406],[21.25,60.312],[21.25,59.188],[21.406,58.031],[21.719,56.844],[22.188,55.625],[22.812,54.375],[23.438,53.203],[24.062,52.109],[24.688,51.094],[25.312,50.156],[25.938,49.297],[26.562,48.516],[27.188,47.812],[27.812,47.188],[28.438,46.531],[29.062,45.844],[29.688,45.125],[30.312,44.375],[30.938,43.594],[31.562,42.781],[32.188,41.938],[32.812,41.062],[33.438,40.172],[34.062,39.266],[34.688,38.344],[35.312,37.406],[35.938,36.453],[36.562,35.484],[37.188,34.5],[37.812,33.5],[38.391,32.547],[38.922,31.641],[39.406,30.781],[39.844,29.969],[40.234,29.203],[40.578,28.484],[40.875,27.812],[41.125,27.188],[41.312,26.797],[41.438,26.641],[41.5,26.719],[41.5,27.031],[41.438,27.578],[41.312,28.359],[41.125,29.375]]
+},
+{ id:'han', name:'Han Dynasty', region:'East Asia', category:'global', group:'Ancient & classical world', color:{r:176,g:132,b:56},
+  founded:'202 BCE', ended:'220 CE', peakYear:'c. 100 BCE', peakRuler:'Emperor Wu of Han',
+  yStart:-202, yEnd:220, yPeak:-100,
+  capital:'Chang\'an, later Luoyang', area:'~6,500,000 km²', population:'~59 million (2 CE census) — roughly a quarter of the world\'s population at the time',
+  gdpNote:'Predates reliable GDP-share estimation, but Han China\'s agrarian output and population made it, alongside Rome, one of the two largest economies on Earth for most of its four-century span.',
+  gdpPct:null,
+  summary:'Under Emperor Wu, Han China expanded deep into Central Asia and first opened the trade corridor that would become known as the Silk Road, linking Chinese silk and lacquerware to Roman markets thousands of kilometers away — the two empires almost certainly never made direct diplomatic contact, yet each anchored the opposite end of the same trade network. The Han also formalized a merit-based civil service exam system, standardized weights, measures, and script across the realm, and presided over major advances including paper, the seismograph, and a lasting model of centralized bureaucratic governance that shaped Chinese statecraft for the next two thousand years — Chinese people still call themselves the "Han people" today.',
+  achievements:['Opened the Silk Road, connecting China to Central Asia, Persia, and ultimately Rome','Invented paper and pioneered an early seismograph for detecting distant earthquakes','Formalized a merit-based imperial civil service examination system','So culturally definitive that the majority Chinese ethnic group still calls itself "Han" today'],
+  decline:'Court intrigue, powerful eunuch factions, the Yellow Turban Rebellion, and the rise of regional warlords fractured central authority, leading to the empire\'s formal division into the Three Kingdoms in 220 CE.',
+  center:[32,105],
+  extent:[[41.125,115.25],[40.875,116.75],[40.578,118.094],[40.234,119.281],[39.844,120.312],[39.406,121.188],[38.922,121.906],[38.391,122.469],[37.812,122.875],[37.188,123.125],[36.531,123.281],[35.844,123.344],[35.125,123.312],[34.375,123.188],[33.594,122.969],[32.781,122.656],[31.938,122.25],[31.062,121.75],[30.203,121.156],[29.359,120.469],[28.531,119.688],[27.719,118.812],[26.922,117.844],[26.141,116.781],[25.375,115.625],[24.625,114.375],[23.906,113.219],[23.219,112.156],[22.562,111.188],[21.938,110.312],[21.344,109.531],[20.781,108.844],[20.25,108.25],[19.75,107.75],[19.375,107.188],[19.125,106.562],[19,105.875],[19,105.125],[19.125,104.312],[19.375,103.438],[19.75,102.5],[20.25,101.5],[20.781,100.5],[21.344,99.5],[21.938,98.5],[22.562,97.5],[23.219,96.5],[23.906,95.5],[24.625,94.5],[25.375,93.5],[26.109,92.469],[26.828,91.406],[27.531,90.312],[28.219,89.188],[28.891,88.031],[29.547,86.844],[30.188,85.625],[30.812,84.375],[31.438,83.359],[32.062,82.578],[32.688,82.031],[33.312,81.719],[33.938,81.641],[34.562,81.797],[35.188,82.188],[35.812,82.812],[36.422,83.516],[37.016,84.297],[37.594,85.156],[38.156,86.094],[38.703,87.109],[39.234,88.203],[39.75,89.375],[40.25,90.625],[40.688,91.953],[41.062,93.359],[41.375,94.844],[41.625,96.406],[41.812,98.047],[41.938,99.766],[42,101.562],[42,103.438],[41.969,105.266],[41.906,107.047],[41.812,108.781],[41.688,110.469],[41.531,112.109],[41.344,113.703],[41.125,115.25]]
+},
+{ id:'roman', name:'Roman Empire', region:'Mediterranean', category:'global', group:'Ancient & classical world', color:{r:180,g:40,b:40},
+  founded:'27 BCE', ended:'476 CE (West) / 1453 CE (East)', peakYear:'117 CE', peakRuler:'Trajan',
+  yStart:-27, yEnd:476, yPeak:117,
+  capital:'Rome', area:'~5,000,000 km²', population:'~60–70 million (estimated, ~20% of world population)',
+  gdpNote:'Predates reliable GDP-share estimation, but the empire controlled the entire Mediterranean trade basin — a 2nd-century Roman diet routinely included Egyptian grain, Gaulish wine, and British wool, evidence of an integrated economy of a scale not seen again in the region for over a millennium.',
+  gdpPct:null,
+  summary:'At its territorial peak under Trajan, the Roman Empire encircled the entire Mediterranean Sea, which Romans themselves called Mare Nostrum — "our sea." Its economy was unusually integrated for the ancient world: a common currency, a 400,000km network of roads, and safe sea lanes let grain, wine, olive oil, metal, and manufactured goods move across three continents. Roman law, engineering (aqueducts, concrete construction, sanitation), and urban planning shaped European and Mediterranean civilization for the two millennia that followed its fall.',
+  achievements:['Controlled and administratively integrated the entire Mediterranean basin','Built a road network exceeding 400,000 km, much of it still traceable today','Roman law forms a direct ancestor of most modern European legal systems','Engineering innovations — concrete, aqueducts, sanitation — unmatched in Europe for over a thousand years after its fall'],
+  decline:'The Western Empire fragmented under pressure from migrating and invading groups, economic strain, and internal political instability, formally ending in 476 CE. The Eastern half survived as the Byzantine Empire for nearly another thousand years, falling to the Ottomans in 1453.',
+  center:[40,15],
+  extent:[[53.375,-1.5],[52.625,-0.5],[51.891,0.484],[51.172,1.453],[50.469,2.406],[49.781,3.344],[49.109,4.266],[48.453,5.172],[47.812,6.062],[47.188,6.938],[46.578,7.781],[45.984,8.594],[45.406,9.375],[44.844,10.125],[44.297,10.844],[43.766,11.531],[43.25,12.188],[42.75,12.812],[42.297,13.438],[41.891,14.062],[41.531,14.688],[41.219,15.312],[40.953,15.938],[40.734,16.562],[40.562,17.188],[40.438,17.812],[40.281,18.469],[40.094,19.156],[39.875,19.875],[39.625,20.625],[39.344,21.406],[39.031,22.219],[38.688,23.062],[38.312,23.938],[37.969,24.844],[37.656,25.781],[37.375,26.75],[37.125,27.75],[36.906,28.781],[36.719,29.844],[36.562,30.938],[36.438,32.062],[36.281,33.031],[36.094,33.844],[35.875,34.5],[35.625,35],[35.344,35.344],[35.031,35.531],[34.688,35.562],[34.312,35.438],[33.953,35.281],[33.609,35.094],[33.281,34.875],[32.969,34.625],[32.672,34.344],[32.391,34.031],[32.125,33.688],[31.875,33.312],[31.656,32.875],[31.469,32.375],[31.312,31.812],[31.188,31.188],[31.094,30.5],[31.031,29.75],[31,28.938],[31,28.062],[31.016,27.141],[31.047,26.172],[31.094,25.156],[31.156,24.094],[31.234,22.984],[31.328,21.828],[31.438,20.625],[31.562,19.375],[31.719,18.203],[31.906,17.109],[32.125,16.094],[32.375,15.156],[32.656,14.297],[32.969,13.516],[33.312,12.812],[33.688,12.188],[34.047,11.469],[34.391,10.656],[34.719,9.75],[35.031,8.75],[35.328,7.656],[35.609,6.469],[35.875,5.188],[36.125,3.812],[36.438,2.484],[36.812,1.203],[37.25,-0.031],[37.75,-1.219],[38.312,-2.359],[38.938,-3.453],[39.625,-4.5],[40.375,-5.5],[41.141,-6.312],[41.922,-6.938],[42.719,-7.375],[43.531,-7.625],[44.359,-7.688],[45.203,-7.562],[46.062,-7.25],[46.938,-6.75],[47.797,-6.312],[48.641,-5.938],[49.469,-5.625],[50.281,-5.375],[51.078,-5.188],[51.859,-5.062],[52.625,-5],[53.375,-5],[53.938,-4.875],[54.312,-4.625],[54.5,-4.25],[54.5,-3.75],[54.312,-3.125],[53.938,-2.375],[53.375,-1.5]]
+},
+{ id:'byzantine', name:'Byzantine Empire', region:'Mediterranean', category:'global', group:'Ancient & classical world', color:{r:150,g:60,b:130},
+  founded:'330 CE', ended:'1453 CE', peakYear:'c. 555 CE', peakRuler:'Justinian I',
+  yStart:330, yEnd:1453, yPeak:555,
+  capital:'Constantinople', area:'~3,500,000 km² (at Justinian\'s peak)', population:'~26 million (estimated, at 6th-century peak)',
+  gdpNote:'Predates reliable GDP-share estimation, but Constantinople remained the wealthiest city in Christendom for most of the medieval period, controlling the Bosporus chokepoint between Black Sea and Mediterranean trade.',
+  gdpPct:null,
+  summary:'The eastern half of the Roman Empire outlived the western half by nearly a thousand years, preserving Roman law, Greek scholarship, and Christian orthodoxy through the medieval period. Under Justinian I, it briefly reconquered much of the western Mediterranean — Italy, North Africa, and parts of Spain — and commissioned the Corpus Juris Civilis, a codification of Roman law that underlies much of continental European legal tradition today. Constantinople\'s massive land and sea walls made it one of the most heavily fortified cities in history, repelling sieges for over eight centuries before finally falling to Ottoman cannon fire in 1453.',
+  achievements:['Codified Roman law into the Corpus Juris Civilis, still foundational to European legal systems','Constantinople\'s Theodosian Walls withstood sieges for over 800 years','Preserved Greek philosophical and scientific texts through the medieval period, later fueling the Renaissance','Built the Hagia Sophia, the world\'s largest cathedral for nearly a thousand years'],
+  decline:'Centuries of territorial losses to Arab, Seljuk, and Crusader incursions — including the catastrophic sack of Constantinople by the Fourth Crusade in 1204 — left a fragmented, weakened state that Ottoman forces finally conquered in 1453, extinguishing the last direct continuation of the Roman Empire.',
+  center:[39,30],
+  extent:[[45.5,13.5],[45.064,13.501],[44.477,13.736],[43.787,14.121],[43.044,14.573],[42.299,15.009],[41.601,15.345],[41.0,15.5],[40.48,15.539],[39.99,15.56],[39.531,15.522],[39.102,15.386],[38.704,15.114],[38.337,14.665],[38.0,14.0],[37.697,13.058],[37.427,11.854],[37.189,10.462],[36.98,8.956],[36.797,7.411],[36.638,5.901],[36.5,4.5],[36.398,3.087],[36.338,1.557],[36.308,0.004],[36.294,-1.474],[36.28,-2.781],[36.253,-3.822],[36.2,-4.5],[36.132,-4.829],[36.067,-4.901],[35.996,-4.732],[35.912,-4.34],[35.806,-3.742],[35.672,-2.956],[35.5,-2.0],[35.283,-0.81],[35.023,0.649],[34.734,2.321],[34.425,4.149],[34.109,6.076],[33.797,8.045],[33.5,10.0],[33.199,12.055],[32.879,14.3],[32.554,16.638],[32.238,18.974],[31.948,21.21],[31.697,23.251],[31.5,25.0],[31.428,26.472],[31.492,27.758],[31.615,28.875],[31.722,29.84],[31.739,30.671],[31.59,31.385],[31.2,32.0],[30.427,32.453],[29.29,32.708],[27.957,32.822],[26.594,32.851],[25.369,32.853],[24.449,32.883],[24.0,33.0],[24.083,33.194],[24.569,33.413],[25.342,33.645],[26.287,33.88],[27.289,34.108],[28.231,34.318],[29.0,34.5],[29.628,34.652],[30.23,34.783],[30.81,34.897],[31.373,35.001],[31.923,35.099],[32.464,35.197],[33.0,35.3],[33.531,35.42],[34.051,35.557],[34.561,35.696],[35.061,35.824],[35.551,35.927],[36.031,35.99],[36.5,36.0],[36.959,35.938],[37.408,35.809],[37.847,35.638],[38.276,35.448],[38.694,35.262],[39.102,35.105],[39.5,35.0],[39.888,35.004],[40.265,35.117],[40.633,35.271],[40.99,35.402],[41.337,35.445],[41.673,35.332],[42.0,35.0],[42.314,34.452],[42.614,33.748],[42.903,32.905],[43.183,31.942],[43.458,30.875],[43.729,29.722],[44.0,28.5],[44.286,27.103],[44.59,25.481],[44.896,23.733],[45.186,21.961],[45.445,20.264],[45.655,18.743],[45.8,17.5],[45.904,16.509],[45.99,15.672],[46.039,14.981],[46.033,14.427],[45.953,14.001],[45.782,13.695],[45.5,13.5]]
+},
+
+
+{ id:'umayyad', name:'Umayyad Caliphate', region:'Middle East', category:'global', group:'Ancient & classical world', color:{r:60,g:150,b:90},
+  founded:'661 CE', ended:'750 CE', peakYear:'c. 720 CE', peakRuler:'Hisham ibn Abd al-Malik',
+  yStart:661, yEnd:750, yPeak:720,
+  capital:'Damascus', area:'~11,000,000 km²', population:'~62 million (estimated, ~29% of world population)',
+  gdpNote:'Predates reliable GDP estimation. By land area it was the largest empire the world had yet seen, stretching from Iberia to the Indus — a record it held until the Mongol conquests five centuries later.',
+  gdpPct:null,
+  summary:'Within roughly a century of the Prophet Muhammad\'s death, Arab-led armies under Umayyad rule had built the largest empire the world had yet seen, stretching from the Iberian Peninsula through North Africa, the Middle East, and Central Asia to the edge of India — a feat of expansion faster than Rome\'s and rivaled only later by the Mongols. It unified an enormous trade corridor between the Mediterranean, Indian Ocean, and Silk Road economies, and its administrative reforms — a common currency, Arabic as the language of administration — laid the groundwork for the Islamic Golden Age that followed under the Abbasids.',
+  achievements:['Largest empire in the world at the time, and the largest by land area until the Mongols','Connected Mediterranean, Middle Eastern, and Central/South Asian trade networks under one administration','Standardized Arabic-language administration and coinage across a vast, diverse territory','Left enduring architectural landmarks including the Great Mosque of Damascus'],
+  decline:'Resentment among non-Arab Muslim converts over unequal treatment, combined with regional revolts, culminated in the Abbasid Revolution of 750 CE, which overthrew the Umayyads everywhere except in Iberia, where a surviving branch founded the independent Emirate of Córdoba.',
+  center:[30,30],
+  extent:[[40.812,-5.062],[40.188,-3.938],[39.594,-2.797],[39.031,-1.641],[38.5,-0.469],[38,0.719],[37.531,1.922],[37.094,3.141],[36.688,4.375],[36.312,5.625],[35.938,6.875],[35.562,8.125],[35.188,9.375],[34.812,10.625],[34.438,11.875],[34.062,13.125],[33.688,14.375],[33.312,15.625],[32.953,16.906],[32.609,18.219],[32.281,19.562],[31.969,20.938],[31.672,22.344],[31.391,23.781],[31.125,25.25],[30.875,26.75],[30.656,28.266],[30.469,29.797],[30.312,31.344],[30.188,32.906],[30.094,34.484],[30.031,36.078],[30,37.688],[30,39.312],[30.078,40.891],[30.234,42.422],[30.469,43.906],[30.781,45.344],[31.172,46.734],[31.641,48.078],[32.188,49.375],[32.812,50.625],[33.406,51.875],[33.969,53.125],[34.5,54.375],[35,55.625],[35.469,56.875],[35.906,58.125],[36.312,59.375],[36.688,60.625],[36.938,61.797],[37.062,62.891],[37.062,63.906],[36.938,64.844],[36.688,65.703],[36.312,66.484],[35.812,67.188],[35.188,67.812],[34.562,68.281],[33.938,68.594],[33.312,68.75],[32.688,68.75],[32.062,68.594],[31.438,68.281],[30.812,67.812],[30.188,67.188],[29.578,66.484],[28.984,65.703],[28.406,64.844],[27.844,63.906],[27.297,62.891],[26.766,61.797],[26.25,60.625],[25.75,59.375],[25.312,58.047],[24.938,56.641],[24.625,55.156],[24.375,53.594],[24.188,51.953],[24.062,50.234],[24,48.438],[24,46.562],[24.062,44.688],[24.188,42.812],[24.375,40.938],[24.625,39.062],[24.938,37.188],[25.312,35.312],[25.75,33.438],[26.25,31.562],[26.719,29.688],[27.156,27.812],[27.562,25.938],[27.938,24.062],[28.281,22.188],[28.594,20.312],[28.875,18.438],[29.125,16.562],[29.422,14.672],[29.766,12.766],[30.156,10.844],[30.594,8.906],[31.078,6.953],[31.609,4.984],[32.188,3],[32.812,1],[33.484,-0.797],[34.203,-2.391],[34.969,-3.781],[35.781,-4.969],[36.641,-5.953],[37.547,-6.734],[38.5,-7.312],[39.5,-7.688],[40.297,-7.875],[40.891,-7.875],[41.281,-7.688],[41.469,-7.312],[41.453,-6.75],[41.234,-6],[40.812,-5.062]]
+},
+{ id:'mongol', name:'Mongol Empire', region:'Central Asia', category:'global', group:'Ancient & classical world', color:{r:210,g:180,b:70},
+  founded:'1206 CE', ended:'1368 CE', peakYear:'c. 1279 CE', peakRuler:'Kublai Khan',
+  yStart:1206, yEnd:1368, yPeak:1279,
+  capital:'Karakorum, later Khanbaliq (Beijing)', area:'~24,000,000 km²', population:'~100 million (estimated, under Mongol rule at its height)',
+  gdpNote:'Predates reliable GDP-share estimation, but by land area it remains the largest contiguous land empire in history — nearly double the size of the Roman or Umayyad realms at their respective peaks.',
+  gdpPct:null,
+  summary:'Genghis Khan and his successors built, in barely two generations, the largest contiguous land empire in human history — stretching from Korea to Eastern Europe. Its most lasting economic legacy was the "Pax Mongolica": with the entire Silk Road under a single set of rulers, merchants, missionaries, and travelers (most famously Marco Polo) could cross Eurasia with a degree of safety and predictability that had never existed before, dramatically accelerating trade and the exchange of ideas and technology between China, the Islamic world, and Europe.',
+  achievements:['Largest contiguous land empire in history, at its peak roughly 24 million km²','Unified the Silk Road under one authority, enabling unprecedented Eurasian trade and cultural exchange ("Pax Mongolica")','Built an extremely effective long-distance messenger relay system (the Yam)','Under Kublai Khan, founded the Yuan Dynasty, ruling China with a degree of administrative continuity'],
+  decline:'The empire split into four increasingly independent khanates within decades of Kublai Khan\'s reign, undermined by succession disputes and the sheer difficulty of governing such a vast, culturally disparate territory from a single center.',
+  center:[45,90],
+  extent:[[57.188,41.562],[57.812,43.438],[58.359,45.391],[58.828,47.422],[59.219,49.531],[59.531,51.719],[59.766,53.984],[59.922,56.328],[60,58.75],[60,61.25],[59.922,63.75],[59.766,66.25],[59.531,68.75],[59.219,71.25],[58.828,73.75],[58.359,76.25],[57.812,78.75],[57.188,81.25],[56.562,83.75],[55.938,86.25],[55.312,88.75],[54.688,91.25],[54.062,93.75],[53.438,96.25],[52.812,98.75],[52.188,101.25],[51.562,103.672],[50.938,106.016],[50.312,108.281],[49.688,110.469],[49.062,112.578],[48.438,114.609],[47.812,116.562],[47.188,118.438],[46.531,120.125],[45.844,121.625],[45.125,122.938],[44.375,124.062],[43.594,125],[42.781,125.75],[41.938,126.312],[41.062,126.688],[40.25,126.812],[39.5,126.688],[38.812,126.312],[38.188,125.688],[37.625,124.812],[37.125,123.688],[36.688,122.312],[36.312,120.688],[35.906,119.031],[35.469,117.344],[35,115.625],[34.5,113.875],[33.969,112.094],[33.406,110.281],[32.812,108.438],[32.188,106.562],[31.609,104.688],[31.078,102.812],[30.594,100.938],[30.156,99.062],[29.766,97.188],[29.422,95.312],[29.125,93.438],[28.875,91.562],[28.688,89.688],[28.562,87.812],[28.5,85.938],[28.5,84.062],[28.562,82.188],[28.688,80.312],[28.875,78.438],[29.125,76.562],[29.422,74.688],[29.766,72.812],[30.156,70.938],[30.594,69.062],[31.078,67.188],[31.609,65.312],[32.188,63.438],[32.812,61.562],[33.438,59.688],[34.062,57.812],[34.688,55.938],[35.312,54.062],[35.938,52.188],[36.562,50.312],[37.188,48.438],[37.812,46.562],[38.484,44.844],[39.203,43.281],[39.969,41.875],[40.781,40.625],[41.641,39.531],[42.547,38.594],[43.5,37.812],[44.5,37.188],[45.484,36.641],[46.453,36.172],[47.406,35.781],[48.344,35.469],[49.266,35.234],[50.172,35.078],[51.062,35],[51.938,35],[52.781,35.234],[53.594,35.703],[54.375,36.406],[55.125,37.344],[55.844,38.516],[56.531,39.922],[57.188,41.562]]
+},
+{ id:'ottoman', name:'Ottoman Empire', region:'Middle East', category:'global', group:'Ancient & classical world', color:{r:190,g:60,b:40},
+  founded:'1299 CE', ended:'1922 CE', peakYear:'c. 1566 CE', peakRuler:'Suleiman the Magnificent',
+  yStart:1299, yEnd:1922, yPeak:1566,
+  capital:'Constantinople (Istanbul)', area:'~5,200,000 km²', population:'~30 million (estimated, at 16th-century peak)',
+  gdpNote:'Sat at the crossroads of the era\'s major trade routes between Europe and Asia. Precise GDP-share estimates for the 16th century are sparse, but its control of the overland spice and silk trade routes to Europe was a direct trigger for the Age of Exploration, as European powers sought sea routes around it.',
+  gdpPct:null,
+  summary:'For over six centuries the Ottoman Empire bridged Europe, Asia, and Africa, controlling the overland trade routes that had connected the two continents to Asia for millennia. Under Suleiman the Magnificent, it reached its territorial and cultural peak, with a legal and administrative system (the Kanun) sophisticated enough that Suleiman was known in the Islamic world as "the Lawgiver." The empire\'s dominance of overland Asia–Europe trade routes was, historians widely note, a direct driver of European maritime exploration — Iberian powers sought sea routes to Asia specifically to bypass Ottoman-controlled land trade.',
+  achievements:['Controlled the primary land trade routes between Europe and Asia for centuries','Suleiman\'s legal code (Kanun) is considered one of the most sophisticated of its era','Constantinople\'s conquest in 1453 formally ended the Byzantine Empire and reshaped European geopolitics','Its trade dominance is a widely cited catalyst for the European Age of Exploration'],
+  decline:'A long, gradual decline through the 18th and 19th centuries driven by military defeats, territorial losses in the Balkans, and internal reform struggles, ending formally with the empire\'s dissolution after the First World War in 1922.',
+  center:[38,32],
+  extent:[[46.688,20.5],[46.312,21.5],[45.922,22.438],[45.516,23.312],[45.094,24.125],[44.656,24.875],[44.203,25.562],[43.734,26.188],[43.25,26.75],[42.75,27.25],[42.266,27.781],[41.797,28.344],[41.344,28.938],[40.906,29.562],[40.484,30.219],[40.078,30.906],[39.688,31.625],[39.312,32.375],[38.906,33.031],[38.469,33.594],[38,34.062],[37.5,34.438],[36.969,34.719],[36.406,34.906],[35.812,35],[35.188,35],[34.594,34.953],[34.031,34.859],[33.5,34.719],[33,34.531],[32.531,34.297],[32.094,34.016],[31.688,33.688],[31.312,33.312],[31,32.875],[30.75,32.375],[30.562,31.812],[30.438,31.188],[30.375,30.5],[30.375,29.75],[30.438,28.938],[30.562,28.062],[30.688,27.141],[30.812,26.172],[30.938,25.156],[31.062,24.094],[31.188,22.984],[31.312,21.828],[31.438,20.625],[31.562,19.375],[31.734,18.203],[31.953,17.109],[32.219,16.094],[32.531,15.156],[32.891,14.297],[33.297,13.516],[33.75,12.812],[34.25,12.188],[34.75,11.719],[35.25,11.406],[35.75,11.25],[36.25,11.25],[36.75,11.406],[37.25,11.719],[37.75,12.188],[38.25,12.812],[38.75,13.438],[39.25,14.062],[39.75,14.688],[40.25,15.312],[40.75,15.938],[41.25,16.562],[41.75,17.188],[42.25,17.812],[42.75,18.312],[43.25,18.688],[43.75,18.938],[44.25,19.062],[44.75,19.062],[45.25,18.938],[45.75,18.688],[46.25,18.312],[46.641,18.109],[46.922,18.078],[47.094,18.219],[47.156,18.531],[47.109,19.016],[46.953,19.672],[46.688,20.5]]
+},
+{ id:'inca', name:'Inca Empire', region:'South America', category:'global', group:'The Americas', color:{r:70,g:150,b:110},
+  founded:'1438 CE', ended:'1533 CE', peakYear:'c. 1527 CE', peakRuler:'Huayna Capac',
+  yStart:1438, yEnd:1533, yPeak:1527,
+  capital:'Cusco', area:'~2,000,000 km²', population:'~10–12 million (estimated)',
+  gdpNote:'Predates GDP-style estimation and had no market currency, but the Inca ran the largest pre-Columbian economy in the Americas — a redistributive system built on labor-tax (mit\'a), state granaries, and an extraordinary 40,000&nbsp;km road network across some of the world\'s most difficult terrain.',
+  gdpPct:null,
+  summary:'The largest empire the pre-Columbian Americas ever produced, the Inca state stretched over 4,000 km along the Andes from modern Colombia to Chile and Argentina — an extraordinary feat given it was built without the wheel, without a market currency, and without a written script. Instead, the Inca administered their empire through the qhapaq ñan, a road network exceeding 40,000 km threading some of the most extreme terrain on Earth; the quipu, a system of knotted cords used to record census, tax, and storage data; and mit\'a, a rotational labor-tax system that built roads, terraces, and storehouses instead of extracting cash. Agricultural engineering — terracing steep Andean slopes and freeze-drying potatoes for long-term storage — let the empire feed a large population at altitudes no comparable contemporary state farmed at scale.',
+  achievements:['Largest pre-Columbian empire in the Americas, spanning over 4,000 km of the Andes','Built the qhapaq ñan, a 40,000+ km road network across extreme mountain terrain','Recorded census, tax, and logistics data using quipu, an intricate knotted-cord system, without a written script','Pioneered large-scale terrace farming and potato freeze-drying, sustaining dense populations at high altitude'],
+  decline:'A devastating civil war between rival heirs Huáscar and Atahualpa, compounded by smallpox arriving ahead of European contact itself, left the empire fatally weakened just as Francisco Pizarro\'s small Spanish force arrived in 1532; Atahualpa\'s capture and execution in 1533 effectively ended Inca sovereignty.',
+  center:[-13,-73],
+  extent:[[1.125,-77.875],[0.875,-78.125],[0.578,-78.375],[0.234,-78.625],[-0.156,-78.875],[-0.594,-79.125],[-1.078,-79.375],[-1.609,-79.625],[-2.188,-79.875],[-2.812,-80.125],[-3.438,-80.297],[-4.062,-80.391],[-4.688,-80.406],[-5.312,-80.344],[-5.938,-80.203],[-6.562,-79.984],[-7.188,-79.688],[-7.812,-79.312],[-8.422,-78.953],[-9.016,-78.609],[-9.594,-78.281],[-10.156,-77.969],[-10.703,-77.672],[-11.234,-77.391],[-11.75,-77.125],[-12.25,-76.875],[-12.75,-76.562],[-13.25,-76.188],[-13.75,-75.75],[-14.25,-75.25],[-14.75,-74.688],[-15.25,-74.062],[-15.75,-73.375],[-16.25,-72.625],[-16.75,-71.969],[-17.25,-71.406],[-17.75,-70.938],[-18.25,-70.562],[-18.75,-70.281],[-19.25,-70.094],[-19.75,-70],[-20.25,-70],[-20.766,-70.016],[-21.297,-70.047],[-21.844,-70.094],[-22.406,-70.156],[-22.984,-70.234],[-23.578,-70.328],[-24.188,-70.438],[-24.812,-70.562],[-25.453,-70.672],[-26.109,-70.766],[-26.781,-70.844],[-27.469,-70.906],[-28.172,-70.953],[-28.891,-70.984],[-29.625,-71],[-30.375,-71],[-31.062,-71],[-31.688,-71],[-32.25,-71],[-32.75,-71],[-33.188,-71],[-33.562,-71],[-33.875,-71],[-34.125,-71],[-34.312,-70.969],[-34.438,-70.906],[-34.5,-70.812],[-34.5,-70.688],[-34.438,-70.531],[-34.312,-70.344],[-34.125,-70.125],[-33.875,-69.875],[-33.562,-69.594],[-33.188,-69.281],[-32.75,-68.938],[-32.25,-68.562],[-31.688,-68.156],[-31.062,-67.719],[-30.375,-67.25],[-29.625,-66.75],[-28.859,-66.281],[-28.078,-65.844],[-27.281,-65.438],[-26.469,-65.062],[-25.641,-64.719],[-24.797,-64.406],[-23.938,-64.125],[-23.062,-63.875],[-22.203,-63.734],[-21.359,-63.703],[-20.531,-63.781],[-19.719,-63.969],[-18.922,-64.266],[-18.141,-64.672],[-17.375,-65.188],[-16.625,-65.812],[-15.875,-66.422],[-15.125,-67.016],[-14.375,-67.594],[-13.625,-68.156],[-12.875,-68.703],[-12.125,-69.234],[-11.375,-69.75],[-10.625,-70.25],[-9.875,-70.75],[-9.125,-71.25],[-8.375,-71.75],[-7.625,-72.25],[-6.875,-72.75],[-6.125,-73.25],[-5.375,-73.75],[-4.625,-74.25],[-3.906,-74.703],[-3.219,-75.109],[-2.562,-75.469],[-1.938,-75.781],[-1.344,-76.047],[-0.781,-76.266],[-0.25,-76.438],[0.25,-76.562],[0.656,-76.703],[0.969,-76.859],[1.188,-77.031],[1.312,-77.219],[1.344,-77.422],[1.281,-77.641],[1.125,-77.875]]
+},
+{ id:'aztec', name:'Aztec Empire', region:'North America', category:'global', group:'The Americas', color:{r:205,g:95,b:40},
+  founded:'1428 CE', ended:'1521 CE', peakYear:'1519 CE', peakRuler:'Moctezuma II',
+  yStart:1428, yEnd:1521, yPeak:1519,
+  capital:'Tenochtitlan', area:'~220,000 km² (directly controlled), plus a much larger tributary zone', population:'~5–6 million (estimated, across the tributary empire)',
+  gdpNote:'Had no market currency comparable to Old World economies, but ran a highly monetized tribute and market system — cacao beans and cotton cloaks functioned as currency — and Tenochtitlan\'s central market at Tlatelolco was, per Spanish eyewitness accounts, larger and busier than any market in contemporary Europe.',
+  gdpPct:null,
+  summary:'Built by the Triple Alliance of Tenochtitlan, Texcoco, and Tlacopan, the Aztec Empire dominated central Mexico through a tribute system rather than direct territorial administration, extracting goods and labor from subject city-states while leaving local rulers largely in place. Tenochtitlan itself, built on an island in Lake Texcoco and connected to the mainland by causeways, was among the largest cities on Earth at contact — Spanish conquistadors who first saw it compared it favorably to Venice and Constantinople. The empire supported sophisticated engineering (chinampa raised-field agriculture, aqueducts), a pictographic writing and calendar system, and an extensive market network anchored by Tlatelolco.',
+  achievements:['Built Tenochtitlan, a lake-island capital of an estimated 200,000+ people — among the largest cities on Earth at the time','Engineered chinampa raised-field agriculture, sustaining a dense urban population on lake wetlands','Ran the Tlatelolco market, described by Spanish eyewitnesses as larger and more orderly than any European market of the day','Maintained a tribute network across hundreds of subject city-states without direct territorial occupation'],
+  decline:'Hernán Cortés exploited deep resentment among tributary city-states to build a large indigenous coalition against the empire; a smallpox epidemic introduced by the Spanish devastated the population, and Tenochtitlan fell after a prolonged siege in 1521, ending Aztec sovereignty.',
+  center:[19,-99],
+  extent:[[21.5,-99.2],[21.496,-98.953],[21.447,-98.678],[21.361,-98.386],[21.245,-98.09],[21.108,-97.802],[20.957,-97.535],[20.8,-97.3],[20.628,-97.102],[20.43,-96.93],[20.213,-96.778],[19.985,-96.636],[19.752,-96.498],[19.521,-96.355],[19.3,-96.2],[19.087,-96.02],[18.874,-95.818],[18.662,-95.609],[18.45,-95.408],[18.236,-95.229],[18.02,-95.088],[17.8,-95.0],[17.568,-94.956],[17.321,-94.939],[17.069,-94.955],[16.821,-95.005],[16.587,-95.093],[16.377,-95.224],[16.2,-95.4],[16.046,-95.641],[15.903,-95.952],[15.778,-96.31],[15.679,-96.694],[15.611,-97.085],[15.583,-97.461],[15.6,-97.8],[15.674,-98.105],[15.803,-98.395],[15.973,-98.675],[16.17,-98.95],[16.383,-99.226],[16.597,-99.507],[16.8,-99.8],[17.002,-100.127],[17.218,-100.493],[17.443,-100.871],[17.669,-101.236],[17.892,-101.562],[18.104,-101.826],[18.3,-102.0],[18.478,-102.075],[18.643,-102.069],[18.799,-102.001],[18.95,-101.891],[19.097,-101.758],[19.246,-101.621],[19.4,-101.5],[19.558,-101.386],[19.717,-101.259],[19.877,-101.122],[20.036,-100.976],[20.193,-100.822],[20.348,-100.663],[20.5,-100.5],[20.663,-100.335],[20.843,-100.168],[21.025,-99.995],[21.196,-99.815],[21.341,-99.624],[21.447,-99.42],[21.5,-99.2]]
+},
+
+
+{ id:'mali', name:'Mali Empire', region:'West Africa', category:'global', group:'African empires', color:{r:230,g:190,b:60},
+  founded:'c. 1235 CE', ended:'c. 1600 CE', peakYear:'c. 1337 CE', peakRuler:'Mansa Musa',
+  yStart:1235, yEnd:1600, yPeak:1337,
+  capital:'Niani', area:'~1,300,000 km² (at peak)', population:'several million across the Niger basin (no reliable contemporary count survives)',
+  gdpNote:'Predates GDP estimation, but Mali controlled a significant share of the medieval world\'s gold supply; Mansa Musa\'s 1324 pilgrimage to Mecca reportedly distributed so much gold in Cairo that it depressed the metal\'s local value for years afterward — one of history\'s best-documented single-event inflation shocks.',
+  gdpPct:null,
+  summary:'Founded by Sundiata Keita after the legendary Battle of Kirina, the Mali Empire became the dominant power of West Africa by controlling the trans-Saharan trade in gold and salt. Under Mansa Musa, widely regarded as one of the wealthiest individuals in history, the empire reached its territorial and cultural peak; his 1324 pilgrimage to Mecca, traveling with an enormous retinue and reportedly distributing vast quantities of gold along the route, made Mali famous across the Islamic world and even appeared on European maps of the era, including the Catalan Atlas of 1375. Timbuktu, under Mali\'s rule, grew into a major center of Islamic scholarship, home to the Sankore mosque and its associated centers of learning.',
+  achievements:['Controlled a major share of the medieval world\'s gold supply via trans-Saharan trade','Mansa Musa\'s 1324 pilgrimage to Mecca is one of history\'s most famous single-event demonstrations of wealth','Made Timbuktu a leading center of Islamic scholarship, home to the Sankore madrasa','Appeared prominently on 14th-century European maps, including the Catalan Atlas, reflecting its international renown'],
+  decline:'Succession disputes among Mansa Musa\'s heirs, combined with the rising power of the Songhai Empire to the east, gradually stripped Mali of its trade dominance through the 15th century; by the 1500s it had been eclipsed by Songhai and survived only as a diminished regional state.',
+  center:[14,-6],
+  extent:[[16.5,-16.5],[16.297,-16.219],[16.052,-15.77],[15.774,-15.21],[15.471,-14.596],[15.152,-13.985],[14.825,-13.434],[14.5,-13.0],[14.169,-12.685],[13.822,-12.44],[13.464,-12.243],[13.098,-12.073],[12.729,-11.907],[12.362,-11.723],[12.0,-11.5],[11.625,-11.258],[11.227,-11.023],[10.824,-10.783],[10.431,-10.523],[10.069,-10.232],[9.752,-9.895],[9.5,-9.5],[9.302,-9.025],[9.138,-8.474],[9.015,-7.873],[8.934,-7.249],[8.902,-6.628],[8.923,-6.036],[9.0,-5.5],[9.146,-5.006],[9.36,-4.526],[9.63,-4.066],[9.942,-3.628],[10.283,-3.219],[10.64,-2.841],[11.0,-2.5],[11.376,-2.185],[11.784,-1.889],[12.216,-1.621],[12.662,-1.389],[13.114,-1.203],[13.563,-1.07],[14.0,-1.0],[14.433,-1.007],[14.872,-1.089],[15.312,-1.227],[15.749,-1.405],[16.179,-1.605],[16.598,-1.809],[17.0,-2.0],[17.397,-2.162],[17.794,-2.305],[18.185,-2.45],[18.56,-2.621],[18.91,-2.838],[19.226,-3.124],[19.5,-3.5],[19.743,-3.99],[19.968,-4.582],[20.165,-5.245],[20.325,-5.949],[20.44,-6.663],[20.501,-7.357],[20.5,-8.0],[20.421,-8.602],[20.268,-9.194],[20.058,-9.776],[19.809,-10.347],[19.538,-10.908],[19.262,-11.459],[19.0,-12.0],[18.727,-12.548],[18.421,-13.109],[18.099,-13.666],[17.778,-14.201],[17.477,-14.697],[17.211,-15.136],[17.0,-15.5],[16.863,-15.813],[16.792,-16.099],[16.759,-16.34],[16.741,-16.517],[16.708,-16.615],[16.637,-16.615],[16.5,-16.5]]
+},
+
+
+{ id:'spanish', name:'Spanish Empire', region:'Global', category:'global', group:'Age of global empires', color:{r:190,g:150,b:40},
+  founded:'1492 CE', ended:'1976 CE (effectively 19th century in the Americas)', peakYear:'c. 1790 CE', peakRuler:'Charles IV',
+  yStart:1492, yEnd:1976, yPeak:1790,
+  capital:'Madrid', area:'~13,700,000 km² at peak', population:'~60 million (estimated, across territories)',
+  gdpNote:'GDP-share figures for the Spanish crown itself are modest relative to its territorial size, but the empire controlled the majority of the era\'s American silver production, which functioned as a dominant global reserve currency and financed trade across Europe and Asia for two centuries.',
+  gdpPct:null,
+  summary:'The first empire genuinely global in scope — famously "the empire on which the sun never set" — Spain\'s American territories produced the silver that, minted into pieces of eight, became the closest thing the early modern world had to a global reserve currency, accepted from Seville to Manila to Canton. That silver wealth, however, proved a double-edged sword: massive imports fueled sustained inflation at home ("the Price Revolution") without building a comparably productive domestic economy, a cautionary case still cited in economic history.',
+  achievements:['First empire with territory on every populated continent','Its silver peso became a de facto global trade currency for over two centuries','Established the first sustained transpacific trade route (the Manila Galleon, linking the Americas to Asia)','Founded some of the oldest continuously operating universities in the Americas'],
+  decline:'A long 19th-century wave of independence movements across Latin America, combined with military decline relative to Britain and France, reduced Spain from a global empire to a regional European power by the century\'s end; the last major colonies (Cuba, Puerto Rico, the Philippines) were lost in 1898.',
+  center:[10,-60],
+  extra:[[19,121.094],[19,121.406],[18.781,121.75],[18.344,122.125],[17.688,122.531],[16.812,122.969],[15.719,123.438],[14.406,123.938],[12.875,124.469],[11.125,125.031],[9.594,125.414],[8.281,125.617],[7.188,125.641],[6.312,125.484],[5.656,125.148],[5.219,124.633],[5,123.938],[5,123.062],[5.219,122.297],[5.656,121.641],[6.312,121.094],[7.188,120.656],[8.281,120.328],[9.594,120.109],[11.125,120],[12.875,120],[14.406,120.039],[15.719,120.117],[16.812,120.234],[17.688,120.391],[18.344,120.586],[18.781,120.82],[19,121.094]],
+  extent:[[43.562,-3.75],[43.438,-2.25],[43.219,-0.984],[42.906,0.047],[42.5,0.844],[42,1.406],[41.406,1.734],[40.719,1.828],[39.938,1.688],[39.062,1.312],[38.297,0.891],[37.641,0.422],[37.094,-0.094],[36.656,-0.656],[36.328,-1.266],[36.109,-1.922],[36,-2.625],[36,-3.375],[36.125,-4.078],[36.375,-4.734],[36.75,-5.344],[37.25,-5.906],[37.875,-6.422],[38.625,-6.891],[39.5,-7.312],[40.5,-7.688],[41.359,-7.828],[42.078,-7.734],[42.656,-7.406],[43.094,-6.844],[43.391,-6.047],[43.547,-5.016],[43.562,-3.75]],
+  moreTerritories:[
+    /* Viceroyalty of New Spain: Mexico, Central America, the Southwest & Florida */
+    [[42,-114.375],[42,-111.625],[41.906,-109.094],[41.719,-106.781],[41.438,-104.688],[41.062,-102.812],[40.594,-101.156],[40.031,-99.719],[39.375,-98.5],[38.625,-97.5],[37.875,-96.422],[37.125,-95.266],[36.375,-94.031],[35.625,-92.719],[34.875,-91.328],[34.125,-89.859],[33.375,-88.312],[32.625,-86.688],[31.875,-85.25],[31.125,-84],[30.375,-82.938],[29.625,-82.062],[28.875,-81.375],[28.125,-80.875],[27.375,-80.562],[26.625,-80.438],[25.969,-80.594],[25.406,-81.031],[24.938,-81.75],[24.562,-82.75],[24.281,-84.031],[24.094,-85.594],[24,-87.438],[24,-89.562],[23.906,-91.391],[23.719,-92.922],[23.438,-94.156],[23.062,-95.094],[22.594,-95.734],[22.031,-96.078],[21.375,-96.125],[20.625,-95.875],[19.906,-95.609],[19.219,-95.328],[18.562,-95.031],[17.938,-94.719],[17.344,-94.391],[16.781,-94.047],[16.25,-93.688],[15.75,-93.312],[15.219,-92.828],[14.656,-92.234],[14.062,-91.531],[13.438,-90.719],[12.781,-89.797],[12.094,-88.766],[11.375,-87.625],[10.625,-86.375],[9.984,-85.203],[9.453,-84.109],[9.031,-83.094],[8.719,-82.156],[8.516,-81.297],[8.422,-80.516],[8.438,-79.812],[8.562,-79.188],[8.734,-78.734],[8.953,-78.453],[9.219,-78.344],[9.531,-78.406],[9.891,-78.641],[10.297,-79.047],[10.75,-79.625],[11.25,-80.375],[11.766,-81.25],[12.297,-82.25],[12.844,-83.375],[13.406,-84.625],[13.984,-86],[14.578,-87.5],[15.188,-89.125],[15.812,-90.875],[16.438,-92.422],[17.062,-93.766],[17.688,-94.906],[18.312,-95.844],[18.938,-96.578],[19.562,-97.109],[20.188,-97.438],[20.812,-97.562],[21.438,-97.656],[22.062,-97.719],[22.688,-97.75],[23.312,-97.75],[23.938,-97.719],[24.562,-97.656],[25.188,-97.562],[25.812,-97.438],[26.438,-97.484],[27.062,-97.703],[27.688,-98.094],[28.312,-98.656],[28.938,-99.391],[29.562,-100.297],[30.188,-101.375],[30.812,-102.625],[31.438,-103.891],[32.062,-105.172],[32.688,-106.469],[33.312,-107.781],[33.938,-109.109],[34.562,-110.453],[35.188,-111.812],[35.812,-113.188],[36.422,-114.484],[37.016,-115.703],[37.594,-116.844],[38.156,-117.906],[38.703,-118.891],[39.234,-119.797],[39.75,-120.625],[40.25,-121.375],[40.688,-121.688],[41.062,-121.562],[41.375,-121],[41.625,-120],[41.812,-118.562],[41.938,-116.688],[42,-114.375]],
+    /* Spanish Caribbean: Cuba, Hispaniola, Puerto Rico */
+    [[23,-80.188],[23,-78.812],[22.953,-77.469],[22.859,-76.156],[22.719,-74.875],[22.531,-73.625],[22.297,-72.406],[22.016,-71.219],[21.688,-70.062],[21.312,-68.938],[20.938,-67.969],[20.562,-67.156],[20.188,-66.5],[19.812,-66],[19.438,-65.656],[19.062,-65.469],[18.688,-65.438],[18.312,-65.562],[17.984,-65.859],[17.703,-66.328],[17.469,-66.969],[17.281,-67.781],[17.141,-68.766],[17.047,-69.922],[17,-71.25],[17,-72.75],[17.047,-74.172],[17.141,-75.516],[17.281,-76.781],[17.469,-77.969],[17.703,-79.078],[17.984,-80.109],[18.312,-81.062],[18.688,-81.938],[19.062,-82.703],[19.438,-83.359],[19.812,-83.906],[20.188,-84.344],[20.562,-84.672],[20.938,-84.891],[21.312,-85],[21.688,-85],[22.016,-84.828],[22.297,-84.484],[22.531,-83.969],[22.719,-83.281],[22.859,-82.422],[22.953,-81.391],[23,-80.188]],
+    /* Viceroyalties of Peru, New Granada & Río de la Plata: most of South America, excluding Portuguese Brazil */
+    [[11.562,-69.375],[11.438,-68.625],[11.281,-67.891],[11.094,-67.172],[10.875,-66.469],[10.625,-65.781],[10.344,-65.109],[10.031,-64.453],[9.688,-63.812],[9.312,-63.188],[8.906,-62.625],[8.469,-62.125],[8,-61.688],[7.5,-61.312],[6.969,-61],[6.406,-60.75],[5.812,-60.562],[5.188,-60.438],[4.547,-60.297],[3.891,-60.141],[3.219,-59.969],[2.531,-59.781],[1.828,-59.578],[1.109,-59.359],[0.375,-59.125],[-0.375,-58.875],[-1.109,-58.656],[-1.828,-58.469],[-2.531,-58.312],[-3.219,-58.188],[-3.891,-58.094],[-4.547,-58.031],[-5.188,-58],[-5.812,-58],[-6.453,-58],[-7.109,-58],[-7.781,-58],[-8.469,-58],[-9.172,-58],[-9.891,-58],[-10.625,-58],[-11.375,-58],[-12.125,-58],[-12.875,-58],[-13.625,-58],[-14.375,-58],[-15.125,-58],[-15.875,-58],[-16.625,-58],[-17.375,-58],[-18.109,-57.969],[-18.828,-57.906],[-19.531,-57.812],[-20.219,-57.688],[-20.891,-57.531],[-21.547,-57.344],[-22.188,-57.125],[-22.812,-56.875],[-23.438,-56.641],[-24.062,-56.422],[-24.688,-56.219],[-25.312,-56.031],[-25.938,-55.859],[-26.562,-55.703],[-27.188,-55.562],[-27.812,-55.438],[-28.422,-55.312],[-29.016,-55.188],[-29.594,-55.062],[-30.156,-54.938],[-30.703,-54.812],[-31.234,-54.688],[-31.75,-54.562],[-32.25,-54.438],[-32.75,-54.453],[-33.25,-54.609],[-33.75,-54.906],[-34.25,-55.344],[-34.75,-55.922],[-35.25,-56.641],[-35.75,-57.5],[-36.25,-58.5],[-36.797,-59.453],[-37.391,-60.359],[-38.031,-61.219],[-38.719,-62.031],[-39.453,-62.797],[-40.234,-63.516],[-41.062,-64.188],[-41.938,-64.812],[-42.812,-65.391],[-43.688,-65.922],[-44.562,-66.406],[-45.438,-66.844],[-46.312,-67.234],[-47.188,-67.578],[-48.062,-67.875],[-48.938,-68.125],[-49.75,-68.328],[-50.5,-68.484],[-51.188,-68.594],[-51.812,-68.656],[-52.375,-68.672],[-52.875,-68.641],[-53.312,-68.562],[-53.688,-68.438],[-54,-68.375],[-54.25,-68.375],[-54.438,-68.438],[-54.562,-68.562],[-54.625,-68.75],[-54.625,-69],[-54.562,-69.312],[-54.438,-69.688],[-54.188,-70.047],[-53.812,-70.391],[-53.312,-70.719],[-52.688,-71.031],[-51.938,-71.328],[-51.062,-71.609],[-50.062,-71.875],[-48.938,-72.125],[-47.844,-72.344],[-46.781,-72.531],[-45.75,-72.688],[-44.75,-72.812],[-43.781,-72.906],[-42.844,-72.969],[-41.938,-73],[-41.062,-73],[-40.172,-72.969],[-39.266,-72.906],[-38.344,-72.812],[-37.406,-72.688],[-36.453,-72.531],[-35.484,-72.344],[-34.5,-72.125],[-33.5,-71.875],[-32.5,-71.641],[-31.5,-71.422],[-30.5,-71.219],[-29.5,-71.031],[-28.5,-70.859],[-27.5,-70.703],[-26.5,-70.562],[-25.5,-70.438],[-24.516,-70.344],[-23.547,-70.281],[-22.594,-70.25],[-21.656,-70.25],[-20.734,-70.281],[-19.828,-70.344],[-18.938,-70.438],[-18.062,-70.562],[-17.188,-70.797],[-16.312,-71.141],[-15.438,-71.594],[-14.562,-72.156],[-13.688,-72.828],[-12.812,-73.609],[-11.938,-74.5],[-11.062,-75.5],[-10.203,-76.391],[-9.359,-77.172],[-8.531,-77.844],[-7.719,-78.406],[-6.922,-78.859],[-6.141,-79.203],[-5.375,-79.438],[-4.625,-79.562],[-3.906,-79.641],[-3.219,-79.672],[-2.562,-79.656],[-1.938,-79.594],[-1.344,-79.484],[-0.781,-79.328],[-0.25,-79.125],[0.25,-78.875],[0.75,-78.641],[1.25,-78.422],[1.75,-78.219],[2.25,-78.031],[2.75,-77.859],[3.25,-77.703],[3.75,-77.562],[4.25,-77.438],[4.734,-77.328],[5.203,-77.234],[5.656,-77.156],[6.094,-77.094],[6.516,-77.047],[6.922,-77.016],[7.312,-77],[7.688,-77],[8.062,-76.922],[8.438,-76.766],[8.812,-76.531],[9.188,-76.219],[9.562,-75.828],[9.938,-75.359],[10.312,-74.812],[10.688,-74.188],[11,-73.547],[11.25,-72.891],[11.438,-72.219],[11.562,-71.531],[11.625,-70.828],[11.625,-70.109],[11.562,-69.375]],
+    /* Spanish Guinea (present-day Equatorial Guinea) */
+    [[4,7.875],[4,8.125],[3.953,8.344],[3.859,8.531],[3.719,8.688],[3.531,8.812],[3.297,8.906],[3.016,8.969],[2.688,9],[2.312,9],[1.984,8.969],[1.703,8.906],[1.469,8.812],[1.281,8.688],[1.141,8.531],[1.047,8.344],[1,8.125],[1,7.875],[1.047,7.656],[1.141,7.469],[1.281,7.312],[1.469,7.188],[1.703,7.094],[1.984,7.031],[2.312,7],[2.688,7],[3.016,7.031],[3.297,7.094],[3.531,7.188],[3.719,7.312],[3.859,7.469],[3.953,7.656],[4,7.875]]
+  ]
+},
+{ id:'qing', name:'Qing Dynasty (China)', region:'East Asia', category:'global', group:'Age of global empires', color:{r:200,g:60,b:60},
+  founded:'1644 CE', ended:'1912 CE', peakYear:'c. 1820 CE', peakRuler:'Jiaqing Emperor',
+  yStart:1644, yEnd:1912, yPeak:1820,
+  capital:'Beijing', area:'~14,700,000 km²', population:'~380 million (estimated, roughly a third of the world population)',
+  gdpNote:'Estimated at roughly 33% of total world GDP in 1820 (Angus Maddison\'s widely-cited estimate) — the largest single economy on Earth at the time, before a century of relative economic decline through the late Qing period.',
+  gdpPct:33,
+  summary:'By 1820, Qing China was, by most estimates, the largest economy on Earth — its enormous, highly productive agrarian base and sophisticated internal trade networks supported roughly a third of the entire world\'s population and a comparable share of global output. The following century proved brutal: the Opium Wars, unequal treaties, internal rebellions (the Taiping Rebellion alone killed an estimated 20–30 million people), and the disruptive arrival of industrializing Western powers eroded China\'s relative economic position dramatically, a decline it would not begin reversing until well into the 20th century.',
+  achievements:['World\'s largest economy by most estimates through the early 19th century','Population and territory roughly doubled under the Qing relative to the preceding Ming dynasty','Sustained one of history\'s most extensive internal canal and grain-transport systems (the Grand Canal)','Compiled the Siku Quanshu, one of the largest literary and scholarly compilation projects in history'],
+  decline:'Military defeats in the Opium Wars, a cascade of unequal treaties, catastrophic internal rebellions, and the disruptive economic shock of industrializing Western and Japanese powers eroded Qing authority through the 19th century, ending with the 1911 revolution and the abdication of the last emperor in 1912.',
+  center:[35,105],
+  extent:[[51.688,126.562],[51.312,128.438],[50.859,130.031],[50.328,131.344],[49.719,132.375],[49.031,133.125],[48.266,133.594],[47.422,133.781],[46.5,133.688],[45.5,133.312],[44.516,132.828],[43.547,132.234],[42.594,131.531],[41.656,130.719],[40.734,129.797],[39.828,128.766],[38.938,127.625],[38.062,126.375],[37.094,125.062],[36.031,123.688],[34.875,122.25],[33.625,120.75],[32.281,119.188],[30.844,117.562],[29.312,115.875],[27.688,114.125],[26.203,112.625],[24.859,111.375],[23.656,110.375],[22.594,109.625],[21.672,109.125],[20.891,108.875],[20.25,108.875],[19.75,109.125],[19.359,109.156],[19.078,108.969],[18.906,108.562],[18.844,107.938],[18.891,107.094],[19.047,106.031],[19.312,104.75],[19.688,103.25],[20.125,101.656],[20.625,99.969],[21.188,98.188],[21.812,96.312],[22.5,94.344],[23.25,92.281],[24.062,90.125],[24.938,87.875],[25.812,85.828],[26.688,83.984],[27.562,82.344],[28.438,80.906],[29.312,79.672],[30.188,78.641],[31.062,77.812],[31.938,77.188],[32.781,76.641],[33.594,76.172],[34.375,75.781],[35.125,75.469],[35.844,75.234],[36.531,75.078],[37.188,75],[37.812,75],[38.438,75.078],[39.062,75.234],[39.688,75.469],[40.312,75.781],[40.938,76.172],[41.562,76.641],[42.188,77.188],[42.812,77.812],[43.438,78.516],[44.062,79.297],[44.688,80.156],[45.312,81.094],[45.938,82.109],[46.562,83.203],[47.188,84.375],[47.812,85.625],[48.406,86.953],[48.969,88.359],[49.5,89.844],[50,91.406],[50.469,93.047],[50.906,94.766],[51.312,96.562],[51.688,98.438],[52.016,100.312],[52.297,102.188],[52.531,104.062],[52.719,105.938],[52.859,107.812],[52.953,109.688],[53,111.562],[53,113.438],[52.953,115.312],[52.859,117.188],[52.719,119.062],[52.531,120.938],[52.297,122.812],[52.016,124.688],[51.688,126.562]]
+},
+{ id:'british', name:'British Empire', region:'Global', category:'global', group:'Age of global empires', color:{r:60,g:100,b:170},
+  founded:'1583 CE', ended:'20th century (gradual decolonization)', peakYear:'c. 1920 CE', peakRuler:'George V',
+  yStart:1583, yEnd:1997, yPeak:1920,
+  capital:'London', area:'~35,500,000 km² (~24% of Earth\'s land area)', population:'~458 million (estimated, ~23% of world population in 1913)',
+  gdpNote:'The largest empire in history by both land area and population. Its economic output combined Britain\'s early-industrial economy with that of its colonies, most significantly India — whose own share of world GDP fell sharply, from roughly a quarter in 1700 to under 5% by 1950, over the course of British rule.',
+  gdpPct:null,
+  summary:'At its territorial peak in the years after the First World War, the British Empire was the largest empire in recorded history by both land area and population, spanning every inhabited continent. It was built substantially on naval supremacy and industrial-era manufacturing, and its economic relationship with its largest colony, India, illustrates the empire\'s central paradox: Britain industrialized rapidly in part on the back of colonial trade and resource flows, while India — the world\'s largest economy as recently as 1700 — underwent sustained deindustrialization and saw its own share of world GDP collapse over the same period.',
+  achievements:['Largest empire in recorded history by land area and population','Pioneered industrial-era global trade, shipping, and financial infrastructure still used today','English became a dominant global language partly as a result of imperial reach','Built extensive railway and telegraph networks across its colonies, especially India'],
+  decline:'Two World Wars severely strained Britain\'s finances and military reach, while colonial independence movements — beginning most significantly with India\'s independence in 1947 — accelerated a broad wave of decolonization that had largely run its course by the 1960s–70s.',
+  center:[25,10],
+  extra:[[70,-105],[70,-95],[69.609,-86.25],[68.828,-78.75],[67.656,-72.5],[66.094,-67.5],[64.141,-63.75],[61.797,-61.25],[59.062,-60],[55.938,-60],[53.266,-60.547],[51.047,-61.641],[49.281,-63.281],[47.969,-65.469],[47.109,-68.203],[46.703,-71.484],[46.75,-75.312],[47.25,-79.688],[47.688,-83.984],[48.062,-88.203],[48.375,-92.344],[48.625,-96.406],[48.812,-100.391],[48.938,-104.297],[49,-108.125],[49,-111.875],[49.172,-115.391],[49.516,-118.672],[50.031,-121.719],[50.719,-124.531],[51.578,-127.109],[52.609,-129.453],[53.812,-131.562],[55.188,-133.438],[56.547,-135.078],[57.891,-136.484],[59.219,-137.656],[60.531,-138.594],[61.828,-139.297],[63.109,-139.766],[64.375,-140],[65.625,-140],[66.719,-138.75],[67.656,-136.25],[68.438,-132.5],[69.062,-127.5],[69.531,-121.25],[69.844,-113.75],[70,-105]],
+  extent:[[61,-4.188],[61,-2.812],[60.828,-1.609],[60.484,-0.578],[59.969,0.281],[59.281,0.969],[58.422,1.484],[57.391,1.828],[56.188,2],[54.812,2],[53.609,1.828],[52.578,1.484],[51.719,0.969],[51.031,0.281],[50.516,-0.578],[50.172,-1.609],[50,-2.812],[50,-4.188],[50.172,-5.391],[50.516,-6.422],[51.031,-7.281],[51.719,-7.969],[52.578,-8.484],[53.609,-8.828],[54.812,-9],[56.188,-9],[57.391,-8.828],[58.422,-8.484],[59.281,-7.969],[59.969,-7.281],[60.484,-6.422],[60.828,-5.391],[61,-4.188]],
+  moreTerritories:[
+    /* British Raj: India & Burma */
+    [[35.438,73.062],[35.562,73.938],[35.641,74.75],[35.672,75.5],[35.656,76.188],[35.594,76.812],[35.484,77.375],[35.328,77.875],[35.125,78.312],[34.875,78.688],[34.562,79.281],[34.188,80.094],[33.75,81.125],[33.25,82.375],[32.688,83.844],[32.062,85.531],[31.375,87.438],[30.625,89.562],[29.906,91.438],[29.219,93.062],[28.562,94.438],[27.938,95.562],[27.344,96.438],[26.781,97.062],[26.25,97.438],[25.75,97.562],[25.25,97.594],[24.75,97.531],[24.25,97.375],[23.75,97.125],[23.25,96.781],[22.75,96.344],[22.25,95.812],[21.75,95.188],[21.25,94.719],[20.75,94.406],[20.25,94.25],[19.75,94.25],[19.25,94.406],[18.75,94.719],[18.25,95.188],[17.75,95.812],[17.219,96.359],[16.656,96.828],[16.062,97.219],[15.438,97.531],[14.781,97.766],[14.094,97.922],[13.375,98],[12.625,98],[11.906,97.719],[11.219,97.156],[10.562,96.312],[9.938,95.188],[9.344,93.781],[8.781,92.094],[8.25,90.125],[7.75,87.875],[7.344,85.859],[7.031,84.078],[6.812,82.531],[6.688,81.219],[6.656,80.141],[6.719,79.297],[6.875,78.688],[7.125,78.312],[7.406,77.953],[7.719,77.609],[8.062,77.281],[8.438,76.969],[8.844,76.672],[9.281,76.391],[9.75,76.125],[10.25,75.875],[10.75,75.625],[11.25,75.375],[11.75,75.125],[12.25,74.875],[12.75,74.625],[13.25,74.375],[13.75,74.125],[14.25,73.875],[14.75,73.609],[15.25,73.328],[15.75,73.031],[16.25,72.719],[16.75,72.391],[17.25,72.047],[17.75,71.688],[18.25,71.312],[18.75,70.938],[19.25,70.562],[19.75,70.188],[20.25,69.812],[20.75,69.438],[21.25,69.062],[21.75,68.688],[22.25,68.312],[22.75,67.969],[23.25,67.656],[23.75,67.375],[24.25,67.125],[24.75,66.906],[25.25,66.719],[25.75,66.562],[26.25,66.438],[26.75,66.328],[27.25,66.234],[27.75,66.156],[28.25,66.094],[28.75,66.047],[29.25,66.016],[29.75,66],[30.25,66],[30.734,66.062],[31.203,66.188],[31.656,66.375],[32.094,66.625],[32.516,66.938],[32.922,67.312],[33.312,67.75],[33.688,68.25],[34.031,68.797],[34.344,69.391],[34.625,70.031],[34.875,70.719],[35.094,71.453],[35.281,72.234],[35.438,73.062]],
+    /* Australia */
+    [[-10.562,125.688],[-10.438,129.312],[-10.438,132.547],[-10.562,135.391],[-10.812,137.844],[-11.188,139.906],[-11.688,141.578],[-12.312,142.859],[-13.062,143.75],[-13.938,144.25],[-14.812,144.797],[-15.688,145.391],[-16.562,146.031],[-17.438,146.719],[-18.312,147.453],[-19.188,148.234],[-20.062,149.062],[-20.938,149.938],[-21.859,150.672],[-22.828,151.266],[-23.844,151.719],[-24.906,152.031],[-26.016,152.203],[-27.172,152.234],[-28.375,152.125],[-29.625,151.875],[-30.781,151.562],[-31.844,151.188],[-32.812,150.75],[-33.688,150.25],[-34.469,149.688],[-35.156,149.062],[-35.75,148.375],[-36.25,147.625],[-36.641,146.844],[-36.922,146.031],[-37.094,145.188],[-37.156,144.312],[-37.109,143.406],[-36.953,142.469],[-36.688,141.5],[-36.312,140.5],[-35.938,139.281],[-35.562,137.844],[-35.188,136.188],[-34.812,134.312],[-34.438,132.219],[-34.062,129.906],[-33.688,127.375],[-33.312,124.625],[-32.891,122.188],[-32.422,120.062],[-31.906,118.25],[-31.344,116.75],[-30.734,115.562],[-30.078,114.688],[-29.375,114.125],[-28.625,113.875],[-27.875,113.656],[-27.125,113.469],[-26.375,113.312],[-25.625,113.188],[-24.875,113.094],[-24.125,113.031],[-23.375,113],[-22.625,113],[-21.828,113],[-20.984,113],[-20.094,113],[-19.156,113],[-18.172,113],[-17.141,113],[-16.062,113],[-14.938,113],[-13.938,113.453],[-13.062,114.359],[-12.312,115.719],[-11.688,117.531],[-11.188,119.797],[-10.812,122.516],[-10.562,125.688]],
+    /* New Zealand */
+    [[-35.312,175.188],[-35.688,175.812],[-36.078,176.312],[-36.484,176.688],[-36.906,176.938],[-37.344,177.062],[-37.797,177.062],[-38.266,176.938],[-38.75,176.688],[-39.25,176.312],[-39.766,175.859],[-40.297,175.328],[-40.844,174.719],[-41.406,174.031],[-41.984,173.266],[-42.578,172.422],[-43.188,171.5],[-43.812,170.5],[-44.328,169.641],[-44.734,168.922],[-45.031,168.344],[-45.219,167.906],[-45.297,167.609],[-45.266,167.453],[-45.125,167.438],[-44.875,167.562],[-44.594,167.75],[-44.281,168],[-43.938,168.312],[-43.562,168.688],[-43.156,169.125],[-42.719,169.625],[-42.25,170.188],[-41.75,170.812],[-41.219,171.359],[-40.656,171.828],[-40.062,172.219],[-39.438,172.531],[-38.781,172.766],[-38.094,172.922],[-37.375,173],[-36.625,173],[-36.016,173.078],[-35.547,173.234],[-35.219,173.469],[-35.031,173.781],[-34.984,174.172],[-35.078,174.641],[-35.312,175.188]],
+    /* East & Southern Africa "Cape to Cairo" corridor: Egypt, Sudan, Kenya, Rhodesias, South Africa */
+    [[31,29.375],[31,30.625],[30.891,31.766],[30.672,32.797],[30.344,33.719],[29.906,34.531],[29.359,35.234],[28.703,35.828],[27.938,36.312],[27.062,36.688],[26.156,37.047],[25.219,37.391],[24.25,37.719],[23.25,38.031],[22.219,38.328],[21.156,38.609],[20.062,38.875],[18.938,39.125],[17.844,39.375],[16.781,39.625],[15.75,39.875],[14.75,40.125],[13.781,40.375],[12.844,40.625],[11.938,40.875],[11.062,41.125],[10.203,41.344],[9.359,41.531],[8.531,41.688],[7.719,41.812],[6.922,41.906],[6.141,41.969],[5.375,42],[4.625,42],[3.875,41.969],[3.125,41.906],[2.375,41.812],[1.625,41.688],[0.875,41.531],[0.125,41.344],[-0.625,41.125],[-1.375,40.875],[-2.125,40.656],[-2.875,40.469],[-3.625,40.312],[-4.375,40.188],[-5.125,40.094],[-5.875,40.031],[-6.625,40],[-7.375,40],[-8.125,39.938],[-8.875,39.812],[-9.625,39.625],[-10.375,39.375],[-11.125,39.062],[-11.875,38.688],[-12.625,38.25],[-13.375,37.75],[-14.125,37.266],[-14.875,36.797],[-15.625,36.344],[-16.375,35.906],[-17.125,35.484],[-17.875,35.078],[-18.625,34.688],[-19.375,34.312],[-20.125,33.969],[-20.875,33.656],[-21.625,33.375],[-22.375,33.125],[-23.125,32.906],[-23.875,32.719],[-24.625,32.562],[-25.375,32.438],[-26.125,32.234],[-26.875,31.953],[-27.625,31.594],[-28.375,31.156],[-29.125,30.641],[-29.875,30.047],[-30.625,29.375],[-31.375,28.625],[-32.031,27.859],[-32.594,27.078],[-33.062,26.281],[-33.438,25.469],[-33.719,24.641],[-33.906,23.797],[-34,22.938],[-34,22.062],[-33.906,21.281],[-33.719,20.594],[-33.438,20],[-33.062,19.5],[-32.594,19.094],[-32.031,18.781],[-31.375,18.562],[-30.625,18.438],[-29.844,18.281],[-29.031,18.094],[-28.188,17.875],[-27.312,17.625],[-26.406,17.344],[-25.469,17.031],[-24.5,16.688],[-23.5,16.312],[-22.5,15.984],[-21.5,15.703],[-20.5,15.469],[-19.5,15.281],[-18.5,15.141],[-17.5,15.047],[-16.5,15],[-15.5,15],[-14.5,15],[-13.5,15],[-12.5,15],[-11.5,15],[-10.5,15],[-9.5,15],[-8.5,15],[-7.5,15],[-6.531,15],[-5.594,15],[-4.688,15],[-3.812,15],[-2.969,15],[-2.156,15],[-1.375,15],[-0.625,15],[0.125,15.047],[0.875,15.141],[1.625,15.281],[2.375,15.469],[3.125,15.703],[3.875,15.984],[4.625,16.312],[5.375,16.688],[6.141,17.047],[6.922,17.391],[7.719,17.719],[8.531,18.031],[9.359,18.328],[10.203,18.609],[11.062,18.875],[11.938,19.125],[12.812,19.375],[13.688,19.625],[14.562,19.875],[15.438,20.125],[16.312,20.375],[17.188,20.625],[18.062,20.875],[18.938,21.125],[19.781,21.344],[20.594,21.531],[21.375,21.688],[22.125,21.812],[22.844,21.906],[23.531,21.969],[24.188,22],[24.812,22],[25.422,22.047],[26.016,22.141],[26.594,22.281],[27.156,22.469],[27.703,22.703],[28.234,22.984],[28.75,23.312],[29.25,23.688],[29.688,24.172],[30.062,24.766],[30.375,25.469],[30.625,26.281],[30.812,27.203],[30.938,28.234],[31,29.375]],
+    /* West Africa colonies: Nigeria, Gold Coast, Sierra Leone, Gambia */
+    [[14,-14.688],[14,-14.312],[13.953,-13.922],[13.859,-13.516],[13.719,-13.094],[13.531,-12.656],[13.297,-12.203],[13.016,-11.734],[12.688,-11.25],[12.312,-10.75],[11.969,-10.219],[11.656,-9.656],[11.375,-9.062],[11.125,-8.438],[10.906,-7.781],[10.719,-7.094],[10.562,-6.375],[10.438,-5.625],[10.266,-4.875],[10.047,-4.125],[9.781,-3.375],[9.469,-2.625],[9.109,-1.875],[8.703,-1.125],[8.25,-0.375],[7.75,0.375],[7.281,1.125],[6.844,1.875],[6.438,2.625],[6.062,3.375],[5.719,4.125],[5.406,4.875],[5.125,5.625],[4.875,6.375],[4.797,7.109],[4.891,7.828],[5.156,8.531],[5.594,9.219],[6.203,9.891],[6.984,10.547],[7.938,11.188],[9.062,11.812],[10.078,12.203],[10.984,12.359],[11.781,12.281],[12.469,11.969],[13.047,11.422],[13.516,10.641],[13.875,9.625],[14.125,8.375],[14.312,7.094],[14.438,5.781],[14.5,4.438],[14.5,3.062],[14.438,1.656],[14.312,0.219],[14.125,-1.25],[13.875,-2.75],[13.672,-4.188],[13.516,-5.562],[13.406,-6.875],[13.344,-8.125],[13.328,-9.312],[13.359,-10.438],[13.438,-11.5],[13.562,-12.5],[13.672,-13.328],[13.766,-13.984],[13.844,-14.469],[13.906,-14.781],[13.953,-14.922],[13.984,-14.891],[14,-14.688]],
+    /* Malaya & Singapore */
+    [[6,101.75],[6,102.25],[5.922,102.688],[5.766,103.062],[5.531,103.375],[5.219,103.625],[4.828,103.812],[4.359,103.938],[3.812,104],[3.188,104],[2.641,103.938],[2.172,103.812],[1.781,103.625],[1.469,103.375],[1.234,103.062],[1.078,102.688],[1,102.25],[1,101.75],[1.078,101.312],[1.234,100.938],[1.469,100.625],[1.781,100.375],[2.172,100.188],[2.641,100.062],[3.188,100],[3.812,100],[4.359,100.062],[4.828,100.188],[5.219,100.375],[5.531,100.625],[5.766,100.938],[5.922,101.312],[6,101.75]],
+    /* British Caribbean: Jamaica, Trinidad & smaller isles */
+    [[18.562,-77.688],[18.438,-77.312],[18.203,-76.75],[17.859,-76],[17.406,-75.062],[16.844,-73.938],[16.172,-72.625],[15.391,-71.125],[14.5,-69.438],[13.5,-67.562],[12.625,-65.953],[11.875,-64.609],[11.25,-63.531],[10.75,-62.719],[10.375,-62.172],[10.125,-61.891],[10,-61.875],[10,-62.125],[10.141,-62.594],[10.422,-63.281],[10.844,-64.188],[11.406,-65.312],[12.109,-66.656],[12.953,-68.219],[13.938,-70],[15.062,-72],[16.031,-73.703],[16.844,-75.109],[17.5,-76.219],[18,-77.031],[18.344,-77.547],[18.531,-77.766],[18.562,-77.688]],
+    /* Middle East mandates: Palestine, Transjordan, Iraq */
+    [[37,39.938],[37,41.062],[36.891,42.094],[36.672,43.031],[36.344,43.875],[35.906,44.625],[35.359,45.281],[34.703,45.844],[33.938,46.312],[33.062,46.688],[32.281,46.812],[31.594,46.688],[31,46.312],[30.5,45.688],[30.094,44.812],[29.781,43.688],[29.562,42.312],[29.438,40.688],[29.359,39.25],[29.328,38],[29.344,36.938],[29.406,36.062],[29.516,35.375],[29.672,34.875],[29.875,34.562],[30.125,34.438],[30.375,34.344],[30.625,34.281],[30.875,34.25],[31.125,34.25],[31.375,34.281],[31.625,34.344],[31.875,34.438],[32.125,34.562],[32.406,34.688],[32.719,34.812],[33.062,34.938],[33.438,35.062],[33.844,35.188],[34.281,35.312],[34.75,35.438],[35.25,35.562],[35.688,35.812],[36.062,36.188],[36.375,36.688],[36.625,37.312],[36.812,38.062],[36.938,38.938],[37,39.938]]
+  ]
+},
+{ id:'russian', name:'Russian Empire', region:'Eurasia', category:'global', group:'Age of global empires', color:{r:150,g:55,b:95},
+  founded:'1721 CE', ended:'1917 CE', peakYear:'c. 1895 CE', peakRuler:'Alexander III',
+  yStart:1721, yEnd:1917, yPeak:1895,
+  capital:'Saint Petersburg', area:'~22,800,000 km² (at territorial peak)', population:'~125 million (estimated, late 19th century)',
+  gdpNote:'Estimated at roughly 8% of world GDP by the early 20th century (Maddison Project) — a large but comparatively agrarian economy relative to its enormous territorial footprint, industrializing later and more unevenly than Western Europe.',
+  gdpPct:8,
+  summary:'Proclaimed by Peter the Great after victory over Sweden, the Russian Empire expanded across nearly a sixth of Earth\'s land surface, stretching from the Baltic Sea to the Pacific and, until the 1867 sale of Alaska, into North America itself. Catherine the Great extended it deep into Ukraine, Crimea, and Poland, while 19th-century expansion pushed its frontier through the Caucasus and Central Asia toward the borders of British India, fueling the diplomatic and intelligence rivalry with Britain known as the Great Game. Despite its territorial scale, the empire industrialized later and more unevenly than Western Europe, and its overwhelmingly agrarian peasant economy remained a persistent source of internal instability.',
+  achievements:['Expanded across roughly a sixth of Earth\'s land area, spanning Europe, Asia, and briefly North America','Built the Trans-Siberian Railway, the longest railway line in the world','St. Petersburg\'s Hermitage grew into one of the world\'s great art collections','Its 19th-century rivalry with Britain over Central Asia — the "Great Game" — shaped the modern borders of the region'],
+  decline:'The strain of the First World War exposed deep structural weaknesses — military defeats, food shortages, and widespread discontent with autocratic rule — culminating in the February and October Revolutions of 1917, which ended the Romanov dynasty and the empire itself.',
+  center:[60,60],
+  extent:[[54.0,20.0],[54.805,20.329],[55.59,20.911],[56.379,21.671],[57.192,22.534],[58.052,23.426],[58.981,24.273],[60.0,25.0],[61.133,25.125],[62.367,24.554],[63.673,23.793],[65.02,23.35],[66.378,23.732],[67.714,25.446],[69.0,29.0],[70.328,34.819],[71.757,42.595],[73.203,51.732],[74.583,61.636],[75.815,71.711],[76.815,81.364],[77.5,90.0],[77.867,97.895],[77.99,105.671],[77.898,113.248],[77.622,120.548],[77.194,127.493],[76.643,134.003],[76.0,140.0],[75.194,145.633],[74.173,151.02],[73.0,156.041],[71.735,160.571],[70.439,164.49],[69.173,167.673],[68.0,170.0],[66.907,171.388],[65.835,171.918],[64.777,171.714],[63.723,170.898],[62.665,169.592],[61.593,167.918],[60.5,166.0],[59.353,163.49],[58.149,160.163],[56.923,156.327],[55.71,152.286],[54.545,148.347],[53.464,144.816],[52.5,142.0],[51.682,139.866],[50.988,138.131],[50.379,136.726],[49.815,135.58],[49.257,134.624],[48.665,133.787],[48.0,133.0],[47.157,132.706],[46.137,133.114],[45.057,133.805],[44.035,134.359],[43.19,134.356],[42.638,133.376],[42.5,131.0],[42.966,126.781],[43.997,120.945],[45.36,114.076],[46.824,106.761],[48.156,99.586],[49.125,93.137],[49.5,88.0],[49.217,84.198],[48.462,81.219],[47.375,78.843],[46.095,76.851],[44.762,75.026],[43.517,73.149],[42.5,71.0],[41.606,68.592],[40.678,66.122],[39.771,63.653],[38.943,61.245],[38.251,58.959],[37.751,56.857],[37.5,55.0],[37.545,53.481],[37.851,52.277],[38.353,51.274],[38.984,50.359],[39.679,49.417],[40.373,48.335],[41.0,47.0],[41.603,45.392],[42.257,43.606],[42.937,41.7],[43.624,39.729],[44.294,37.751],[44.927,35.822],[45.5,34.0],[45.985,32.2],[46.394,30.343],[46.759,28.494],[47.118,26.72],[47.504,25.086],[47.953,23.657],[48.5,22.5],[49.15,21.605],[49.875,20.911],[50.656,20.405],[51.477,20.074],[52.319,19.905],[53.166,19.885],[54.0,20.0]]
+},
+
+
+];
+
+EMPIRES.forEach(e=>{
+  const t = [];
+  if(e.extent) t.push(e.extent);
+  if(e.extra) t.push(e.extra);
+  if(e.moreTerritories) t.push(...e.moreTerritories);
+  e.territories = t;
+});
+
+const GDP_COMPARE = [
+  {label:'Mughal India', small:'c. 1700 CE', pct:24, india:true},
+  {label:'India (subcontinent)', small:'c. 1000 CE — Chola era', pct:29, india:true},
+  {label:'India (subcontinent)', small:'c. 1500 CE — Vijayanagara era', pct:25, india:true},
+  {label:'Qing China', small:'c. 1820 CE', pct:33, india:false},
+  {label:'China', small:'c. 1600 CE', pct:29, india:false},
+  {label:'Western Europe', small:'c. 1700 CE', pct:22, india:false}
+];
+
+/* ============================================================
+   SHARED APP NAV — theme, accent, and menu (matches index.html;
+   uses the same localStorage keys so preferences sync across pages)
+   ============================================================ */
+const THEME_KEY='dayplan_theme';
+const ACCENT_KEY='dayplan_accent';
+const SURFACE_KEY='dayplan_surface';
+const APP_ACCENTS=['white','blue','green','amber','pink'];
+const APP_SURFACES=['black','grey'];
+let appTheme='dark';
+let appAccent='white';
+let appSurface='black';
+
+function saveAppPreferences(){
+  try{
+    localStorage.setItem(THEME_KEY,appTheme);
+    localStorage.setItem(ACCENT_KEY,appAccent);
+    localStorage.setItem(SURFACE_KEY,appSurface);
+  }catch(e){}
+}
+function updateAccentSwatches(){
+  document.querySelectorAll('.accent-swatch').forEach(s=>{
+    s.classList.toggle('active',s.dataset.accent===appAccent);
+  });
+  document.querySelectorAll('.surface-swatch').forEach(s=>{
+    const isActive=(appTheme==='light'&&s.dataset.surface==='white')||(appTheme==='dark'&&s.dataset.surface===appSurface);
+    s.classList.toggle('active',isActive);
+  });
+}
+function applyAppPreferences(){
+  document.body.classList.toggle('light',appTheme==='light');
+  document.body.classList.toggle('grey',appTheme==='dark'&&appSurface==='grey');
+  document.body.dataset.accent=appAccent;
+  const icon=appTheme==='dark'?'<i class="ti ti-sun"></i>':'<i class="ti ti-moon"></i>';
+  document.querySelectorAll('[onclick="toggleAppTheme()"]').forEach(b=>b.innerHTML=icon);
+  updateAccentSwatches();
+}
+function loadAppPreferences(){
+  try{
+    const t=localStorage.getItem(THEME_KEY);
+    const a=localStorage.getItem(ACCENT_KEY);
+    const s=localStorage.getItem(SURFACE_KEY);
+    if(t==='light'||t==='dark') appTheme=t;
+    if(a&&APP_ACCENTS.includes(a)) appAccent=a;
+    if(s&&APP_SURFACES.includes(s)) appSurface=s;
+  }catch(e){}
+  applyAppPreferences();
+}
+function toggleAppTheme(){
+  appTheme=appTheme==='dark'?'light':'dark';
+  applyAppPreferences();
+  saveAppPreferences();
+}
+function setAppSurface(surface){
+  if(surface==='white'){
+    appTheme='light';
+  }else if(APP_SURFACES.includes(surface)){
+    appTheme='dark';
+    appSurface=surface;
+  }else{
+    return;
+  }
+  applyAppPreferences();
+  saveAppPreferences();
+  closeAccentPicker();
+}
+function setAppAccent(accent){
+  if(!APP_ACCENTS.includes(accent)) return;
+  appAccent=accent;
+  applyAppPreferences();
+  saveAppPreferences();
+  closeAccentPicker();
+}
+function toggleAccentPicker(e){
+  e.stopPropagation();
+  const pop=document.getElementById('navAccentPop');
+  const open=pop.classList.toggle('open');
+  if(open) closeNavMenu();
+}
+function closeAccentPicker(){
+  document.getElementById('navAccentPop').classList.remove('open');
+}
+function toggleNavMenu(e){
+  if(e)e.stopPropagation();
+  document.getElementById('navMenuPop').classList.toggle('open');
+  closeAccentPicker();
+}
+function closeNavMenu(){
+  document.getElementById('navMenuPop').classList.remove('open');
+}
+function toggleFS(){
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+document.addEventListener('click', ()=>{ closeNavMenu(); closeAccentPicker(); });
+loadAppPreferences();
+
+let selectedEmpire = null;
+let EMPIRE_COLOR = {r:255,g:255,b:255};
+let viewMode = 'all';
+let category = 'all';
+
+function emColorCss(c){ return `rgb(${c.r},${c.g},${c.b})`; }
+
+function groupOrder(){ return ['Golden ages of India','Ancient & classical world','African empires','The Americas','Age of global empires']; }
+
+function buildRail(){
+  const rail = document.getElementById('em-rail');
+  const list = currentEmpireList();
+  const groups = groupOrder().filter(g=>list.some(e=>e.group===g));
+  rail.innerHTML = groups.map(g=>`
+    <div class="em-rail-group-label">${g}</div>
+    <div class="em-rail-row">
+      ${list.filter(e=>e.group===g).map(e=>`
+        <div class="em-chip" id="chip-${e.id}" onclick="emSelect('${e.id}')" style="--chip-c:${emColorCss(e.color)};--chip-bg:rgba(${e.color.r},${e.color.g},${e.color.b},.16)">
+          <div class="em-chip-top">
+            <div class="em-chip-name"><span class="em-dot" style="background:${emColorCss(e.color)}"></span>${e.name}</div>
+            <div class="em-chip-era">${e.peakYear}</div>
+          </div>
+          <div class="em-chip-meta">${e.area}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+  document.querySelectorAll('.em-chip').forEach(c=>c.classList.remove('active'));
+  if(selectedEmpire){ const chip=document.getElementById('chip-'+selectedEmpire.id); if(chip) chip.classList.add('active'); }
+}
+
+function emToggleRail(){
+  document.getElementById('em-rail-wrap').classList.toggle('collapsed');
+}
+
+function emSetCategory(cat){
+  category = cat;
+  document.querySelectorAll('.em-tab').forEach(t=>t.classList.toggle('active', t.dataset.cat===cat));
+  const wrap = document.getElementById('em-globe-wrap');
+  wrap.classList.remove('cat-india','cat-global');
+  if(cat==='india') wrap.classList.add('cat-india');
+  if(cat==='global') wrap.classList.add('cat-global');
+  selectedEmpire = null;
+  emCloseDrawer();
+  buildRail();
+  if(cat==='india'){ targetLambda=80*Math.PI/180; targetPhi=0.42; }
+  else if(cat==='global'){ targetLambda=1.35; targetPhi=0.28; }
+  else { targetLambda=0.6; targetPhi=0.32; }
+}
+
+function emSetMode(mode){
+  viewMode = mode;
+  document.querySelectorAll('.em-mode-opt').forEach(m=>m.classList.toggle('active', m.dataset.mode===mode));
+  const hint = document.getElementById('em-hint-text');
+  if(hint) hint.textContent = mode==='all'
+    ? 'drag to rotate · every empire\'s peak extent is overlaid in its own colour — tap one below to spotlight it'
+    : 'drag to rotate · tap an empire below to focus on its peak extent';
+}
+
+function emSelect(id){
+  const e = EMPIRES.find(x=>x.id===id);
+  if(!e) return;
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  selectedEmpire = e;
+  EMPIRE_COLOR = e.color;
+  targetLambda = e.center[1]*Math.PI/180;
+  targetPhi = Math.max(-1.3,Math.min(1.3, e.center[0]*Math.PI/180));
+  document.querySelectorAll('.em-chip').forEach(c=>c.classList.remove('active'));
+  const chip = document.getElementById('chip-'+id); if(chip) chip.classList.add('active');
+  renderDrawer(e);
+  const drawerEl = document.getElementById('em-drawer');
+  drawerEl.classList.add('open');
+  drawerEl.classList.remove('minimized');
+  document.getElementById('em-drawer-close').style.display='flex';
+  document.getElementById('em-drawer-min').style.display='flex';
+  document.getElementById('em-drawer-min').classList.remove('is-min');
+}
+
+function emToggleMinimize(){
+  const drawerEl = document.getElementById('em-drawer');
+  const btn = document.getElementById('em-drawer-min');
+  const nowMin = drawerEl.classList.toggle('minimized');
+  btn.classList.toggle('is-min', nowMin);
+  btn.title = nowMin ? 'Expand' : 'Minimize';
+}
+
+/* ============ READ ALOUD (text-to-speech, female voice) ============ */
+var __ttsVoices = [];
+var __ttsActiveBtn = null;
+function __ttsLoadVoices(){ __ttsVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){ __ttsLoadVoices(); window.speechSynthesis.onvoiceschanged = __ttsLoadVoices; }
+function __ttsFemaleVoice(){
+  if(!__ttsVoices.length) __ttsLoadVoices();
+  var pref = /female|zira|samantha|victoria|karen|moira|tessa|susan|fiona|kate|serena|allison|ava|salli|joanna|kimberly|amy|emma|ivy|jenny/i;
+  return __ttsVoices.find(function(v){ return pref.test(v.name) && /^en/i.test(v.lang); })
+      || __ttsVoices.find(function(v){ return pref.test(v.name); })
+      || __ttsVoices.find(function(v){ return /^en/i.test(v.lang) && !/male/i.test(v.name); })
+      || __ttsVoices[0] || null;
+}
+function __ttsResetBtn(btn){ if(!btn) return; btn.classList.remove('tts-playing'); btn.innerHTML = btn.dataset.ttsLabel || '<i class="ti ti-volume"></i>Listen'; }
+function ttsStripHtml(html){ var d=document.createElement('div'); d.innerHTML = html==null?'':String(html); return (d.textContent||d.innerText||'').replace(/\s+/g,' ').trim(); }
+function ttsToggle(text, btn){
+  if(!('speechSynthesis' in window)){
+    if(window.median && window.median.window && typeof window.median.window.open==='function'){
+      if(confirm('Read-aloud isn\'t available inside the app. Open this page in your browser to listen?')){
+        window.median.window.open(window.location.href, 'external');
+      }
+    } else {
+      alert('Read-aloud is not supported in this browser.');
+    }
+    return;
+  }
+  var synth = window.speechSynthesis;
+  if(synth.speaking){
+    var wasSameBtn = (__ttsActiveBtn === btn);
+    synth.cancel(); __ttsResetBtn(__ttsActiveBtn); __ttsActiveBtn = null;
+    if(wasSameBtn) return;
+  }
+  var utter = new SpeechSynthesisUtterance(text);
+  var voice = __ttsFemaleVoice();
+  if(voice) utter.voice = voice;
+  utter.rate = 0.98; utter.pitch = 1.05;
+  utter.onend = function(){ __ttsResetBtn(btn); if(__ttsActiveBtn===btn) __ttsActiveBtn=null; };
+  utter.onerror = function(){ __ttsResetBtn(btn); if(__ttsActiveBtn===btn) __ttsActiveBtn=null; };
+  synth.speak(utter);
+  if(btn){ if(!btn.dataset.ttsLabel) btn.dataset.ttsLabel = btn.innerHTML; btn.classList.add('tts-playing'); btn.innerHTML = '<i class="ti ti-player-stop"></i>Stop'; __ttsActiveBtn = btn; }
+}
+var emCurrentEmpireText = '';
+function emEmpireText(e){
+  var parts = [e.name, e.region, 'Founded '+e.founded+', ended '+e.ended+'. Peak in '+e.peakYear+' under '+e.peakRuler+'.'];
+  parts.push('Capital: '+e.capital+'. Peak area: '+e.area+'. Population: '+e.population+'.');
+  parts.push('Overview. '+ttsStripHtml(e.summary));
+  if(e.achievements && e.achievements.length) parts.push('Notable achievements. '+e.achievements.map(ttsStripHtml).join('. '));
+  parts.push('Decline. '+ttsStripHtml(e.decline));
+  return parts.join(' ');
+}
+function emReadEmpire(btn){ ttsToggle(emCurrentEmpireText, btn); }
+
+function renderDrawer(e){
+  const col = emColorCss(e.color);
+  const gdpBlock = e.gdpPct ? `
+    <div class="em-gdp-bar-wrap">
+      <div class="em-gdp-bar-track"><div class="em-gdp-bar-fill" style="width:${e.gdpPct*2.6}%;background:${col}"></div></div>
+    </div>
+    <div class="em-gdp-caption">${e.gdpNote}</div>
+  ` : `<div class="em-gdp-caption">${e.gdpNote}</div>`;
+
+  emCurrentEmpireText = emEmpireText(e);
+  document.getElementById('em-drawer').style.setProperty('--chip-c', col);
+  document.getElementById('em-drawer').innerHTML = `
+    <div class="em-d-region" style="color:${col}">${e.region}</div>
+    <div class="em-d-name">${e.name}</div>
+    <div class="em-d-era">${e.founded} – ${e.ended} · peak ${e.peakYear} under ${e.peakRuler}</div>
+    <button class="em-listen-btn" id="emListenBtn" onclick="emReadEmpire(this)"><i class="ti ti-volume"></i>Listen</button>
+
+    <div class="em-d-stats">
+      <div class="em-d-stat"><div class="em-d-stat-label">Capital</div><div class="em-d-stat-val">${e.capital}</div></div>
+      <div class="em-d-stat"><div class="em-d-stat-label">Peak area</div><div class="em-d-stat-val">${e.area}</div></div>
+      <div class="em-d-stat"><div class="em-d-stat-label">Population</div><div class="em-d-stat-val">${e.population}</div></div>
+      <div class="em-d-stat"><div class="em-d-stat-label">GDP at peak</div><div class="em-d-stat-val">${e.gdpPct ? '~'+e.gdpPct+'% of world GDP' : 'see note below'}</div></div>
+    </div>
+
+    <div class="em-d-section-h">Economic weight</div>
+    ${gdpBlock}
+
+    <div class="em-d-section-h">Overview</div>
+    <div class="em-d-text">${e.summary}</div>
+
+    <div class="em-d-section-h">Notable achievements</div>
+    <ul class="em-d-list">${e.achievements.map(a=>`<li>${a}</li>`).join('')}</ul>
+
+    <div class="em-d-section-h">Decline</div>
+    <div class="em-d-text">${e.decline}</div>
+
+    <div class="em-source-note">Territory shown is a stylized approximation of peak extent for visualization — historians frequently dispute exact borders for pre-modern states. GDP figures, where given, follow Angus Maddison's historical national-accounts estimates (1990 international dollars); figures without a percentage predate reliable estimation and are described qualitatively instead.</div>
+  `;
+}
+
+function emCloseDrawer(){
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  const drawerEl = document.getElementById('em-drawer');
+  drawerEl.classList.remove('open');
+  drawerEl.classList.remove('minimized');
+  document.getElementById('em-drawer-close').style.display='none';
+  document.getElementById('em-drawer-min').style.display='none';
+  document.getElementById('em-drawer-min').classList.remove('is-min');
+}
+
+function emOpenCompare(){
+  const rows = GDP_COMPARE.slice().sort((a,b)=>b.pct-a.pct);
+  document.getElementById('em-cmp-rows').innerHTML = rows.map(r=>`
+    <div class="em-cmp-row">
+      <div class="em-cmp-row-top">
+        <span class="em-cmp-row-label">${r.label}<small>${r.small}</small></span>
+        <span class="em-cmp-row-val">${r.pct}%</span>
+      </div>
+      <div class="em-cmp-track"><div class="em-cmp-fill ${r.india?'india':''}" style="width:${r.pct*2.6}%"></div></div>
+    </div>
+  `).join('');
+  document.getElementById('em-compare-bg').classList.add('open');
+}
+function emCloseCompare(){ document.getElementById('em-compare-bg').classList.remove('open'); }
+function emOpenInfo(){ document.getElementById('em-info-bg').classList.add('open'); }
+function emCloseInfo(){ document.getElementById('em-info-bg').classList.remove('open'); }
+
+function emOpenTimeline(){
+  buildTimeline();
+  document.getElementById('em-timeline-bg').classList.add('open');
+}
+function emCloseTimeline(){ document.getElementById('em-timeline-bg').classList.remove('open'); }
+
+function buildTimeline(){
+  const list = EMPIRES.slice().sort((a,b)=>a.yStart-b.yStart);
+  const xMin=-1000, xMax=2020;
+  const pxPerYear = 0.62;
+  const totalW = Math.round((xMax-xMin)*pxPerYear)+80;
+  const rowH = 30, topPad = 28, chartH = list.length*rowH + topPad + 10;
+
+  function xPos(y){ return (y-xMin)*pxPerYear + 10; }
+
+  let grid = '';
+  for(let y=xMin; y<=xMax; y+=400){
+    const gx = xPos(y);
+    const lbl = y<0 ? `${Math.abs(y)} BCE` : `${y} CE`;
+    grid += `<line x1="${gx}" y1="0" x2="${gx}" y2="${chartH}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>`;
+    grid += `<text x="${gx+4}" y="14" font-size="9" fill="rgba(255,255,255,.35)" font-family="IBM Plex Mono, monospace">${lbl}</text>`;
+  }
+  const nowX = xPos(2026);
+  grid += `<line x1="${nowX}" y1="0" x2="${nowX}" y2="${chartH}" stroke="rgba(217,164,65,.4)" stroke-width="1" stroke-dasharray="3,3"/>`;
+
+  let bars = '';
+  list.forEach((e,i)=>{
+    const y = topPad + i*rowH;
+    const x1 = xPos(e.yStart), x2 = xPos(e.yEnd);
+    const w = Math.max(3, x2-x1);
+    const c = emColorCss(e.color);
+    const px = xPos(e.yPeak);
+    bars += `<g class="em-tl-bar-label" onclick="emCloseTimeline();emSelect('${e.id}')">
+      <rect x="${x1}" y="${y}" width="${w}" height="12" rx="6" fill="${c}" fill-opacity="0.55" stroke="${c}" stroke-width="1"/>
+      <circle cx="${px}" cy="${y+6}" r="3.4" fill="${c}"/>
+      <text x="${x1}" y="${y-3}" font-size="10.5" fill="#ddd" font-family="Inter,sans-serif">${e.name}</text>
+    </g>`;
+  });
+
+  const svg = `<svg width="${totalW}" height="${chartH+6}" viewBox="0 0 ${totalW} ${chartH+6}" xmlns="http://www.w3.org/2000/svg">${grid}${bars}</svg>`;
+  document.getElementById('em-tl-scroll').innerHTML = svg;
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  initGlobe();
+  buildRail();
+});
+</script>
+<script>
+/* ---- Canopus global terminal shortcut: redirects into index.html's Terminal page ---- */
+(function(){
+  var SC_KEY='canopus_term_shortcut';
+  function getShortcut(){
+    try{var raw=localStorage.getItem(SC_KEY);if(raw)return JSON.parse(raw);}catch(e){}
+    return {alt:true,ctrl:false,shift:false,meta:false,key:'`'};
+  }
+  function matches(e,sc){
+    if(!sc||!sc.key)return false;
+    return !!sc.ctrl===e.ctrlKey&&!!sc.alt===e.altKey&&!!sc.shift===e.shiftKey&&!!sc.meta===e.metaKey&&(e.key||'').toLowerCase()===sc.key.toLowerCase();
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(matches(e,getShortcut())){
+      e.preventDefault();
+      window.location.href='index.html?openTerminal=1';
+    }
+  },true);
+})();
+</script>
+<script>
+/* ---- Canopus: local keyboard shortcut to hide/show this page's header ---- */
+(function(){
+  var nav=document.getElementById('app-nav')||document.querySelector('header');
+  if(!nav)return;
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key||'').toLowerCase()==='h'){
+      e.preventDefault();
+      nav.style.display=(nav.style.display==='none')?'':'none';
+    }
+  },true);
+})();
+</script>
+</body>
+</html>

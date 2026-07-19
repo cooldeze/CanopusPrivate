@@ -1,0 +1,194 @@
+/* ══════════════════════════════════════════════════════════════════
+   CANOPUS — GLOBAL RETRO CRT PHOSPHOR THEME
+   Shared across index.html, jeejournal.html, library.html, sirius.html
+   and vault.html. Activated app-wide by running `theme retro` in the
+   Terminal (persisted in localStorage under 'canopus_term_theme').
+   Every page checks that key on load and toggles html.crt-retro.
+
+   PHOSPHOR COLOUR: the actual colour is a set of CSS variables so it
+   can be swapped without touching any of the rules below. The colour
+   itself is chosen with `theme retro green|amber` in the Terminal, or
+   the swatches in the nav's colour picker, and persisted under
+   'canopus_retro_phosphor' (retro-theme.js applies it as
+   html[data-phosphor="..."]). Default is green; amber is the classic
+   monochrome-amber CRT look.
+   ══════════════════════════════════════════════════════════════════ */
+
+html.crt-retro{
+  --phos-text:#3ce6ac;
+  --phos-shadow-1:rgba(77,255,192,.45);
+  --phos-shadow-2:rgba(77,255,192,.8);
+  --phos-border:rgba(77,255,192,.28);
+  --phos-decoration:rgba(77,255,192,.5);
+  --phos-outline:rgba(77,255,192,.5);
+  --phos-heading:#8dffcf;
+  --phos-heading-shadow:rgba(141,255,207,.75);
+  --phos-link:#c8ffe8;
+  --phos-link-border:rgba(77,255,192,.35);
+  --phos-caret:#4dffc0;
+  --phos-hover:#4dffc0;
+  --phos-hover-shadow:rgba(77,255,192,.9);
+  --phos-placeholder:rgba(77,255,192,.32);
+  --phos-selection:rgba(77,255,192,.3);
+  --phos-dim:#1f9c74;
+  --phos-scroll-track:#000;
+  --phos-scroll-thumb:#1f9c74;
+  --phos-img-filter:grayscale(1) sepia(1) hue-rotate(85deg) saturate(4) brightness(.95) contrast(1.05);
+  --phos-vignette-glow:rgba(77,255,192,.06);
+}
+
+/* Amber phosphor — classic monochrome-amber CRT (e.g. old GRiD / DOS
+   terminals). Same rules everywhere below, different variable values. */
+html.crt-retro[data-phosphor="amber"]{
+  --phos-text:#ffb347;
+  --phos-shadow-1:rgba(255,179,71,.45);
+  --phos-shadow-2:rgba(255,179,71,.8);
+  --phos-border:rgba(255,179,71,.28);
+  --phos-decoration:rgba(255,179,71,.5);
+  --phos-outline:rgba(255,179,71,.5);
+  --phos-heading:#ffd28a;
+  --phos-heading-shadow:rgba(255,210,138,.75);
+  --phos-link:#ffe4b8;
+  --phos-link-border:rgba(255,179,71,.35);
+  --phos-caret:#ffb347;
+  --phos-hover:#ffb347;
+  --phos-hover-shadow:rgba(255,179,71,.9);
+  --phos-placeholder:rgba(255,179,71,.32);
+  --phos-selection:rgba(255,179,71,.3);
+  --phos-dim:#a66a1f;
+  --phos-scroll-track:#000;
+  --phos-scroll-thumb:#a66a1f;
+  --phos-img-filter:grayscale(1) sepia(1) hue-rotate(-18deg) saturate(4) brightness(1) contrast(1.05);
+  --phos-vignette-glow:rgba(255,179,71,.07);
+}
+
+/* Blue phosphor — "WarGames" / NORAD tactical-display look: bright
+   electric cyan-blue vector lines on black, the classic WOPR map
+   aesthetic. Same rules everywhere below, different variable values. */
+html.crt-retro[data-phosphor="blue"]{
+  --phos-text:#5fd4ff;
+  --phos-shadow-1:rgba(95,212,255,.5);
+  --phos-shadow-2:rgba(95,212,255,.85);
+  --phos-border:rgba(95,212,255,.3);
+  --phos-decoration:rgba(95,212,255,.55);
+  --phos-outline:rgba(95,212,255,.55);
+  --phos-heading:#d3f4ff;
+  --phos-heading-shadow:rgba(211,244,255,.8);
+  --phos-link:#bdeeff;
+  --phos-link-border:rgba(95,212,255,.4);
+  --phos-caret:#5fd4ff;
+  --phos-hover:#9fe6ff;
+  --phos-hover-shadow:rgba(159,230,255,.95);
+  --phos-placeholder:rgba(95,212,255,.32);
+  --phos-selection:rgba(95,212,255,.32);
+  --phos-dim:#2477a3;
+  --phos-scroll-track:#000;
+  --phos-scroll-thumb:#2477a3;
+  --phos-img-filter:grayscale(1) sepia(1) hue-rotate(150deg) saturate(5.5) brightness(1.05) contrast(1.15);
+  --phos-vignette-glow:rgba(95,212,255,.08);
+}
+
+html.crt-retro,
+html.crt-retro body{
+  background:#000 !important;
+}
+
+html.crt-retro body,
+html.crt-retro body *{
+  font-family:'IBM Plex Mono',ui-monospace,'SFMono-Regular','Courier New',monospace !important;
+  color:var(--phos-text) !important;
+  background-color:transparent !important;
+  background-image:none !important;
+  border-color:var(--phos-border) !important;
+  box-shadow:none !important;
+  text-shadow:0 0 4px var(--phos-shadow-1),0 0 1px var(--phos-shadow-2) !important;
+  text-decoration-color:var(--phos-decoration) !important;
+  outline-color:var(--phos-outline) !important;
+}
+
+/* icon font (Tabler Icons, e.g. <i class="ti ti-info-circle">,
+   <i class="ti ti-dots">) renders glyphs from its own private-use-area
+   codepoints — it only works with font-family:'tabler-icons'. The
+   blanket "body *" font-family override above forces these onto the
+   monospace font too, so the glyphs vanish. Restore the icon font here;
+   this selector's extra class (.ti) gives it higher specificity than
+   the generic rule above, so it wins regardless of order. */
+html.crt-retro .ti,
+html.crt-retro .ti::before,
+html.crt-retro .ti::after{
+  font-family:'tabler-icons' !important;
+}
+
+/* full-viewport overlays & modals (flight tracker, fullscreen timer,
+   the "info" tab overlay, etc.) rely on a solid backdrop to hide
+   whatever was open behind them. The blanket background-color:transparent
+   rule above strips that, letting the previous page show through, so
+   give these their opaque black back — this selector's higher
+   specificity wins over the generic rule above regardless of order. */
+html.crt-retro [class*="overlay"],
+html.crt-retro [class*="modal"]{
+  background-color:#000 !important;
+}
+
+html.crt-retro body *::before,
+html.crt-retro body *::after{
+  color:var(--phos-text) !important;
+  border-color:var(--phos-border) !important;
+  text-shadow:0 0 4px var(--phos-shadow-1) !important;
+}
+
+/* headings & strong emphasis glow brighter, like a CRT's brightest text */
+html.crt-retro h1, html.crt-retro h2, html.crt-retro h3, html.crt-retro h4, html.crt-retro h5,
+html.crt-retro strong, html.crt-retro b{
+  color:var(--phos-heading) !important;
+  text-shadow:0 0 6px var(--phos-heading-shadow) !important;
+}
+
+/* links, buttons, inputs, active nav */
+html.crt-retro a, html.crt-retro button, html.crt-retro .nav-link,
+html.crt-retro input, html.crt-retro select, html.crt-retro textarea{
+  color:var(--phos-link) !important;
+  border-color:var(--phos-link-border) !important;
+  caret-color:var(--phos-caret) !important;
+}
+html.crt-retro a:hover, html.crt-retro button:hover, html.crt-retro .nav-link:hover,
+html.crt-retro .nav-link.active{
+  color:var(--phos-hover) !important;
+  text-shadow:0 0 8px var(--phos-hover-shadow) !important;
+}
+html.crt-retro ::placeholder{
+  color:var(--phos-placeholder) !important;
+  -webkit-text-fill-color:var(--phos-placeholder) !important;
+}
+html.crt-retro ::selection{ background:var(--phos-selection); color:#000; }
+
+/* muted / secondary text stays legible but dimmer, no glow */
+html.crt-retro [class*="dim"], html.crt-retro [class*="muted"], html.crt-retro [class*="hint"],
+html.crt-retro [class*="sub"], html.crt-retro small{
+  color:var(--phos-dim) !important;
+  text-shadow:none !important;
+}
+
+/* images / video / svg / canvas get a monochrome phosphor tint */
+html.crt-retro img, html.crt-retro video, html.crt-retro svg, html.crt-retro canvas{
+  filter:var(--phos-img-filter) !important;
+  opacity:.9;
+}
+
+/* scrollbars */
+html.crt-retro{ scrollbar-color:var(--phos-text) var(--phos-scroll-track); }
+html.crt-retro ::-webkit-scrollbar{ background:#000; }
+html.crt-retro ::-webkit-scrollbar-thumb{ background:var(--phos-scroll-thumb); }
+
+/* full-viewport scanline + vignette overlay, injected by retro-theme.js */
+#crt-global-overlay{position:fixed;inset:0;pointer-events:none;z-index:2147483000}
+#crt-global-overlay .crt-global-scanlines{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.2) 3px,rgba(0,0,0,0) 4px);
+}
+#crt-global-overlay .crt-global-vignette{
+  position:absolute;inset:0;
+  box-shadow:inset 0 0 16px var(--phos-vignette-glow,rgba(77,255,192,.06)),inset 0 0 220px rgba(0,0,0,.92);
+  animation:crtGlobalFlicker 6s infinite;
+}
+@keyframes crtGlobalFlicker{0%,96%,100%{opacity:1}97%{opacity:.94}98%{opacity:1}99%{opacity:.97}}

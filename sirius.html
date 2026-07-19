@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sirius — LOQ · Canopus</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="retro-theme.css">
+<link rel="stylesheet" href="vhs-theme.css">
+<link rel="stylesheet" href="harsh-mode.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,300italic;9..144,500italic&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============ THEME TOKENS (mirrors Canopus root site) ============ */
+:root,body[data-accent="white"]{--accent:#fff;--accent-hover:#ddd;--accent-on:#000;--accent-muted:#2a2a2a;--accent-soft:rgba(255,255,255,.06);}
+body[data-accent="blue"]{--accent:#5a9fd4;--accent-hover:#4a8fc4;--accent-on:#000;--accent-muted:#2a4a6a;--accent-soft:rgba(90,159,212,.12);}
+body[data-accent="green"]{--accent:#4a9a6a;--accent-hover:#3a8a5a;--accent-on:#000;--accent-muted:#1a3a2a;--accent-soft:rgba(74,154,106,.12);}
+body[data-accent="amber"]{--accent:#c9952a;--accent-hover:#b8851a;--accent-on:#000;--accent-muted:#4a3a1a;--accent-soft:rgba(201,149,42,.12);}
+body[data-accent="pink"]{--accent:#e0629c;--accent-hover:#cf4f8a;--accent-on:#000;--accent-muted:#4a1a32;--accent-soft:rgba(224,98,156,.12);}
+body{--sq-bg:#000;--sq-panel:#0b0b0c;--sq-panel-hi:#131314;--sq-line:#1c1c1e;--sq-text-hi:#f2f2f0;--sq-text-lo:#9a9a96;--sq-text-faint:#55554f;--sq-radius:13px;}
+body.grey{--sq-bg:#0A0A0B;--sq-panel:#111214;--sq-panel-hi:#17181B;--sq-line:#212327;}
+body.light{--sq-bg:#faf8f3;--sq-panel:#fff;--sq-panel-hi:#f3f1ea;--sq-line:#e4e0d4;--sq-text-hi:#18170f;--sq-text-lo:#5c5a4d;--sq-text-faint:#9a9684;}
+body.light[data-accent="white"]{--accent:#161512;--accent-hover:#333;--accent-on:#fff;--accent-muted:#c9c5b6;--accent-soft:rgba(22,21,18,.06);}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--sq-bg);color:var(--sq-text-hi);font-family:'Inter',sans-serif;min-height:100%}
+body{padding-bottom:80px;transition:background .25s,color .25s}
+a{color:inherit}
+::selection{background:var(--accent-muted);color:var(--sq-text-hi)}
+
+/* ============ NAV (shared with index.html / vault.html) ============ */
+html.chdr-hidden #app-nav{display:none!important}
+#app-nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;z-index:100;background:linear-gradient(var(--sq-bg) 70%,transparent);pointer-events:none}
+#app-nav>*{pointer-events:auto}
+.nav-logo{font-size:11px;font-weight:500;letter-spacing:.18em;color:rgba(255,255,255,.7);text-transform:uppercase}
+.nav-logo-wrap{display:flex;align-items:center;gap:6px}
+.nav-links{display:flex;gap:2px;padding:2px}
+.nav-link{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;color:#333;transition:color .2s,background .2s;border:none;background:none;letter-spacing:.06em;font-family:'Inter',sans-serif}
+.nav-link.active{color:var(--accent);background:var(--accent-soft)}
+.nav-link:hover:not(.active){color:#666}
+.nav-util{display:flex;align-items:center;gap:4px}
+.nav-fs{width:30px;height:30px;border-radius:7px;background:transparent;border:none;color:#333;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:color .2s}
+.nav-fs:hover{color:#888}
+.nav-menu-pop{position:fixed;right:24px;top:52px;background:var(--sq-panel);border:0.5px solid var(--sq-line);border-radius:10px;padding:4px;min-width:168px;z-index:110;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.nav-menu-pop.open{display:block}
+.nav-menu-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;font-size:11px;color:#555;background:none;border:none;width:100%;text-align:left;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.04em;transition:background .12s,color .12s}
+.nav-menu-item:hover{background:var(--sq-panel-hi);color:#aaa}
+.nav-menu-item i{font-size:13px;width:14px;color:#333}
+.nav-accent-pop{position:fixed;right:62px;top:52px;background:var(--sq-panel);border:0.5px solid var(--sq-line);border-radius:10px;padding:8px 10px;z-index:110;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:7px}
+.nav-accent-pop.open{display:flex}
+.accent-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--swatch);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.accent-swatch:hover{transform:scale(1.08)}
+.accent-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--swatch)}
+.accent-swatch[data-accent="white"]{--swatch:#fff}
+.accent-swatch[data-accent="blue"]{--swatch:#5a9fd4}
+.accent-swatch[data-accent="green"]{--swatch:#4a9a6a}
+.accent-swatch[data-accent="amber"]{--swatch:#c9952a}
+.accent-swatch[data-accent="pink"]{--swatch:#e0629c}
+.nav-pop-sep{width:0.5px;align-self:stretch;background:#222;margin:0 1px}
+body.light .nav-pop-sep{background:#e2e0d9}
+.surface-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--sw);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.surface-swatch:hover{transform:scale(1.08)}
+.surface-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--sw)}
+body.light .surface-swatch.active{box-shadow:0 0 0 2px #f5f5f0,0 0 0 3.5px var(--sw)}
+.surface-swatch[data-surface="black"]{--sw:#000;border-color:#444}
+.surface-swatch[data-surface="grey"]{--sw:#3a3b3e}
+.surface-swatch[data-surface="white"]{--sw:#fff}
+body.light #app-nav{background:linear-gradient(var(--sq-bg) 70%,transparent)}
+body.light .nav-logo{color:rgba(0,0,0,.55)}
+body.light .nav-link{color:#aaa}
+body.light .nav-link.active{color:var(--accent);background:var(--accent-soft)}
+body.light .nav-fs{color:#aaa}
+body.light .nav-menu-pop{background:#fff;border-color:#ddd;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+body.light .nav-menu-item{color:#777}
+body.light .nav-menu-item:hover{background:#f0f0eb;color:#333}
+body.light .nav-menu-item i{color:#bbb}
+@media(max-width:640px){
+  .nav-logo-wrap{display:none}
+  #app-nav{padding:16px 16px;background:linear-gradient(#000 85%,transparent)}
+  body.light #app-nav{background:linear-gradient(#f5f5f0 85%,transparent)}
+  .nav-links{max-width:calc(100vw - 148px);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:4px}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-link{padding:9px 16px;font-size:14px;white-space:nowrap;flex-shrink:0}
+  .nav-fs{width:36px;height:36px;font-size:16px}
+  .nav-util{gap:6px}
+  .nav-menu-pop,.nav-accent-pop{top:64px}
+}
+@media(max-width:400px){
+  .nav-links{max-width:calc(100vw - 128px);gap:2px}
+  .nav-link{padding:8px 13px;font-size:13px}
+  .nav-fs{width:34px;height:34px;font-size:15px}
+}
+
+/* ============ PAGE HEADING (in-flow, sits below the fixed nav) ============ */
+.sq-page-heading{display:flex;align-items:center;gap:8px;flex-shrink:0;margin:0 2px 18px}
+.sq-celestial{font-family:'Fraunces',serif;font-weight:600;font-size:14px;letter-spacing:.02em;color:var(--accent)}
+.sq-paren{font-size:11px;color:var(--sq-text-faint);letter-spacing:.03em}
+.sq-info-btn{width:19px;height:19px;border-radius:50%;border:0.5px solid var(--sq-text-faint);background:none;color:var(--sq-text-faint);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transition:all .2s;flex-shrink:0}
+.sq-info-btn:hover{color:var(--sq-text-hi);border-color:var(--sq-text-hi)}
+
+/* ============ WRAP ============ */
+.sq-wrap{max-width:920px;margin:0 auto;padding:72px 24px 0}
+
+/* ============ HERO — rotating starlight quote ============ */
+.sq-hero{position:relative;padding:46px 20px 40px;text-align:center;border-bottom:0.5px solid var(--sq-line);margin-bottom:34px;overflow:hidden}
+.sq-hero-stars{position:absolute;inset:0;pointer-events:none;opacity:.7}
+.sq-hero-stars span{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--sq-text-hi);opacity:0;animation:sqTwinkle 4.5s ease-in-out infinite}
+body.light .sq-hero-stars{display:none}
+@keyframes sqTwinkle{0%,100%{opacity:0}50%{opacity:.9}}
+.sq-eyebrow{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--sq-text-faint);margin-bottom:18px;position:relative;z-index:2}
+.sq-hero-quote{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:clamp(21px,3.4vw,32px);line-height:1.42;color:var(--sq-text-hi);max-width:680px;margin:0 auto 16px;min-height:2.9em;display:flex;align-items:center;justify-content:center;position:relative;z-index:2;transition:opacity .4s}
+.sq-hero-quote.fading{opacity:0}
+.sq-hero-author{font-size:12px;color:var(--accent);letter-spacing:.05em;text-transform:uppercase;font-weight:600;position:relative;z-index:2}
+.sq-hero-stats{display:flex;justify-content:center;gap:26px;margin-top:26px;flex-wrap:wrap;position:relative;z-index:2}
+.sq-stat{text-align:center}
+.sq-stat b{display:block;font-family:'Fraunces',serif;font-size:19px;font-weight:500;color:var(--sq-text-hi)}
+.sq-stat span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--sq-text-faint)}
+.sq-hero-next{margin-top:20px;display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:20px;border:0.5px solid var(--sq-line);background:var(--sq-panel);color:var(--sq-text-lo);font-size:11.5px;cursor:pointer;font-family:'Work Sans',sans-serif;transition:all .15s;position:relative;z-index:2}
+.sq-hero-next:hover{border-color:var(--accent);color:var(--sq-text-hi)}
+
+/* ============ CONTROLS ============ */
+.sq-search-wrap{position:relative;margin-bottom:14px}
+.sq-search-ic{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--sq-text-faint);font-size:15px;pointer-events:none}
+.sq-search-wrap input{width:100%;background:var(--sq-panel);border:0.5px solid var(--sq-line);border-radius:11px;padding:12px 40px;font-size:13.5px;color:var(--sq-text-hi);font-family:'Work Sans',sans-serif;transition:border-color .15s}
+.sq-search-wrap input::placeholder{color:var(--sq-text-faint)}
+.sq-search-wrap input:focus{outline:none;border-color:var(--accent-muted)}
+.sq-search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:7px;background:none;border:none;color:var(--sq-text-faint);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:12px}
+.sq-search-clear.show{display:flex}
+.sq-cats{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;scrollbar-width:none}
+.sq-cats::-webkit-scrollbar{display:none}
+.sq-cat-chip{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:20px;border:0.5px solid var(--sq-line);background:var(--sq-panel);color:var(--sq-text-lo);font-size:11.5px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Work Sans',sans-serif;white-space:nowrap}
+.sq-cat-chip i{font-size:13px}
+.sq-cat-chip:hover{color:var(--sq-text-hi);border-color:#3a3a3a}
+.sq-cat-chip.active{background:var(--accent-soft);border-color:var(--accent-muted);color:var(--accent)}
+.sq-meta-row{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 16px}
+.sq-result-count{font-size:11px;color:var(--sq-text-faint);letter-spacing:.04em;font-family:'IBM Plex Mono',monospace}
+.sq-fav-toggle{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--sq-text-faint);cursor:pointer;background:none;border:none;padding:4px 8px;border-radius:7px;transition:color .15s;font-family:'Work Sans',sans-serif}
+.sq-fav-toggle:hover{color:var(--sq-text-lo)}
+.sq-fav-toggle.active{color:var(--accent)}
+.sq-fav-toggle i{font-size:13px}
+.sq-meta-actions{display:flex;align-items:center;gap:8px}
+.sq-add-toggle{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--sq-text-lo);cursor:pointer;background:var(--sq-panel);border:0.5px solid var(--sq-line);padding:7px 13px;border-radius:20px;transition:all .15s;font-family:'Work Sans',sans-serif}
+.sq-add-toggle:hover{color:var(--sq-text-hi);border-color:#3a3a3a}
+.sq-add-toggle i{font-size:13px}
+.sq-card-custom-tag{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--sq-text-faint);margin-left:6px}
+
+/* ============ SUBSECTION HEADERS (browse-all mode) ============ */
+.sq-section-head{display:flex;align-items:center;gap:10px;margin:30px 2px 12px}
+.sq-section-head:first-child{margin-top:0}
+.sq-section-ic{width:26px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sq-section-title{font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--sq-text-hi)}
+.sq-section-count{font-size:10.5px;color:var(--sq-text-faint);font-family:'IBM Plex Mono',monospace}
+
+/* ============ GRID / CARDS ============ */
+.sq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:6px}
+.sq-card{background:var(--sq-panel);border:0.5px solid var(--sq-line);border-radius:var(--sq-radius);padding:18px 18px 14px;cursor:pointer;transition:border-color .15s,transform .15s;display:flex;flex-direction:column}
+.sq-card:hover{border-color:#3a3a3a;transform:translateY(-1px)}
+.sq-card-quote{font-family:'Fraunces',serif;font-style:italic;font-size:14.5px;line-height:1.5;color:var(--sq-text-hi);flex:1;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.sq-card-quote::before{content:'"'}
+.sq-card-quote::after{content:'"'}
+.sq-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sq-card-author{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sq-card-actions{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.sq-card-act{width:24px;height:24px;border-radius:7px;background:none;border:none;color:var(--sq-text-faint);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:color .15s}
+.sq-card-act:hover{color:var(--sq-text-hi)}
+.sq-card-act.on{color:var(--accent)}
+.sq-empty{text-align:center;padding:80px 20px 40px;color:var(--sq-text-faint)}
+.sq-empty i{font-size:24px;margin-bottom:14px;display:block}
+.sq-empty h2{font-family:'Fraunces',serif;font-weight:400;font-size:18px;color:var(--sq-text-lo);margin-bottom:6px}
+.sq-empty p{font-size:12.5px;max-width:300px;margin:0 auto;line-height:1.55}
+
+/* ============ QUOTE MODAL ============ */
+.sq-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
+.sq-modal-bg.open{opacity:1;pointer-events:auto}
+.sq-modal{position:relative;background:var(--sq-panel);border:0.5px solid var(--sq-line);border-radius:16px;padding:32px 28px 24px;width:min(520px,100%);max-height:82vh;overflow-y:auto;font-family:'Work Sans',sans-serif}
+.sq-modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:8px;border:0.5px solid var(--sq-line);background:none;color:var(--sq-text-hi);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.sq-modal-close:hover{border-color:var(--sq-text-faint)}
+.sq-modal-quote{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:21px;line-height:1.5;color:var(--sq-text-hi);margin-bottom:18px}
+.sq-modal-quote::before{content:'"'}
+.sq-modal-quote::after{content:'"'}
+.sq-modal-author{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:600;margin-bottom:4px}
+.sq-modal-cat{font-size:11px;color:var(--sq-text-faint);margin-bottom:20px}
+.sq-modal-actions{display:flex;gap:8px;padding-top:16px;border-top:0.5px solid var(--sq-line)}
+.sq-modal-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:0.5px solid var(--sq-line);background:var(--sq-panel-hi);color:var(--sq-text-lo);font-size:11.5px;cursor:pointer;font-family:'Work Sans',sans-serif;transition:all .15s}
+.sq-modal-btn:hover{color:var(--sq-text-hi);border-color:#3a3a3a}
+.sq-modal-btn.on{color:var(--accent);border-color:var(--accent-muted);background:var(--accent-soft)}
+.tts-playing{color:var(--accent)!important;border-color:var(--accent-muted)!important;background:var(--accent-soft)!important}
+
+/* ============ ADD-QUOTE FORM ============ */
+.sq-form-title{font-family:'Fraunces',serif;font-size:19px;font-weight:500;margin-bottom:16px;color:var(--sq-text-hi)}
+.sq-form-label{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--sq-text-faint);margin-bottom:6px;display:block}
+.sq-form-group{margin-bottom:16px}
+.sq-form-group textarea,.sq-form-group input[type="text"],.sq-form-group select{width:100%;background:var(--sq-panel-hi);border:0.5px solid var(--sq-line);border-radius:9px;padding:10px 12px;font-size:13.5px;color:var(--sq-text-hi);font-family:'Work Sans',sans-serif;resize:vertical;transition:border-color .15s}
+.sq-form-group textarea::placeholder,.sq-form-group input::placeholder{color:var(--sq-text-faint)}
+.sq-form-group textarea:focus,.sq-form-group input:focus,.sq-form-group select:focus{outline:none;border-color:var(--accent-muted)}
+.sq-form-group select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.sq-form-newcat{display:none;margin-top:10px}
+.sq-form-newcat.show{display:block}
+.sq-form-error{font-size:11.5px;color:#d16565;margin-top:-6px;margin-bottom:14px;display:none}
+.sq-form-error.show{display:block}
+.sq-form-actions{display:flex;gap:8px;padding-top:14px;border-top:0.5px solid var(--sq-line)}
+.sq-form-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:9px;border:0.5px solid var(--sq-line);background:var(--sq-panel-hi);color:var(--sq-text-lo);font-size:12.5px;font-weight:500;cursor:pointer;font-family:'Work Sans',sans-serif;transition:all .15s}
+.sq-form-btn:hover{color:var(--sq-text-hi);border-color:#3a3a3a}
+.sq-form-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-on)}
+.sq-form-btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.sq-card-delete{color:var(--sq-text-faint)}
+.sq-card-delete:hover{color:#d16565}
+
+/* ============ INFO MODAL (naming) ============ */
+.sq-info-modal{position:relative;background:var(--sq-panel);border:0.5px solid var(--sq-line);border-radius:16px;padding:26px 26px 22px;width:min(480px,100%);max-height:82vh;overflow-y:auto;font-family:'Work Sans',sans-serif}
+.sq-info-heading{font-family:'Fraunces',serif;font-size:19px;font-weight:500;margin-bottom:4px;color:var(--sq-text-hi)}
+.sq-info-heading b{color:var(--accent)}
+.sq-info-assoc{font-size:11px;color:var(--sq-text-faint);letter-spacing:.04em;font-style:italic;margin-bottom:12px}
+.sq-info-text{font-size:13px;color:var(--sq-text-lo);line-height:1.7;margin-bottom:12px}
+.sq-info-tags{font-size:10.5px;color:var(--sq-text-faint);letter-spacing:.05em;text-transform:uppercase;padding-top:10px;border-top:0.5px solid var(--sq-line)}
+
+.sq-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sq-panel-hi);border:0.5px solid var(--sq-line);color:var(--sq-text-hi);font-size:12px;padding:10px 18px;border-radius:20px;opacity:0;pointer-events:none;transition:all .25s;z-index:400;font-family:'Work Sans',sans-serif}
+.sq-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:640px){
+  .sq-wrap{padding:64px 16px 0}
+  .sq-page-heading .sq-paren{display:none}
+  .sq-hero{padding:34px 12px 30px}
+  .sq-hero-stats{gap:18px}
+  .sq-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body data-accent="white" data-track-feature="sirius">
+<script src="retro-theme.js"></script>
+<script src="vhs-theme.js"></script>
+<script src="harsh-mode.js"></script>
+<script src="tracker.js"></script>
+<script>
+(function(){try{
+  var t=localStorage.getItem('dayplan_theme'),a=localStorage.getItem('dayplan_accent'),s=localStorage.getItem('dayplan_surface');
+  if(t==='light')document.body.classList.add('light');
+  if(t!=='light'&&s==='grey')document.body.classList.add('grey');
+  if(a&&['white','blue','green','amber','pink'].indexOf(a)>=0)document.body.dataset.accent=a;
+}catch(e){}})();
+</script>
+
+<nav id="app-nav">
+  <span class="nav-logo-wrap">
+    <span class="nav-logo">Canopus</span>
+  </span>
+  <div class="nav-links">
+    <button class="nav-link" onclick="sqGoTo('focus')">Focus</button>
+    <button class="nav-link" onclick="sqGoTo('schedule')">Schedule</button>
+    <button class="nav-link" onclick="sqGoTo('progress')">Progress</button>
+    <button class="nav-link" onclick="sqGoTo('sky')">Sky</button>
+    <button class="nav-link" onclick="sqGoTo('capsule')">Capsule</button>
+    <button class="nav-link" onclick="sqGoTo('flight')">Flight</button>
+    <button class="nav-link" onclick="sqGoTo('passport')">Passport</button>
+    <button class="nav-link" onclick="window.location.href='vault.html'">Vault</button>
+    <button class="nav-link" onclick="window.location.href='empires.html'">Empires</button>
+    <button class="nav-link" onclick="window.location.href='conflicts.html'">Conflicts</button>
+    <button class="nav-link" onclick="sqGoTo('literature')">Literature</button>
+    <button class="nav-link active">Sirius</button>
+    <button class="nav-link" onclick="window.location.href='library.html'">Library</button>
+    <button class="nav-link" onclick="sqGoTo('features')">Features</button>
+    <button class="nav-link" onclick="window.location.href='interests.html'">Interests</button>
+    <button class="nav-link" onclick="window.location.href='index.html?openTerminal=1'">Terminal</button>
+  </div>
+  <div class="nav-util">
+    <button class="nav-fs" id="accent-picker-btn" onclick="toggleAccentPicker(event)" aria-label="Accent color" title="Accent color"><i class="ti ti-palette"></i></button>
+    <button class="nav-fs" id="theme-toggle-btn" onclick="toggleAppTheme()" aria-label="Toggle theme" title="Light/dark"><i class="ti ti-sun"></i></button>
+    <button class="nav-fs" id="navMoreBtn" onclick="toggleNavMenu(event)" aria-label="More" title="More"><i class="ti ti-dots"></i></button>
+  </div>
+</nav>
+<script>
+/* ── Nav header: keep the open feature's tab centered in the scrollable
+   mobile strip, but leave it wherever the user scrolls it once they've
+   touched/dragged the strip themselves. ── */
+(function(){
+  function setup(){
+    var navLinks=document.querySelector('#app-nav .nav-links');
+    if(!navLinks) return;
+    var userTouching=false;
+    var releaseTimer=null;
+    function touchStart(){ userTouching=true; clearTimeout(releaseTimer); }
+    function touchEnd(){ clearTimeout(releaseTimer); releaseTimer=setTimeout(function(){ userTouching=false; },150); }
+    navLinks.addEventListener('touchstart',touchStart,{passive:true});
+    navLinks.addEventListener('touchend',touchEnd,{passive:true});
+    navLinks.addEventListener('touchcancel',touchEnd,{passive:true});
+    navLinks.addEventListener('mousedown',touchStart);
+    window.addEventListener('mouseup',touchEnd);
+    window.centerActiveNav=function(smooth){
+      if(userTouching) return;
+      var active=navLinks.querySelector('.nav-link.active');
+      if(!active) return;
+      active.scrollIntoView({behavior:smooth?'smooth':'auto',inline:'center',block:'nearest'});
+    };
+    window.centerActiveNav(false);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup);
+  else setup();
+})();
+</script>
+<div class="nav-accent-pop" id="navAccentPop">
+  <button class="accent-swatch" data-accent="white" onclick="setAppAccent('white')" title="White" aria-label="White accent"></button>
+  <button class="accent-swatch" data-accent="blue" onclick="setAppAccent('blue')" title="Blue" aria-label="Blue accent"></button>
+  <button class="accent-swatch" data-accent="green" onclick="setAppAccent('green')" title="Green" aria-label="Green accent"></button>
+  <button class="accent-swatch" data-accent="amber" onclick="setAppAccent('amber')" title="Amber" aria-label="Amber accent"></button>
+  <button class="accent-swatch" data-accent="pink" onclick="setAppAccent('pink')" title="Pink" aria-label="Pink accent"></button>
+  <span class="nav-pop-sep"></span>
+  <button class="surface-swatch" data-surface="black" onclick="setAppSurface('black')" title="Black" aria-label="Black surface"></button>
+  <button class="surface-swatch" data-surface="grey" onclick="setAppSurface('grey')" title="Grey" aria-label="Grey surface"></button>
+  <button class="surface-swatch" data-surface="white" onclick="setAppSurface('white')" title="White" aria-label="White surface"></button>
+</div>
+<div class="nav-menu-pop" id="navMenuPop">
+  <button class="nav-menu-item" onclick="sqGoTo('flight')"><i class="ti ti-plane"></i>Flight tracker</button>
+  <button class="nav-menu-item" onclick="sqGoTo('passport')"><i class="ti ti-book"></i>Passport</button>
+  <button class="nav-menu-item" onclick="window.location.href='vault.html'"><i class="ti ti-books"></i>Vault</button>
+  <button class="nav-menu-item" onclick="window.location.href='interests.html'"><i class="ti ti-chart-radar"></i>Interests</button>
+  <button class="nav-menu-item" onclick="toggleFS();closeNavMenu()"><i class="ti ti-maximize"></i>Fullscreen</button>
+  <button class="nav-menu-item" onclick="window.location.href='index.html'"><i class="ti ti-home"></i>Back to app</button>
+</div>
+
+<div class="sq-wrap">
+
+  <div class="sq-page-heading">
+    <span class="sq-celestial">Sirius</span>
+    <span class="sq-paren">(LOQ — Library of Quotation)</span>
+    <button class="sq-info-btn" onclick="openSqInfo()" title="Why Sirius?" aria-label="Why is this section named Sirius?"><i class="ti ti-info-circle"></i></button>
+  </div>
+
+  <!-- HERO -->
+  <div class="sq-hero">
+    <div class="sq-hero-stars" id="sqStars"></div>
+    <div class="sq-eyebrow">The brightest words, gathered</div>
+    <div class="sq-hero-quote" id="sqHeroQuote">Loading…</div>
+    <div class="sq-hero-author" id="sqHeroAuthor"></div>
+    <button class="sq-hero-next" onclick="sqNextHero()"><i class="ti ti-refresh"></i>Another quote</button>
+    <div class="sq-hero-stats">
+      <div class="sq-stat"><b id="sqStatQuotes">0</b><span>Quotes</span></div>
+      <div class="sq-stat"><b id="sqStatAuthors">0</b><span>Voices</span></div>
+      <div class="sq-stat"><b id="sqStatCats">0</b><span>Subsections</span></div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="sq-search-wrap">
+    <i class="ti ti-search sq-search-ic"></i>
+    <input id="sqSearchInput" type="text" placeholder="Search quotes, authors, or themes…" oninput="sqOnSearch()">
+    <button class="sq-search-clear" id="sqSearchClear" onclick="sqClearSearch()"><i class="ti ti-x"></i></button>
+  </div>
+
+  <!-- CATEGORY CHIPS -->
+  <div class="sq-cats" id="sqCats"></div>
+
+  <div class="sq-meta-row">
+    <span class="sq-result-count" id="sqResultCount">— quotes</span>
+    <div class="sq-meta-actions">
+      <button class="sq-add-toggle" onclick="sqOpenAddModal()"><i class="ti ti-plus"></i>Add your own</button>
+      <button class="sq-fav-toggle" id="sqFavToggle" onclick="sqToggleFavOnly()"><i class="ti ti-bookmark"></i>Favorites only</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="sqResults"></div>
+
+</div>
+
+<!-- QUOTE MODAL -->
+<div class="sq-modal-bg" id="sqModalBg" onclick="if(event.target===this)sqCloseModal()">
+  <div class="sq-modal" id="sqModalBody"></div>
+</div>
+
+<!-- ADD QUOTE MODAL -->
+<div class="sq-modal-bg" id="sqAddBg" onclick="if(event.target===this)sqCloseAddModal()">
+  <div class="sq-modal" id="sqAddBody"></div>
+</div>
+
+<!-- NAMING INFO MODAL -->
+<div class="sq-modal-bg" id="sqInfoBg" onclick="if(event.target===this)closeSqInfo()">
+  <div class="sq-info-modal" id="sqInfoBody"></div>
+</div>
+
+<div class="sq-toast" id="sqToast"></div>
+
+<script>
+/* ============================================================
+   SIRIUS — LOQ (Library of Quotation)
+   Standalone feature file for the Canopus site.
+   Shares theme/accent state with index.html via localStorage
+   keys 'dayplan_theme' / 'dayplan_accent'.
+   ============================================================ */
+
+const SQ_CATS=[
+  {key:'wisdom',label:'Wisdom & Philosophy',icon:'ti-bulb'},
+  {key:'leadership',label:'Leadership & Courage',icon:'ti-flag'},
+  {key:'perseverance',label:'Perseverance & Resilience',icon:'ti-mountain'},
+  {key:'love',label:'Love & Relationships',icon:'ti-heart'},
+  {key:'success',label:'Success & Ambition',icon:'ti-trophy'},
+  {key:'creativity',label:'Creativity & Art',icon:'ti-palette'},
+  {key:'science',label:'Science & Knowledge',icon:'ti-atom'},
+  {key:'freedom',label:'Freedom & Justice',icon:'ti-scale'},
+  {key:'happiness',label:'Happiness & Gratitude',icon:'ti-sun'},
+  {key:'growth',label:'Change & Growth',icon:'ti-seedling'},
+  {key:'humor',label:'Humor & Wit',icon:'ti-mood-smile'},
+  {key:'life',label:'Life & Mortality',icon:'ti-hourglass'}
+];
+
+// q = quote text, a = author, c = category key
+const SQ_QUOTES=[
+// ---- Wisdom & Philosophy ----
+{q:"The unexamined life is not worth living.",a:"Socrates",c:'wisdom'},
+{q:"Knowing yourself is the beginning of all wisdom.",a:"Aristotle",c:'wisdom'},
+{q:"It is the mark of an educated mind to be able to entertain a thought without accepting it.",a:"Aristotle",c:'wisdom'},
+{q:"The only true wisdom is in knowing you know nothing.",a:"Socrates",c:'wisdom'},
+{q:"He who knows others is wise; he who knows himself is enlightened.",a:"Lao Tzu",c:'wisdom'},
+{q:"The journey of a thousand miles begins with a single step.",a:"Lao Tzu",c:'wisdom'},
+{q:"Real knowledge is to know the extent of one's ignorance.",a:"Confucius",c:'wisdom'},
+{q:"By three methods we may learn wisdom: reflection, imitation, and experience.",a:"Confucius",c:'wisdom'},
+{q:"Yesterday I was clever, so I wanted to change the world. Today I am wise, so I am changing myself.",a:"Rumi",c:'wisdom'},
+{q:"We suffer more in imagination than in reality.",a:"Seneca",c:'wisdom'},
+{q:"It is not that we have a short time to live, but that we waste a lot of it.",a:"Seneca",c:'wisdom'},
+{q:"You have power over your mind, not outside events. Realize this, and you will find strength.",a:"Marcus Aurelius",c:'wisdom'},
+{q:"The happiness of your life depends upon the quality of your thoughts.",a:"Marcus Aurelius",c:'wisdom'},
+{q:"Whatever the mind can conceive and believe, it can achieve.",a:"Napoleon Hill",c:'wisdom'}
+,
+// ---- Leadership & Courage ----
+{q:"A leader is best when people barely know he exists.",a:"Lao Tzu",c:'leadership'},
+{q:"The greatest leader is not necessarily the one who does the greatest things. He is the one that gets the people to do the greatest things.",a:"Ronald Reagan",c:'leadership'},
+{q:"Courage is not the absence of fear, but the triumph over it.",a:"Nelson Mandela",c:'leadership'},
+{q:"It is better to lead from behind and to put others in front, especially when you celebrate victory.",a:"Nelson Mandela",c:'leadership'},
+{q:"We have nothing to fear but fear itself.",a:"Franklin D. Roosevelt",c:'leadership'},
+{q:"Success is not final, failure is not fatal: it is the courage to continue that counts.",a:"Winston Churchill",c:'leadership'},
+{q:"You cannot get through a single day without having an impact on the world around you.",a:"Jane Goodall",c:'leadership'},
+{q:"A ship in harbor is safe, but that is not what ships are built for.",a:"John A. Shedd",c:'leadership'},
+{q:"The best way to find yourself is to lose yourself in the service of others.",a:"Mahatma Gandhi",c:'leadership'},
+{q:"An eye for an eye will only make the whole world blind.",a:"Mahatma Gandhi",c:'leadership'},
+{q:"I have a dream that my four little children will one day live in a nation where they will not be judged by the color of their skin.",a:"Martin Luther King Jr.",c:'leadership'},
+{q:"Ask not what your country can do for you — ask what you can do for your country.",a:"John F. Kennedy",c:'leadership'},
+{q:"Do not go where the path may lead, go instead where there is no path and leave a trail.",a:"Ralph Waldo Emerson",c:'leadership'}
+,
+// ---- Perseverance & Resilience ----
+{q:"Fall seven times, stand up eight.",a:"Japanese Proverb",c:'perseverance'},
+{q:"It always seems impossible until it's done.",a:"Nelson Mandela",c:'perseverance'},
+{q:"I have not failed. I've just found 10,000 ways that won't work.",a:"Thomas Edison",c:'perseverance'},
+{q:"Our greatest glory is not in never falling, but in rising every time we fall.",a:"Confucius",c:'perseverance'},
+{q:"When you get into a tight place and everything goes against you, never give up then, for that is just the place and time that the tide will turn.",a:"Harriet Beecher Stowe",c:'perseverance'},
+{q:"Perseverance is not a long race; it is many short races one after the other.",a:"Walter Elliot",c:'perseverance'},
+{q:"The gem cannot be polished without friction, nor man perfected without trials.",a:"Confucius",c:'perseverance'},
+{q:"Nothing in the world can take the place of persistence.",a:"Calvin Coolidge",c:'perseverance'},
+{q:"Rivers know this: there is no hurry. We shall get there some day.",a:"A.A. Milne",c:'perseverance'},
+{q:"Out of difficulties grow miracles.",a:"Jean de La Bruyère",c:'perseverance'},
+{q:"You may encounter many defeats, but you must not be defeated.",a:"Maya Angelou",c:'perseverance'},
+{q:"The bamboo that bends is stronger than the oak that resists.",a:"Japanese Proverb",c:'perseverance'}
+,
+// ---- Love & Relationships ----
+{q:"Where there is love there is life.",a:"Mahatma Gandhi",c:'love'},
+{q:"The best thing to hold onto in life is each other.",a:"Audrey Hepburn",c:'love'},
+{q:"We are all a little weird and life's a little weird, and when we find someone whose weirdness is compatible with ours, we join up.",a:"Dr. Seuss",c:'love'},
+{q:"Love does not dominate; it cultivates.",a:"Johann Wolfgang von Goethe",c:'love'},
+{q:"To love and be loved is to feel the sun from both sides.",a:"David Viscott",c:'love'},
+{q:"Love is composed of a single soul inhabiting two bodies.",a:"Aristotle",c:'love'},
+{q:"A friend is someone who knows all about you and still loves you.",a:"Elbert Hubbard",c:'love'},
+{q:"Where you used to be, there is a hole in the world, which I find myself constantly walking around in the daytime.",a:"Edna St. Vincent Millay",c:'love'},
+{q:"The greatest happiness of life is the conviction that we are loved.",a:"Victor Hugo",c:'love'},
+{q:"Love yourself first and everything else falls into line.",a:"Lucille Ball",c:'love'},
+{q:"Gravitation is not responsible for people falling in love.",a:"Albert Einstein",c:'love'}
+,
+// ---- Success & Ambition ----
+{q:"Success is not the key to happiness. Happiness is the key to success.",a:"Albert Schweitzer",c:'success'},
+{q:"I attribute my success to this: I never gave or took any excuse.",a:"Florence Nightingale",c:'success'},
+{q:"The way to get started is to quit talking and begin doing.",a:"Walt Disney",c:'success'},
+{q:"If you really look closely, most overnight successes took a long time.",a:"Steve Jobs",c:'success'},
+{q:"Stay hungry, stay foolish.",a:"Steve Jobs",c:'success'},
+{q:"Whether you think you can or you think you can't, you're right.",a:"Henry Ford",c:'success'},
+{q:"Quality means doing it right when no one is looking.",a:"Henry Ford",c:'success'},
+{q:"Opportunities don't happen. You create them.",a:"Chris Grosser",c:'success'},
+{q:"The road to success and the road to failure are almost exactly the same.",a:"Colin R. Davis",c:'success'},
+{q:"Do not wait to strike till the iron is hot, but make it hot by striking.",a:"William Butler Yeats",c:'success'},
+{q:"There are no shortcuts to any place worth going.",a:"Beverly Sills",c:'success'},
+{q:"I find that the harder I work, the more luck I seem to have.",a:"Thomas Jefferson",c:'success'}
+,
+// ---- Creativity & Art ----
+{q:"Every artist was first an amateur.",a:"Ralph Waldo Emerson",c:'creativity'},
+{q:"Art washes away from the soul the dust of everyday life.",a:"Pablo Picasso",c:'creativity'},
+{q:"Creativity takes courage.",a:"Henri Matisse",c:'creativity'},
+{q:"Simplicity is the ultimate sophistication.",a:"Leonardo da Vinci",c:'creativity'},
+{q:"Learning never exhausts the mind.",a:"Leonardo da Vinci",c:'creativity'},
+{q:"Every child is an artist. The problem is how to remain an artist once we grow up.",a:"Pablo Picasso",c:'creativity'},
+{q:"Imagination is more important than knowledge.",a:"Albert Einstein",c:'creativity'},
+{q:"Design is not just what it looks like and feels like. Design is how it works.",a:"Steve Jobs",c:'creativity'},
+{q:"There is no must in art because art is free.",a:"Wassily Kandinsky",c:'creativity'},
+{q:"You can't use up creativity. The more you use, the more you have.",a:"Maya Angelou",c:'creativity'},
+{q:"An artist cannot fail; it is a success to be one.",a:"Charles Horton Cooley",c:'creativity'}
+,
+// ---- Science & Knowledge ----
+{q:"Somewhere, something incredible is waiting to be known.",a:"Carl Sagan",c:'science'},
+{q:"We are a way for the cosmos to know itself.",a:"Carl Sagan",c:'science'},
+{q:"Imagination is more important than knowledge, for knowledge is limited.",a:"Albert Einstein",c:'science'},
+{q:"Try not to become a man of success, but rather try to become a man of value.",a:"Albert Einstein",c:'science'},
+{q:"Nothing in life is to be feared, it is only to be understood.",a:"Marie Curie",c:'science'},
+{q:"I have not failed. I've just found 10,000 ways that won't work.",a:"Thomas Edison",c:'science'},
+{q:"The good thing about science is that it's true whether or not you believe in it.",a:"Neil deGrasse Tyson",c:'science'},
+{q:"Look up at the stars and not down at your feet.",a:"Stephen Hawking",c:'science'},
+{q:"Intelligence is the ability to adapt to change.",a:"Stephen Hawking",c:'science'},
+{q:"The present is theirs; the future, for which I really worked, is mine.",a:"Nikola Tesla",c:'science'},
+{q:"If I have seen further it is by standing on the shoulders of giants.",a:"Isaac Newton",c:'science'},
+{q:"It is not the strongest of the species that survives, but the most adaptable to change.",a:"Charles Darwin",c:'science'}
+,
+// ---- Freedom & Justice ----
+{q:"Injustice anywhere is a threat to justice everywhere.",a:"Martin Luther King Jr.",c:'freedom'},
+{q:"Freedom is nothing but a chance to be better.",a:"Albert Camus",c:'freedom'},
+{q:"Man is condemned to be free.",a:"Jean-Paul Sartre",c:'freedom'},
+{q:"They that can give up essential liberty to obtain a little temporary safety deserve neither liberty nor safety.",a:"Benjamin Franklin",c:'freedom'},
+{q:"Darkness cannot drive out darkness: only light can do that. Hate cannot drive out hate: only love can do that.",a:"Martin Luther King Jr.",c:'freedom'},
+{q:"To be free is not merely to cast off one's chains, but to live in a way that respects and enhances the freedom of others.",a:"Nelson Mandela",c:'freedom'},
+{q:"I know why the caged bird sings.",a:"Maya Angelou",c:'freedom'},
+{q:"Whoever is careless with the truth in small matters cannot be trusted with important matters.",a:"Albert Einstein",c:'freedom'},
+{q:"One person can make a difference, and everyone should try.",a:"John F. Kennedy",c:'freedom'},
+{q:"If you are neutral in situations of injustice, you have chosen the side of the oppressor.",a:"Desmond Tutu",c:'freedom'}
+,
+// ---- Happiness & Gratitude ----
+{q:"Happiness is not something ready made. It comes from your own actions.",a:"Dalai Lama",c:'happiness'},
+{q:"The most wasted of all days is one without laughter.",a:"E. E. Cummings",c:'happiness'},
+{q:"Gratitude turns what we have into enough.",a:"Anonymous",c:'happiness'},
+{q:"Count your age by friends, not years. Count your life by smiles, not tears.",a:"John Lennon",c:'happiness'},
+{q:"For every minute you are angry you lose sixty seconds of happiness.",a:"Ralph Waldo Emerson",c:'happiness'},
+{q:"It is not how much we have, but how much we enjoy, that makes happiness.",a:"Charles Spurgeon",c:'happiness'},
+{q:"Folks are usually about as happy as they make their minds up to be.",a:"Abraham Lincoln",c:'happiness'},
+{q:"The purpose of our lives is to be happy.",a:"Dalai Lama",c:'happiness'},
+{q:"Happiness is when what you think, what you say, and what you do are in harmony.",a:"Mahatma Gandhi",c:'happiness'},
+{q:"Enjoy the little things, for one day you may look back and realize they were the big things.",a:"Robert Brault",c:'happiness'}
+,
+// ---- Change & Growth ----
+{q:"Be the change that you wish to see in the world.",a:"Mahatma Gandhi",c:'growth'},
+{q:"The only constant in life is change.",a:"Heraclitus",c:'growth'},
+{q:"Life is what happens when you're busy making other plans.",a:"John Lennon",c:'growth'},
+{q:"It is not the strongest or the most intelligent who will survive but those who can best manage change.",a:"Charles Darwin",c:'growth'},
+{q:"Growth is painful. Change is painful. But nothing is as painful as staying stuck somewhere you don't belong.",a:"N. R. Narayana Murthy",c:'growth'},
+{q:"You must be the change you wish to see in the world.",a:"Mahatma Gandhi",c:'growth'},
+{q:"Progress is impossible without change, and those who cannot change their minds cannot change anything.",a:"George Bernard Shaw",c:'growth'},
+{q:"What lies behind us and what lies before us are tiny matters compared to what lies within us.",a:"Ralph Waldo Emerson",c:'growth'},
+{q:"Not all those who wander are lost.",a:"Proverb",c:'growth'},
+{q:"He who has a why to live can bear almost any how.",a:"Friedrich Nietzsche",c:'growth'},
+{q:"That which does not kill us makes us stronger.",a:"Friedrich Nietzsche",c:'growth'}
+,
+// ---- Humor & Wit ----
+{q:"I am not young enough to know everything.",a:"Oscar Wilde",c:'humor'},
+{q:"Be yourself; everyone else is already taken.",a:"Oscar Wilde",c:'humor'},
+{q:"The reports of my death are greatly exaggerated.",a:"Mark Twain",c:'humor'},
+{q:"Wrinkles should merely indicate where smiles have been.",a:"Mark Twain",c:'humor'},
+{q:"I have never let my schooling interfere with my education.",a:"Mark Twain",c:'humor'},
+{q:"Always forgive your enemies; nothing annoys them so much.",a:"Oscar Wilde",c:'humor'},
+{q:"A day without laughter is a day wasted.",a:"Charlie Chaplin",c:'humor'},
+{q:"I can resist everything except temptation.",a:"Oscar Wilde",c:'humor'},
+{q:"Behind every great man is a woman rolling her eyes.",a:"Jim Carrey",c:'humor'},
+{q:"The trouble with having an open mind, of course, is that people will insist on coming along and trying to put things in it.",a:"Terry Pratchett",c:'humor'}
+,
+// ---- Life & Mortality ----
+{q:"In the end, it's not the years in your life that count. It's the life in your years.",a:"Abraham Lincoln",c:'life'},
+{q:"Life is really simple, but we insist on making it complicated.",a:"Confucius",c:'life'},
+{q:"The unexamined life is not worth living.",a:"Socrates",c:'life'},
+{q:"Death is not the greatest loss in life. The greatest loss is what dies inside us while we live.",a:"Norman Cousins",c:'life'},
+{q:"To live is the rarest thing in the world. Most people exist, that is all.",a:"Oscar Wilde",c:'life'},
+{q:"Life is either a daring adventure or nothing at all.",a:"Helen Keller",c:'life'},
+{q:"The purpose of life is not to be happy. It is to be useful, to be honorable, to be compassionate.",a:"Ralph Waldo Emerson",c:'life'},
+{q:"Do not go gentle into that good night; rage, rage against the dying of the light.",a:"Dylan Thomas",c:'life'},
+{q:"Your time is limited, so don't waste it living someone else's life.",a:"Steve Jobs",c:'life'},
+{q:"It matters not how a man dies, but how he lives.",a:"Samuel Johnson",c:'life'}
+];
+
+/* ============ STATE ============ */
+let sqActiveCat='all';
+let sqSearch='';
+let sqFavOnly=false;
+let sqHeroIdx=-1;
+let sqFavs={};
+try{ sqFavs=JSON.parse(localStorage.getItem('sirius_favs')||'{}'); }catch(e){ sqFavs={}; }
+let sqCustomQuotes=[];
+try{ sqCustomQuotes=JSON.parse(localStorage.getItem('sirius_custom_quotes')||'[]'); }catch(e){ sqCustomQuotes=[]; }
+let sqCustomCats=[];
+try{ sqCustomCats=JSON.parse(localStorage.getItem('sirius_custom_cats')||'[]'); }catch(e){ sqCustomCats=[]; }
+let sqNewCatMode=false;
+
+/* ============ COMBINED (built-in + user-added) ============ */
+function sqAllQuotes(){ return SQ_QUOTES.concat(sqCustomQuotes); }
+function sqAllCats(){ return SQ_CATS.concat(sqCustomCats); }
+function sqSaveCustomQuotes(){ try{ localStorage.setItem('sirius_custom_quotes',JSON.stringify(sqCustomQuotes)); }catch(e){} }
+function sqSaveCustomCats(){ try{ localStorage.setItem('sirius_custom_cats',JSON.stringify(sqCustomCats)); }catch(e){} }
+
+/* ============ INIT ============ */
+function sqInit(){
+  sqBuildStars();
+  sqBuildCatChips();
+  sqUpdateStats();
+  sqNextHero();
+  sqRender();
+  applyAppPreferences();
+}
+function sqBuildStars(){
+  const wrap=document.getElementById('sqStars');
+  let html='';
+  for(let i=0;i<26;i++){
+    const top=Math.random()*100, left=Math.random()*100, delay=(Math.random()*4.5).toFixed(2);
+    html+=`<span style="top:${top}%;left:${left}%;animation-delay:${delay}s"></span>`;
+  }
+  wrap.innerHTML=html;
+}
+function sqBuildCatChips(){
+  const wrap=document.getElementById('sqCats');
+  let html=`<button class="sq-cat-chip active" data-k="all" onclick="sqSetCat('all')"><i class="ti ti-stars"></i>All</button>`;
+  sqAllCats().forEach(c=>{
+    html+=`<button class="sq-cat-chip" data-k="${c.key}" onclick="sqSetCat('${c.key}')"><i class="ti ${c.icon}"></i>${c.label}</button>`;
+  });
+  wrap.innerHTML=html;
+}
+function sqUpdateStats(){
+  const all=sqAllQuotes();
+  document.getElementById('sqStatQuotes').textContent=all.length;
+  document.getElementById('sqStatAuthors').textContent=new Set(all.map(q=>q.a)).size;
+  document.getElementById('sqStatCats').textContent=sqAllCats().filter(c=>all.some(q=>q.c===c.key)).length;
+}
+
+/* ============ HERO ROTATION ============ */
+function sqNextHero(){
+  const all=sqAllQuotes();
+  let idx;
+  do{ idx=Math.floor(Math.random()*all.length); }while(idx===sqHeroIdx && all.length>1);
+  sqHeroIdx=idx;
+  const el=document.getElementById('sqHeroQuote');
+  el.classList.add('fading');
+  setTimeout(()=>{
+    const q=all[idx];
+    el.textContent=q.q;
+    document.getElementById('sqHeroAuthor').textContent='— '+q.a;
+    el.classList.remove('fading');
+  },220);
+}
+
+/* ============ FILTER + RENDER ============ */
+function sqSetCat(k){
+  sqActiveCat=k;
+  document.querySelectorAll('.sq-cat-chip').forEach(b=>b.classList.toggle('active',b.dataset.k===k));
+  sqRender();
+}
+function sqOnSearch(){
+  sqSearch=document.getElementById('sqSearchInput').value.trim().toLowerCase();
+  document.getElementById('sqSearchClear').classList.toggle('show',sqSearch.length>0);
+  sqRender();
+}
+function sqClearSearch(){
+  document.getElementById('sqSearchInput').value='';
+  sqSearch='';
+  document.getElementById('sqSearchClear').classList.remove('show');
+  sqRender();
+}
+function sqToggleFavOnly(){
+  sqFavOnly=!sqFavOnly;
+  document.getElementById('sqFavToggle').classList.toggle('active',sqFavOnly);
+  sqRender();
+}
+function sqMatch(q){
+  if(sqFavOnly && !sqFavs[sqKey(q)]) return false;
+  if(sqActiveCat!=='all' && q.c!==sqActiveCat) return false;
+  if(sqSearch){
+    const hay=(q.q+' '+q.a+' '+sqCatLabel(q.c)).toLowerCase();
+    if(hay.indexOf(sqSearch)===-1) return false;
+  }
+  return true;
+}
+function sqKey(q){ return q.id?('custom::'+q.id):(q.a+'::'+q.q.slice(0,24)); }
+function sqCatLabel(k){ const c=sqAllCats().find(x=>x.key===k); return c?c.label:k; }
+function sqCatIcon(k){ const c=sqAllCats().find(x=>x.key===k); return c?c.icon:'ti-quote'; }
+
+function sqRender(){
+  const results=sqAllQuotes().filter(sqMatch);
+  document.getElementById('sqResultCount').textContent=results.length+(results.length===1?' quote':' quotes');
+  const target=document.getElementById('sqResults');
+
+  if(!results.length){
+    target.innerHTML=`<div class="sq-empty"><i class="ti ti-quote-off"></i><h2>No quotes found</h2><p>Try a different search term, or clear your filters to browse the full library.</p></div>`;
+    return;
+  }
+
+  // Browse-all mode (no search, no fav filter, category = all): group by subsection
+  if(sqActiveCat==='all' && !sqSearch && !sqFavOnly){
+    let html='';
+    const all=sqAllQuotes();
+    sqAllCats().forEach(cat=>{
+      const items=all.filter(q=>q.c===cat.key);
+      if(!items.length) return;
+      html+=`<div class="sq-section-head"><div class="sq-section-ic"><i class="ti ${cat.icon}"></i></div><div class="sq-section-title">${cat.label}</div><div class="sq-section-count">${items.length}</div></div>`;
+      html+=`<div class="sq-grid">${items.map(sqCardHTML).join('')}</div>`;
+    });
+    target.innerHTML=html;
+  } else {
+    target.innerHTML=`<div class="sq-grid">${results.map(sqCardHTML).join('')}</div>`;
+  }
+}
+function sqCardHTML(q){
+  const k=sqKey(q); const on=!!sqFavs[k];
+  const safeQ=q.q.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  const delBtn=q.id?`<button class="sq-card-act sq-card-delete" onclick="event.stopPropagation();sqDeleteCustom('${q.id}')" title="Delete"><i class="ti ti-trash"></i></button>`:'';
+  return `<div class="sq-card" onclick="sqOpenModal('${k}')">
+    <div class="sq-card-quote">${q.q}</div>
+    <div class="sq-card-bottom">
+      <span class="sq-card-author">${q.a}${q.id?'<span class="sq-card-custom-tag">Yours</span>':''}</span>
+      <span class="sq-card-actions">
+        <button class="sq-card-act ${on?'on':''}" onclick="event.stopPropagation();sqToggleFav('${k}')" title="Save"><i class="ti ti-bookmark${on?'-filled':''}"></i></button>
+        <button class="sq-card-act" onclick="event.stopPropagation();sqCopy('${safeQ}','${q.a.replace(/'/g,"\\'")}')" title="Copy"><i class="ti ti-copy"></i></button>
+        ${delBtn}
+      </span>
+    </div>
+  </div>`;
+}
+
+/* ============ FAVORITES ============ */
+function sqToggleFav(k){
+  if(sqFavs[k]) delete sqFavs[k]; else sqFavs[k]=true;
+  try{ localStorage.setItem('sirius_favs',JSON.stringify(sqFavs)); }catch(e){}
+  sqRender();
+  const mb=document.getElementById('sqModalBg');
+  if(mb.classList.contains('open')) sqRenderModalActions(k);
+}
+function sqFindByKey(k){ return sqAllQuotes().find(q=>sqKey(q)===k); }
+
+/* ============ READ ALOUD (text-to-speech, female voice) ============ */
+var __ttsVoices = [];
+var __ttsActiveBtn = null;
+function __ttsLoadVoices(){ __ttsVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){ __ttsLoadVoices(); window.speechSynthesis.onvoiceschanged = __ttsLoadVoices; }
+function __ttsFemaleVoice(){
+  if(!__ttsVoices.length) __ttsLoadVoices();
+  var pref = /female|zira|samantha|victoria|karen|moira|tessa|susan|fiona|kate|serena|allison|ava|salli|joanna|kimberly|amy|emma|ivy|jenny/i;
+  return __ttsVoices.find(function(v){ return pref.test(v.name) && /^en/i.test(v.lang); })
+      || __ttsVoices.find(function(v){ return pref.test(v.name); })
+      || __ttsVoices.find(function(v){ return /^en/i.test(v.lang) && !/male/i.test(v.name); })
+      || __ttsVoices[0] || null;
+}
+function __ttsResetBtn(btn){ if(!btn) return; btn.classList.remove('tts-playing'); btn.innerHTML = btn.dataset.ttsLabel || '<i class="ti ti-volume"></i>Listen'; }
+function ttsStripHtml(html){ var d=document.createElement('div'); d.innerHTML = html==null?'':String(html); return (d.textContent||d.innerText||'').replace(/\s+/g,' ').trim(); }
+function ttsToggle(text, btn){
+  if(!('speechSynthesis' in window)){
+    if(window.median && window.median.window && typeof window.median.window.open==='function'){
+      if(confirm('Read-aloud isn\'t available inside the app. Open this page in your browser to listen?')){
+        window.median.window.open(window.location.href, 'external');
+      }
+    } else {
+      alert('Read-aloud is not supported in this browser.');
+    }
+    return;
+  }
+  var synth = window.speechSynthesis;
+  if(synth.speaking){
+    var wasSameBtn = (__ttsActiveBtn === btn);
+    synth.cancel(); __ttsResetBtn(__ttsActiveBtn); __ttsActiveBtn = null;
+    if(wasSameBtn) return;
+  }
+  var utter = new SpeechSynthesisUtterance(text);
+  var voice = __ttsFemaleVoice();
+  if(voice) utter.voice = voice;
+  utter.rate = 0.98; utter.pitch = 1.05;
+  utter.onend = function(){ __ttsResetBtn(btn); if(__ttsActiveBtn===btn) __ttsActiveBtn=null; };
+  utter.onerror = function(){ __ttsResetBtn(btn); if(__ttsActiveBtn===btn) __ttsActiveBtn=null; };
+  synth.speak(utter);
+  if(btn){ if(!btn.dataset.ttsLabel) btn.dataset.ttsLabel = btn.innerHTML; btn.classList.add('tts-playing'); btn.innerHTML = '<i class="ti ti-player-stop"></i>Stop'; __ttsActiveBtn = btn; }
+}
+var sqCurrentQuoteText = '';
+function sqReadQuote(btn){ ttsToggle(sqCurrentQuoteText, btn); }
+
+/* ============ MODAL ============ */
+function sqOpenModal(k){
+  const q=sqFindByKey(k); if(!q) return;
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  if(window.CanopusTrack) CanopusTrack.event('quote', k, q.q.slice(0,80)+' — '+q.a);
+  const on=!!sqFavs[k];
+  sqCurrentQuoteText = ttsStripHtml(q.q) + '. ' + q.a;
+  document.getElementById('sqModalBody').innerHTML=`
+    <button class="sq-modal-close" onclick="sqCloseModal()"><i class="ti ti-x"></i></button>
+    <div class="sq-modal-quote">${q.q}</div>
+    <div class="sq-modal-author">${q.a}</div>
+    <div class="sq-modal-cat"><i class="ti ${sqCatIcon(q.c)}" style="margin-right:5px"></i>${sqCatLabel(q.c)}</div>
+    <div class="sq-modal-actions" id="sqModalActions"></div>
+  `;
+  sqRenderModalActions(k);
+  document.getElementById('sqModalBg').classList.add('open');
+}
+function sqRenderModalActions(k){
+  const q=sqFindByKey(k); if(!q) return;
+  const on=!!sqFavs[k];
+  const safeQ=q.q.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  document.getElementById('sqModalActions').innerHTML=`
+    <button class="sq-modal-btn" id="sqListenBtn" onclick="sqReadQuote(this)"><i class="ti ti-volume"></i>Listen</button>
+    <button class="sq-modal-btn ${on?'on':''}" onclick="sqToggleFav('${k}')"><i class="ti ti-bookmark${on?'-filled':''}"></i>${on?'Saved':'Save'}</button>
+    <button class="sq-modal-btn" onclick="sqCopy('${safeQ}','${q.a.replace(/'/g,"\\'")}')"><i class="ti ti-copy"></i>Copy</button>
+  `;
+}
+function sqCloseModal(){ if(window.speechSynthesis) window.speechSynthesis.cancel(); document.getElementById('sqModalBg').classList.remove('open'); }
+
+/* ============ USER-ADDED QUOTES ============ */
+function sqOpenAddModal(){
+  sqNewCatMode=false;
+  const catOptions=sqAllCats().map(c=>`<option value="${c.key}">${c.label}</option>`).join('');
+  document.getElementById('sqAddBody').innerHTML=`
+    <button class="sq-modal-close" onclick="sqCloseAddModal()"><i class="ti ti-x"></i></button>
+    <div class="sq-form-title">Add your own quote</div>
+    <div class="sq-form-group">
+      <label class="sq-form-label" for="sqFormQuote">Quote</label>
+      <textarea id="sqFormQuote" rows="3" placeholder="Type or paste the quote…"></textarea>
+    </div>
+    <div class="sq-form-group">
+      <label class="sq-form-label" for="sqFormAuthor">Author</label>
+      <input type="text" id="sqFormAuthor" placeholder="Who said it? (leave blank for Anonymous)">
+    </div>
+    <div class="sq-form-group">
+      <label class="sq-form-label" for="sqFormCat">Subsection</label>
+      <select id="sqFormCat" onchange="sqOnCatSelectChange()">
+        ${catOptions}
+        <option value="__new__">+ New subsection…</option>
+      </select>
+      <div class="sq-form-newcat" id="sqFormNewCatWrap">
+        <input type="text" id="sqFormNewCat" placeholder="Name your new subsection (e.g. Travel & Adventure)">
+      </div>
+    </div>
+    <div class="sq-form-error" id="sqFormError">Please add a quote and a subsection name.</div>
+    <div class="sq-form-actions">
+      <button class="sq-form-btn" onclick="sqCloseAddModal()">Cancel</button>
+      <button class="sq-form-btn primary" onclick="sqSubmitQuote()"><i class="ti ti-plus"></i>Add quote</button>
+    </div>
+  `;
+  document.getElementById('sqAddBg').classList.add('open');
+}
+function sqOnCatSelectChange(){
+  const v=document.getElementById('sqFormCat').value;
+  sqNewCatMode=(v==='__new__');
+  document.getElementById('sqFormNewCatWrap').classList.toggle('show',sqNewCatMode);
+}
+function sqCloseAddModal(){ document.getElementById('sqAddBg').classList.remove('open'); }
+function sqSlugify(label){
+  let base=label.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||'custom';
+  let key=base, n=2;
+  while(sqAllCats().some(c=>c.key===key)){ key=base+'-'+n; n++; }
+  return key;
+}
+function sqSubmitQuote(){
+  const quoteEl=document.getElementById('sqFormQuote');
+  const authorEl=document.getElementById('sqFormAuthor');
+  const catEl=document.getElementById('sqFormCat');
+  const newCatEl=document.getElementById('sqFormNewCat');
+  const errorEl=document.getElementById('sqFormError');
+
+  const quoteText=quoteEl.value.trim();
+  const authorText=authorEl.value.trim()||'Anonymous';
+  let catKey=catEl.value;
+  let newCatLabel=sqNewCatMode?newCatEl.value.trim():'';
+
+  if(!quoteText || (sqNewCatMode && !newCatLabel)){
+    errorEl.classList.add('show');
+    return;
+  }
+  errorEl.classList.remove('show');
+
+  if(sqNewCatMode){
+    const key=sqSlugify(newCatLabel);
+    sqCustomCats.push({key:key,label:newCatLabel,icon:'ti-quote'});
+    sqSaveCustomCats();
+    catKey=key;
+  }
+
+  sqCustomQuotes.push({
+    id:'c'+Date.now()+Math.floor(Math.random()*1000),
+    q:quoteText,
+    a:authorText,
+    c:catKey
+  });
+  sqSaveCustomQuotes();
+
+  sqCloseAddModal();
+  sqBuildCatChips();
+  document.querySelectorAll('.sq-cat-chip').forEach(b=>b.classList.toggle('active',b.dataset.k===sqActiveCat));
+  sqUpdateStats();
+  sqRender();
+  sqToast('Quote added');
+}
+function sqDeleteCustom(id){
+  sqCustomQuotes=sqCustomQuotes.filter(q=>q.id!==id);
+  sqSaveCustomQuotes();
+  sqUpdateStats();
+  sqRender();
+  sqToast('Quote removed');
+}
+
+/* ============ COPY / TOAST ============ */
+function sqCopy(text,author){
+  const full='"'+text+'" — '+author;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(full).then(()=>sqToast('Copied to clipboard')).catch(()=>sqToast('Could not copy'));
+  } else {
+    sqToast('Copy not supported here');
+  }
+}
+function sqToast(msg){
+  const t=document.getElementById('sqToast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(window._sqToastTimer);
+  window._sqToastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+/* ============ NAMING INFO MODAL ============ */
+function openSqInfo(){
+  document.getElementById('sqInfoBody').innerHTML=`
+    <button class="sq-modal-close" onclick="closeSqInfo()"><i class="ti ti-x"></i></button>
+    <div class="sq-info-heading"><b>Sirius</b> (LOQ — Library of Quotation)</div>
+    <div class="sq-info-assoc">Hindu association: Mrigavyadha</div>
+    <div class="sq-info-text">Sirius, the brightest star in the night sky, is known in Hindu tradition as <strong>Mrigavyadha</strong> — "the deer hunter" — prized for its unmistakable brilliance and precision, cutting through the dark with a clarity no other star can match. LOQ is named <strong>Sirius</strong> because a single well-aimed sentence can do the same: a great quotation is thought distilled to its brightest, sharpest point — small enough to remember, powerful enough to change how you see something. This library gathers those points of light from history's sharpest minds, organised into subsections so the right words are always easy to find.</div>
+    <div class="sq-info-tags">Wisdom · Brevity · Insight · Memory · Clarity</div>
+  `;
+  document.getElementById('sqInfoBg').classList.add('open');
+}
+function closeSqInfo(){ document.getElementById('sqInfoBg').classList.remove('open'); }
+
+/* ============ NAV: other tabs live on index.html, so send the user there ============ */
+function sqGoTo(page){
+  window.location.href='index.html#'+page;
+}
+function toggleNavMenu(e){
+  if(e)e.stopPropagation();
+  document.getElementById('navMenuPop').classList.toggle('open');
+  closeAccentPicker();
+}
+function closeNavMenu(){
+  document.getElementById('navMenuPop').classList.remove('open');
+}
+function toggleFS(){
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+document.addEventListener('click',function(e){
+  const menuPop=document.getElementById('navMenuPop');
+  const menuBtn=document.getElementById('navMoreBtn');
+  if(menuPop&&!menuPop.contains(e.target)&&menuBtn&&!menuBtn.contains(e.target))closeNavMenu();
+  const accentPop=document.getElementById('navAccentPop');
+  const accentBtn=document.getElementById('accent-picker-btn');
+  if(accentPop&&!accentPop.contains(e.target)&&accentBtn&&!accentBtn.contains(e.target))closeAccentPicker();
+});
+
+/* ============ THEME / ACCENT (shared prefs with index.html via localStorage) ============ */
+const THEME_KEY='dayplan_theme';
+const ACCENT_KEY='dayplan_accent';
+const SURFACE_KEY='dayplan_surface';
+const APP_ACCENTS=['white','blue','green','amber','pink'];
+const APP_SURFACES=['black','grey'];
+let appTheme='dark';
+let appAccent='white';
+let appSurface='black';
+
+function saveAppPreferences(){
+  try{
+    localStorage.setItem(THEME_KEY,appTheme);
+    localStorage.setItem(ACCENT_KEY,appAccent);
+    localStorage.setItem(SURFACE_KEY,appSurface);
+  }catch(e){}
+}
+function updateAccentSwatches(){
+  document.querySelectorAll('.accent-swatch').forEach(s=>{
+    s.classList.toggle('active',s.dataset.accent===appAccent);
+  });
+  document.querySelectorAll('.surface-swatch').forEach(s=>{
+    const isActive=(appTheme==='light'&&s.dataset.surface==='white')||(appTheme==='dark'&&s.dataset.surface===appSurface);
+    s.classList.toggle('active',isActive);
+  });
+}
+function applyAppPreferences(){
+  document.body.classList.toggle('light',appTheme==='light');
+  document.body.classList.toggle('grey',appTheme==='dark'&&appSurface==='grey');
+  document.body.dataset.accent=appAccent;
+  const icon=appTheme==='dark'?'<i class="ti ti-sun"></i>':'<i class="ti ti-moon"></i>';
+  document.querySelectorAll('[onclick="toggleAppTheme()"]').forEach(b=>b.innerHTML=icon);
+  updateAccentSwatches();
+}
+function loadAppPreferences(){
+  try{
+    const t=localStorage.getItem(THEME_KEY);
+    const a=localStorage.getItem(ACCENT_KEY);
+    const s=localStorage.getItem(SURFACE_KEY);
+    if(t==='light'||t==='dark') appTheme=t;
+    if(a&&APP_ACCENTS.includes(a)) appAccent=a;
+    if(s&&APP_SURFACES.includes(s)) appSurface=s;
+  }catch(e){}
+  applyAppPreferences();
+}
+function toggleAppTheme(){
+  appTheme=appTheme==='dark'?'light':'dark';
+  applyAppPreferences();
+  saveAppPreferences();
+}
+function setAppSurface(surface){
+  if(surface==='white'){
+    appTheme='light';
+  }else if(APP_SURFACES.includes(surface)){
+    appTheme='dark';
+    appSurface=surface;
+  }else{
+    return;
+  }
+  applyAppPreferences();
+  saveAppPreferences();
+  closeAccentPicker();
+}
+function setAppAccent(accent){
+  if(!APP_ACCENTS.includes(accent)) return;
+  appAccent=accent;
+  applyAppPreferences();
+  saveAppPreferences();
+  closeAccentPicker();
+}
+function toggleAccentPicker(e){
+  e.stopPropagation();
+  const pop=document.getElementById('navAccentPop');
+  const open=pop.classList.toggle('open');
+  if(open) closeNavMenu();
+}
+function closeAccentPicker(){
+  document.getElementById('navAccentPop').classList.remove('open');
+}
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape'){ sqCloseModal(); sqCloseAddModal(); closeSqInfo(); closeAccentPicker(); closeNavMenu(); }
+});
+
+loadAppPreferences();
+document.addEventListener('DOMContentLoaded',sqInit);
+</script>
+<script>
+/* ---- Canopus global terminal shortcut: redirects into index.html's Terminal page ---- */
+(function(){
+  var SC_KEY='canopus_term_shortcut';
+  function getShortcut(){
+    try{var raw=localStorage.getItem(SC_KEY);if(raw)return JSON.parse(raw);}catch(e){}
+    return {alt:true,ctrl:false,shift:false,meta:false,key:'`'};
+  }
+  function matches(e,sc){
+    if(!sc||!sc.key)return false;
+    return !!sc.ctrl===e.ctrlKey&&!!sc.alt===e.altKey&&!!sc.shift===e.shiftKey&&!!sc.meta===e.metaKey&&(e.key||'').toLowerCase()===sc.key.toLowerCase();
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(matches(e,getShortcut())){
+      e.preventDefault();
+      window.location.href='index.html?openTerminal=1';
+    }
+  },true);
+})();
+</script>
+<script>
+/* ---- Canopus: local keyboard shortcut to hide/show this page's header (persists across all Canopus pages) ---- */
+(function(){
+  var nav=document.getElementById('app-nav')||document.querySelector('header');
+  if(!nav)return;
+  function setHidden(hidden){
+    document.documentElement.classList.toggle('chdr-hidden',hidden);
+    try{localStorage.setItem('canopusHeaderHidden',hidden?'1':'0');}catch(e){}
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key||'').toLowerCase()==='h'){
+      e.preventDefault();
+      setHidden(!document.documentElement.classList.contains('chdr-hidden'));
+    }
+  },true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>JEE Journal · Canopus</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="retro-theme.css">
+<link rel="stylesheet" href="vhs-theme.css">
+<link rel="stylesheet" href="harsh-mode.css">
+<style>
+:root,body[data-accent="white"]{--accent:#fff;--accent-hover:#ddd;--accent-on:#000;--accent-muted:#2a2a2a;--accent-soft:rgba(255,255,255,.07);}
+body[data-accent="blue"]{--accent:#5a9fd4;--accent-hover:#4a8fc4;--accent-on:#000;--accent-muted:#2a4a6a;--accent-soft:rgba(90,159,212,.13);}
+body[data-accent="green"]{--accent:#4a9a6a;--accent-hover:#3a8a5a;--accent-on:#000;--accent-muted:#1a3a2a;--accent-soft:rgba(74,154,106,.13);}
+body[data-accent="amber"]{--accent:#c9952a;--accent-hover:#b8851a;--accent-on:#000;--accent-muted:#4a3a1a;--accent-soft:rgba(201,149,42,.13);}
+body[data-accent="pink"]{--accent:#e0629c;--accent-hover:#cf4f8a;--accent-on:#000;--accent-muted:#4a1a32;--accent-soft:rgba(224,98,156,.13);}
+body.light[data-accent="white"]{--accent:#111;--accent-hover:#333;--accent-on:#fff;--accent-muted:#aaa;--accent-soft:rgba(0,0,0,.05);}
+
+:root{--surf-bg:#050506;--surf-panel:#0c0d10;--surf-panel-hi:#131419;--surf-modal:#111217;--surf-line:#1d1f24;
+  --good:#4fa374;--good-soft:rgba(79,163,116,.14);--bad:#c9705a;--bad-soft:rgba(201,112,90,.14);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.55);
+  --shadow-2:0 2px 6px rgba(0,0,0,.45), 0 16px 40px -16px rgba(0,0,0,.6);
+  --r-lg:18px;--r-md:13px;--r-sm:9px;
+  --ease:cubic-bezier(.2,.7,.2,1);}
+body.grey{--surf-bg:#0A0A0C;--surf-panel:#121317;--surf-panel-hi:#191b20;--surf-modal:#141519;--surf-line:#23252b;}
+body.light{--surf-bg:#F4EFE4;--surf-panel:#FFFEFA;--surf-panel-hi:#F4EEE1;--surf-modal:#FFFEFA;--surf-line:#E1D9C8;
+  --good:#3c8a5e;--good-soft:rgba(60,138,94,.10);--bad:#b3543e;--bad-soft:rgba(179,84,62,.10);
+  --shadow-1:0 1px 2px rgba(60,50,30,.06), 0 8px 20px -14px rgba(60,50,30,.18);
+  --shadow-2:0 2px 8px rgba(60,50,30,.08), 0 20px 40px -20px rgba(60,50,30,.22);}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--surf-bg);color:#f4f3f1;font-family:'Inter',sans-serif;min-height:100%}
+body{
+  padding-bottom:70px;
+  background-image:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,255,255,.05), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 0%, var(--accent-soft), transparent 55%);
+  background-attachment:fixed;
+}
+body.light{color:#1c1a15}
+*{scrollbar-width:thin}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#26282e;border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+body.light ::-webkit-scrollbar-thumb{background:#ded3ba}
+::selection{background:var(--accent);color:var(--accent-on)}
+
+/* ── Header ── */
+html.chdr-hidden header{display:none!important}
+header{position:sticky;top:0;z-index:20;
+  background:linear-gradient(var(--surf-bg) 68%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  padding:calc(20px + env(safe-area-inset-top)) 24px 16px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  border-bottom:0.5px solid transparent;}
+.back-btn{width:36px;height:36px;border-radius:11px;border:0.5px solid var(--surf-line);background:var(--surf-panel);
+  color:rgba(255,255,255,.65);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;
+  transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+body.light .back-btn{color:rgba(0,0,0,.55)}
+.back-btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.hdr-title{font-family:'Fraunces',serif;font-size:22px;font-weight:500;letter-spacing:-.015em}
+.hdr-title span{color:var(--accent);font-style:italic}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.07em;margin-top:3px;text-transform:uppercase}
+body.light .hdr-sub{color:rgba(0,0,0,.42)}
+.hdr-spacer{flex:1}
+.hdr-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{width:34px;height:34px;border-radius:10px;border:0.5px solid var(--surf-line);background:var(--surf-panel);
+  color:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13.5px;
+  transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+body.light .icon-btn{color:rgba(0,0,0,.5)}
+.icon-btn:hover{color:var(--accent-on);border-color:var(--accent);background:var(--accent);transform:translateY(-1px)}
+
+/* ── Stats ── */
+.stats-wrap{padding:4px 24px 18px;max-width:1120px;margin:0 auto}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:11px}
+.stat-card{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:var(--r-md);padding:16px 18px;
+  box-shadow:var(--shadow-1);transition:transform .2s var(--ease),box-shadow .2s var(--ease);position:relative;overflow:hidden}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-2)}
+.stat-num{font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:500;letter-spacing:-.01em}
+.stat-num.accent{color:var(--accent)}
+.stat-num.bad{color:var(--bad)}
+.stat-label{font-size:10px;color:rgba(255,255,255,.42);letter-spacing:.09em;text-transform:uppercase;margin-top:5px}
+body.light .stat-label{color:rgba(0,0,0,.42)}
+.stat-bar{height:4px;border-radius:3px;background:rgba(255,255,255,.07);margin-top:11px;overflow:hidden}
+body.light .stat-bar{background:rgba(0,0,0,.07)}
+.stat-bar-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s var(--ease)}
+
+/* ── Toolbar ── */
+.toolbar{max-width:1120px;margin:0 auto;padding:0 24px 16px;display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.tb-tabs{display:flex;gap:3px;background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:12px;padding:4px;box-shadow:var(--shadow-1)}
+.tb-tab{border:none;background:none;padding:8px 15px;border-radius:9px;font-size:11.5px;font-weight:500;color:rgba(255,255,255,.45);
+  cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.02em;transition:all .18s var(--ease);white-space:nowrap}
+body.light .tb-tab{color:rgba(0,0,0,.42)}
+.tb-tab.active{background:var(--accent);color:var(--accent-on);box-shadow:0 2px 8px -2px var(--accent-soft)}
+.tb-tab:hover:not(.active){color:rgba(255,255,255,.8);background:rgba(255,255,255,.04)}
+body.light .tb-tab:hover:not(.active){color:rgba(0,0,0,.7);background:rgba(0,0,0,.03)}
+.tb-search{flex:1;min-width:150px;position:relative}
+.tb-search input{width:100%;background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:11px;
+  padding:9px 13px 9px 34px;color:inherit;font-size:12.5px;font-family:'Inter',sans-serif;box-shadow:var(--shadow-1);
+  transition:border-color .18s var(--ease)}
+.tb-search input:focus{outline:none;border-color:var(--accent)}
+.tb-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:rgba(255,255,255,.32)}
+body.light .tb-search i{color:rgba(0,0,0,.32)}
+.tb-backlog-toggle{display:flex;align-items:center;gap:7px;background:var(--surf-panel);border:0.5px solid var(--surf-line);
+  border-radius:11px;padding:8px 14px;cursor:pointer;font-size:11.5px;color:rgba(255,255,255,.55);user-select:none;
+  transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+body.light .tb-backlog-toggle{color:rgba(0,0,0,.55)}
+.tb-backlog-toggle:hover{border-color:rgba(201,112,90,.45)}
+.tb-backlog-toggle.active{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.tb-backlog-toggle .dot{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px currentColor;opacity:.9}
+
+/* ── Legend ── */
+.legend{max-width:1120px;margin:10px auto 4px;padding:12px 18px;border-radius:var(--r-md);background:var(--surf-panel);
+  border:0.5px dashed var(--surf-line);display:flex;gap:16px;flex-wrap:wrap;font-size:10.5px;color:rgba(255,255,255,.4);letter-spacing:.02em;line-height:1.6}
+body.light .legend{color:rgba(0,0,0,.42)}
+.legend{margin-left:24px;margin-right:24px}
+@media(min-width:1168px){.legend{margin-left:auto;margin-right:auto}}
+.legend b{color:var(--accent);font-weight:600}
+
+/* ── Subject sections ── */
+.main-wrap{max-width:1120px;margin:0 auto;padding:18px 24px 44px}
+.subj-section{margin-top:28px;animation:jj-rise .35s var(--ease) both}
+@keyframes jj-rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.subj-head{display:flex;align-items:baseline;gap:10px;padding:0 2px 12px;border-bottom:0.5px solid var(--surf-line);margin-bottom:12px}
+.subj-name{font-family:'Fraunces',serif;font-size:19px;font-weight:500;letter-spacing:-.01em}
+.subj-name.physics{color:#5a9fd4}
+.subj-name.chemistry{color:#4a9a6a}
+.subj-name.maths{color:#c9952a}
+.subj-count{font-size:11px;color:rgba(255,255,255,.38);font-family:'IBM Plex Mono',monospace}
+body.light .subj-count{color:rgba(0,0,0,.4)}
+.grp-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.32);margin:16px 3px 8px;font-weight:500}
+body.light .grp-label{color:rgba(0,0,0,.36)}
+
+.chap-row{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-left:3px solid transparent;
+  border-radius:var(--r-md);padding:12px 14px;margin-bottom:7px;transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+.chap-row:hover{border-color:rgba(255,255,255,.16);box-shadow:var(--shadow-2)}
+body.light .chap-row:hover{border-color:rgba(0,0,0,.14)}
+.chap-row.backlog{border-left-color:var(--bad)}
+.chap-row.thought{border-left-color:var(--accent)}
+.chap-row.partial{border-left-color:#c9952a}
+.chap-row.cleared{opacity:.62}
+.chap-row.cleared:hover{opacity:.85}
+
+.partial-pill{font-size:10px;font-family:'IBM Plex Mono',monospace;padding:3px 9px;border-radius:20px;flex-shrink:0;
+  white-space:nowrap;background:rgba(201,149,42,.14);color:#c9952a;font-weight:500}
+.chap-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.chap-name{flex:1;min-width:120px;font-size:13.5px;font-weight:400}
+.chap-name-edit{background:none;border:none;border-bottom:1px solid transparent;color:inherit;font-family:inherit;font-size:13.5px;width:100%;padding:3px 0;transition:border-color .15s}
+.chap-name-edit:hover{border-bottom-color:var(--surf-line)}
+.chap-name-edit:focus{outline:none;border-bottom:1px solid var(--accent)}
+
+.chap-del{width:26px;height:26px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,.22);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .18s var(--ease);flex-shrink:0}
+.chap-del:hover{color:var(--bad);background:var(--bad-soft)}
+body.light .chap-del{color:rgba(0,0,0,.22)}
+
+.chap-mock-btn{width:26px;height:26px;border-radius:8px;border:0.5px solid var(--surf-line);background:transparent;
+  color:rgba(255,255,255,.38);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;
+  transition:all .18s var(--ease);flex-shrink:0}
+.chap-mock-btn:hover{border-color:var(--accent);color:var(--accent);transform:scale(1.06)}
+.chap-mock-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+body.light .chap-mock-btn{color:rgba(0,0,0,.35)}
+
+.prep-pill{font-size:10px;font-family:'IBM Plex Mono',monospace;padding:3px 9px;border-radius:20px;flex-shrink:0;white-space:nowrap;font-weight:500}
+.prep-pill.low{background:var(--bad-soft);color:var(--bad)}
+.prep-pill.mid{background:rgba(201,149,42,.14);color:#c9952a}
+.prep-pill.high{background:var(--good-soft);color:var(--good)}
+
+.tb-mock-toggle{display:flex;align-items:center;gap:7px;background:var(--surf-panel);border:0.5px solid var(--surf-line);
+  border-radius:11px;padding:8px 14px;cursor:pointer;font-size:11.5px;color:rgba(255,255,255,.55);user-select:none;
+  transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+body.light .tb-mock-toggle{color:rgba(0,0,0,.55)}
+.tb-mock-toggle:hover{border-color:var(--accent)}
+.tb-mock-toggle.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.tb-mock-toggle .dot{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px currentColor;opacity:.9}
+
+/* ── Status (main heading, single-select) ── */
+.status-row{display:flex;gap:6px;flex-wrap:wrap}
+.status-opt{background:var(--surf-panel-hi);border:0.5px solid var(--surf-line);border-radius:8px;padding:7px 12px;
+  font-size:11.5px;color:rgba(255,255,255,.55);cursor:pointer;font-family:'Inter',sans-serif;transition:all .18s var(--ease);letter-spacing:.01em}
+body.light .status-opt{color:rgba(0,0,0,.55)}
+.status-opt:hover{border-color:rgba(255,255,255,.32);transform:translateY(-1px)}
+body.light .status-opt:hover{border-color:rgba(0,0,0,.3)}
+.status-opt.active{text-decoration:line-through;text-decoration-thickness:1.5px}
+.status-opt[data-k="backlog"].active{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.status-opt[data-k="not_taught"].active{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.35);color:rgba(255,255,255,.85)}
+body.light .status-opt[data-k="not_taught"].active{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.35);color:rgba(0,0,0,.75)}
+.status-opt[data-k="thought"].active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+/* ── Sub-options (practiced resources, rated 25/50/75/100%) ── */
+.sub-opts{display:flex;flex-direction:column;gap:7px;margin-top:9px;padding-top:10px;border-top:0.5px dashed var(--surf-line)}
+.sub-opt{background:transparent;border:0.5px solid var(--surf-line);border-radius:8px;padding:6px 11px;
+  font-size:11px;color:rgba(255,255,255,.45);cursor:pointer;font-family:'Inter',sans-serif;transition:all .18s var(--ease)}
+body.light .sub-opt{color:rgba(0,0,0,.5)}
+.sub-opt:hover{border-color:rgba(255,255,255,.32)}
+body.light .sub-opt:hover{border-color:rgba(0,0,0,.3)}
+.sub-opt.active{text-decoration:line-through;text-decoration-thickness:1.5px;background:var(--good-soft);border-color:var(--good);color:var(--good)}
+
+.pct-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pct-label{font-size:10.5px;color:rgba(255,255,255,.45);min-width:118px;letter-spacing:.01em}
+body.light .pct-label{color:rgba(0,0,0,.5)}
+.pct-btns{display:flex;gap:4px}
+.pct-opt{background:transparent;border:0.5px solid var(--surf-line);border-radius:6px;padding:4px 9px;
+  font-size:10px;color:rgba(255,255,255,.4);cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .18s var(--ease)}
+body.light .pct-opt{color:rgba(0,0,0,.45)}
+.pct-opt:hover{border-color:rgba(255,255,255,.38);transform:translateY(-1px)}
+body.light .pct-opt:hover{border-color:rgba(0,0,0,.35)}
+.pct-opt.active{background:var(--good-soft);border-color:var(--good);color:var(--good);font-weight:500}
+.pct-val{font-size:10px;font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.32);min-width:30px}
+body.light .pct-val{color:rgba(0,0,0,.35)}
+
+.add-row{display:flex;gap:8px;margin-top:12px}
+.add-row input{flex:1;background:var(--surf-panel);border:0.5px dashed var(--surf-line);border-radius:11px;
+  padding:10px 13px;color:inherit;font-size:12.5px;font-family:'Inter',sans-serif;transition:border-color .18s}
+.add-row input:focus{outline:none;border-color:var(--accent);border-style:solid}
+.add-row button{background:var(--accent-soft);border:0.5px solid var(--accent);color:var(--accent);border-radius:11px;
+  padding:0 17px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .18s var(--ease)}
+.add-row button:hover{background:var(--accent);color:var(--accent-on);transform:translateY(-1px)}
+
+.empty-msg{text-align:center;padding:54px 20px;color:rgba(255,255,255,.32);font-size:13px;font-style:italic;font-family:'Fraunces',serif}
+body.light .empty-msg{color:rgba(0,0,0,.36)}
+
+/* ── Radar / recommendations ── */
+.radar-wrap{max-width:1120px;margin:0 auto;padding:0 24px 22px}
+.radar-head{font-family:'Fraunces',serif;font-size:16px;font-weight:500;margin-bottom:11px;letter-spacing:-.01em}
+.radar-grid-wrap{display:flex;gap:12px;flex-wrap:wrap;background:var(--surf-panel);border:0.5px solid var(--surf-line);
+  border-radius:var(--r-lg);padding:18px 12px;box-shadow:var(--shadow-1)}
+.radar-card{flex:1;min-width:190px;display:flex;flex-direction:column;align-items:center}
+.radar-card svg{max-width:100%;height:auto}
+.radar-grid{fill:none;stroke:rgba(255,255,255,.08);stroke-width:1}
+body.light .radar-grid{stroke:rgba(0,0,0,.09)}
+.radar-axis{stroke:rgba(255,255,255,.15);stroke-width:1}
+body.light .radar-axis{stroke:rgba(0,0,0,.15)}
+.radar-label{font-size:9.5px;fill:rgba(255,255,255,.52);font-family:'IBM Plex Mono',monospace;text-anchor:middle}
+body.light .radar-label{fill:rgba(0,0,0,.52)}
+.radar-fig{fill:var(--accent);fill-opacity:.2;stroke:var(--accent);stroke-width:1.8}
+.radar-dot{fill:var(--accent)}
+.radar-title{font-size:10.5px;color:rgba(255,255,255,.42);text-align:center;margin-top:8px;letter-spacing:.05em;text-transform:uppercase}
+body.light .radar-title{color:rgba(0,0,0,.44)}
+.reco-head{font-family:'Fraunces',serif;font-size:15px;font-weight:500;margin:18px 0 9px;letter-spacing:-.01em}
+.reco-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.reco-list li{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-left:3px solid var(--accent);
+  border-radius:var(--r-sm);padding:11px 14px;font-size:12px;line-height:1.6;color:rgba(255,255,255,.78);box-shadow:var(--shadow-1)}
+body.light .reco-list li{color:rgba(0,0,0,.78)}
+.reco-list li b{color:var(--accent);font-weight:600}
+
+/* ── Objectives (backlog + unfinished chapters, actionable) ── */
+.objectives-wrap{max-width:1120px;margin:0 auto;padding:0 24px 22px}
+.obj-head{font-family:'Fraunces',serif;font-size:16px;font-weight:500;margin-bottom:11px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;letter-spacing:-.01em}
+.obj-count{font-size:11px;font-weight:400;color:rgba(255,255,255,.38);font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+body.light .obj-count{color:rgba(0,0,0,.4)}
+.obj-group-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.32);margin:16px 3px 9px;font-weight:500}
+body.light .obj-group-label{color:rgba(0,0,0,.36)}
+.obj-card{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-left:3px solid transparent;
+  border-radius:var(--r-md);padding:13px 15px;margin-bottom:8px;transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+.obj-card:hover{border-color:rgba(255,255,255,.16);box-shadow:var(--shadow-2)}
+body.light .obj-card:hover{border-color:rgba(0,0,0,.14)}
+.obj-card.is-backlog{border-left-color:var(--bad)}
+.obj-card.is-progress{border-left-color:var(--accent)}
+.obj-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.subj-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px currentColor;opacity:.95}
+.obj-name{font-size:13.5px;flex:1;min-width:120px}
+.obj-mock-flag{color:var(--accent);font-size:13px;display:flex}
+.obj-pill{font-size:10px;font-family:'IBM Plex Mono',monospace;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;font-weight:500}
+.obj-pill.backlog{background:var(--bad-soft);color:var(--bad)}
+.obj-pill.low{background:var(--bad-soft);color:var(--bad)}
+.obj-pill.mid{background:rgba(201,149,42,.14);color:#c9952a}
+.obj-pill.high{background:var(--good-soft);color:var(--good)}
+.obj-action{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  margin-top:11px;padding-top:11px;border-top:0.5px dashed var(--surf-line)}
+.obj-goal{font-size:11px;color:rgba(255,255,255,.46);flex:1;min-width:160px;font-style:italic}
+body.light .obj-goal{color:rgba(0,0,0,.5)}
+.obj-btn{background:var(--accent-soft);border:0.5px solid var(--accent);color:var(--accent);border-radius:9px;
+  padding:6px 13px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;transition:all .18s var(--ease)}
+.obj-btn:hover{background:var(--accent);color:var(--accent-on);transform:translateY(-1px)}
+.obj-chips{display:flex;gap:5px;flex-wrap:wrap}
+.obj-chip{background:transparent;border:0.5px solid var(--surf-line);border-radius:8px;padding:5px 10px;
+  font-size:10px;color:rgba(255,255,255,.52);cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .18s var(--ease);white-space:nowrap}
+body.light .obj-chip{color:rgba(0,0,0,.55)}
+.obj-chip:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surf-modal);
+  border:0.5px solid var(--surf-line);border-radius:var(--r-sm);padding:12px 19px;font-size:12px;color:#fff;opacity:0;pointer-events:none;
+  transition:all .3s var(--ease);z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.55);backdrop-filter:blur(10px)}
+body.light .toast{color:#1c1a15}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:640px){
+  header{padding:calc(16px + env(safe-area-inset-top)) 16px 12px}
+  .stats-wrap,.toolbar,.main-wrap,.radar-wrap,.objectives-wrap{padding-left:16px;padding-right:16px}
+  .legend{margin-left:16px;margin-right:16px}
+  .chap-row{padding:11px}
+  .chap-name{min-width:100%;order:-1;margin-bottom:3px}
+  .res-btn::after{display:none}
+}
+</style>
+</head>
+<body>
+<script src="retro-theme.js"></script>
+<script src="vhs-theme.js"></script>
+<script src="harsh-mode.js"></script>
+
+<header>
+  <button class="back-btn" onclick="window.location.href='index.html'" title="Back" aria-label="Back"><i class="ti ti-arrow-left"></i></button>
+  <div>
+    <div class="hdr-title"><span>JEE</span> Study Journal</div>
+    <div class="hdr-sub" id="hdr-sub">Physics · Chemistry · Maths</div>
+  </div>
+  <div class="hdr-spacer"></div>
+  <div class="hdr-actions">
+    <button class="icon-btn" onclick="exportJournal()" title="Export progress"><i class="ti ti-download"></i></button>
+    <button class="icon-btn" onclick="resetJournal()" title="Reset to defaults"><i class="ti ti-refresh"></i></button>
+  </div>
+</header>
+
+<div class="stats-wrap">
+  <div class="stats-grid" id="stats-grid"></div>
+</div>
+
+<div class="radar-wrap" id="radar-wrap"></div>
+
+<div class="objectives-wrap" id="objectives-wrap"></div>
+
+<div class="legend">
+  <span>pick one: <b>Backlog</b> · <b>Not thought in class yet</b> · <b>Thought</b></span>
+  <span>once <b>Thought</b>, rate each of <b>module</b> · <b>PYQ</b> · <b>QB</b> · <b>external book</b> at <b>25/50/75/100%</b></span>
+  <span>tap a percentage to set it, tap it again to clear it back to 0%</span>
+  <span>tap <b><i class="ti ti-target-arrow"></i></b> to flag a chapter for an upcoming mock test &mdash; readiness weighs <b>Module</b> &amp; <b>PYQ</b> 40% each, <b>External Book</b> 15%, <b>QB</b> 5%</span>
+</div>
+
+<div class="toolbar">
+  <div class="tb-tabs" id="tb-tabs">
+    <button class="tb-tab active" data-subj="all" onclick="setSubjFilter('all')">All</button>
+    <button class="tb-tab" data-subj="Physics" onclick="setSubjFilter('Physics')">Physics</button>
+    <button class="tb-tab" data-subj="Chemistry" onclick="setSubjFilter('Chemistry')">Chemistry</button>
+    <button class="tb-tab" data-subj="Maths" onclick="setSubjFilter('Maths')">Maths</button>
+  </div>
+  <div class="tb-search">
+    <i class="ti ti-search"></i>
+    <input type="text" id="search-inp" placeholder="Search chapters…" oninput="onSearch(this.value)">
+  </div>
+  <div class="tb-backlog-toggle" id="backlog-toggle" onclick="toggleBacklogOnly()">
+    <span class="dot"></span> Backlog only
+  </div>
+  <div class="tb-mock-toggle" id="mock-toggle" onclick="toggleMockOnly()">
+    <span class="dot"></span> Mock test only
+  </div>
+</div>
+
+<div class="main-wrap" id="main-wrap"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =================== DATA =================== */
+const JJ_KEY='dayplan_jee_journal';
+const RES_KEYS=[
+  {k:'module',lbl:'Practiced Module',full:'Module',weight:40},
+  {k:'pyq',lbl:'Practiced PYQ',full:'Previous Year Questions',weight:40},
+  {k:'qb',lbl:'Practiced QB',full:'Question Bank',weight:5},
+  {k:'book',lbl:'Practiced External Book',full:'External Book',weight:15}
+];
+const STATUS_OPTS=[
+  {k:'backlog',lbl:'Backlog'},
+  {k:'not_taught',lbl:'Not thought in class yet'},
+  {k:'thought',lbl:'Thought'}
+];
+
+const DEFAULT_CHAPTERS=[
+// ── Physics ──
+...['Units and Measurements','Kinematics','Laws of Motion','Work, Energy and Power',
+  'System of Particles and Rotational Motion','Gravitation','Mechanical Properties of Solids',
+  'Mechanical Properties of Fluids','Thermal Properties of Matter','Thermodynamics',
+  'Kinetic Theory of Gases','Oscillations','Waves','Electrostatics','Current Electricity',
+  'Moving Charges and Magnetism','Magnetism and Matter','Electromagnetic Induction',
+  'Alternating Current','Electromagnetic Waves','Ray Optics and Optical Instruments','Wave Optics',
+  'Dual Nature of Radiation and Matter','Atoms','Nuclei','Semiconductor Electronics',
+  'Communication Systems','Experimental Skills'].map(n=>({subject:'Physics',group:'',name:n})),
+// ── Chemistry: Physical ──
+...['Some Basic Concepts of Chemistry','Structure of Atom','States of Matter','Chemical Thermodynamics',
+  'Equilibrium','Redox Reactions','Solutions','Electrochemistry','Chemical Kinetics','Surface Chemistry',
+  'Solid State'].map(n=>({subject:'Chemistry',group:'Physical',name:n})),
+// ── Chemistry: Inorganic ──
+...['Classification of Elements and Periodicity','Chemical Bonding and Molecular Structure','Hydrogen',
+  's-Block Elements','p-Block Elements','d and f Block Elements','Coordination Compounds',
+  'General Principles of Isolation of Metals'].map(n=>({subject:'Chemistry',group:'Inorganic',name:n})),
+// ── Chemistry: Organic ──
+...['Basic Principles and Techniques','Hydrocarbons','Haloalkanes and Haloarenes',
+  'Alcohols, Phenols and Ethers','Aldehydes, Ketones and Carboxylic Acids','Amines','Biomolecules',
+  'Polymers','Chemistry in Everyday Life'].map(n=>({subject:'Chemistry',group:'Organic',name:n})),
+// ── Maths ──
+...['Sets, Relations and Functions','Complex Numbers and Quadratic Equations','Matrices and Determinants',
+  'Permutations and Combinations','Binomial Theorem','Sequences and Series',
+  'Limits, Continuity and Differentiability','Differentiation','Application of Derivatives',
+  'Indefinite Integration','Definite Integration and Applications','Differential Equations',
+  'Straight Lines and Circles','Conic Sections','Three Dimensional Geometry','Vector Algebra',
+  'Trigonometry','Statistics and Probability'].map(n=>({subject:'Maths',group:'',name:n})),
+];
+
+let jjState={subjFilter:'all',search:'',backlogOnly:false,mockOnly:false};
+
+/* =================== STORAGE =================== */
+function jjMigrate(c){
+  // Legacy shape had booleans: backlog, module, qb, pyq, book (no single `status`/`practiced`).
+  if(!c.status){
+    const toPct=v=>v?100:0;
+    const practiced={module:toPct(c.module),pyq:toPct(c.pyq),qb:toPct(c.qb),book:toPct(c.book)};
+    let status='not_taught';
+    if(c.backlog) status='backlog';
+    else if(practiced.module||practiced.pyq||practiced.qb||practiced.book) status='thought';
+    c.status=status;
+    c.practiced=practiced;
+    delete c.backlog; delete c.module; delete c.qb; delete c.pyq; delete c.book;
+  }
+  if(!c.practiced) c.practiced={module:0,pyq:0,qb:0,book:0};
+  // An earlier version stored these as booleans (done/not done) — upgrade to percentages.
+  RES_KEYS.forEach(r=>{
+    const v=c.practiced[r.k];
+    if(typeof v==='boolean') c.practiced[r.k]=v?100:0;
+    else if(typeof v!=='number' || isNaN(v)) c.practiced[r.k]=0;
+  });
+  if(typeof c.mock!=='boolean') c.mock=false;
+  return c;
+}
+function jjLoad(){
+  try{
+    const raw=localStorage.getItem(JJ_KEY);
+    if(raw){
+      const data=JSON.parse(raw);
+      if(Array.isArray(data)&&data.length) return data.map(jjMigrate);
+    }
+  }catch(e){}
+  const seeded=DEFAULT_CHAPTERS.map((c,i)=>({
+    id:'c'+i, subject:c.subject, group:c.group, name:c.name,
+    status:'not_taught', practiced:{module:0,pyq:0,qb:0,book:0},
+    mock:false, custom:false
+  }));
+  jjSave(seeded);
+  return seeded;
+}
+function jjSave(data){ try{ localStorage.setItem(JJ_KEY, JSON.stringify(data)); }catch(e){} }
+
+let chapters=jjLoad();
+
+/* =================== THEME SYNC (matches main app's saved theme/accent) =================== */
+(function syncTheme(){
+  try{
+    const t=localStorage.getItem('dayplan_theme');
+    const a=localStorage.getItem('dayplan_accent');
+    const s=localStorage.getItem('dayplan_surface');
+    if(t==='light') document.body.classList.add('light');
+    if(t==='dark'&&s==='grey') document.body.classList.add('grey');
+    if(a) document.body.dataset.accent=a;
+  }catch(e){}
+})();
+
+/* =================== TOAST =================== */
+let toastTimer=null;
+function jjToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* =================== FILTER HELPERS =================== */
+function setSubjFilter(s){
+  jjState.subjFilter=s;
+  document.querySelectorAll('.tb-tab').forEach(b=>b.classList.toggle('active',b.dataset.subj===s));
+  render();
+}
+function onSearch(v){ jjState.search=v.trim().toLowerCase(); render(); }
+function toggleBacklogOnly(){
+  jjState.backlogOnly=!jjState.backlogOnly;
+  document.getElementById('backlog-toggle').classList.toggle('active',jjState.backlogOnly);
+  render();
+}
+function toggleMockOnly(){
+  jjState.mockOnly=!jjState.mockOnly;
+  document.getElementById('mock-toggle').classList.toggle('active',jjState.mockOnly);
+  render();
+}
+
+/* =================== MUTATIONS =================== */
+function setStatus(id,status){
+  const c=chapters.find(x=>x.id===id); if(!c) return;
+  // Clicking the already-active status un-strikes it, resetting to "not thought" as a neutral default.
+  c.status = (c.status===status) ? 'not_taught' : status;
+  // Moving away from "thought" doesn't erase what was already practiced — it just hides those pills
+  // until the chapter is marked "thought" again.
+  jjSave(chapters);
+  render();
+}
+function setPracticedPct(id,key,pct){
+  const c=chapters.find(x=>x.id===id); if(!c) return;
+  // Tapping the already-active percentage clears it back to 0%.
+  c.practiced[key] = (c.practiced[key]===pct) ? 0 : pct;
+  jjSave(chapters);
+  render();
+}
+function toggleMock(id){
+  const c=chapters.find(x=>x.id===id); if(!c) return;
+  c.mock=!c.mock;
+  jjSave(chapters);
+  render();
+  jjToast(c.mock?'Flagged for mock test':'Removed from mock test');
+}
+function renameChapter(id,val){
+  const c=chapters.find(x=>x.id===id); if(!c) return;
+  c.name=val.trim()||c.name;
+  jjSave(chapters);
+}
+function deleteChapter(id){
+  if(!confirm('Remove this chapter from your journal?')) return;
+  chapters=chapters.filter(x=>x.id!==id);
+  jjSave(chapters);
+  render();
+}
+function addChapter(subject){
+  const inp=document.getElementById('add-inp-'+subject);
+  const name=(inp.value||'').trim();
+  if(!name) return;
+  chapters.push({id:'c'+Date.now()+Math.floor(Math.random()*1000),subject,group:'',name,
+    status:'not_taught',practiced:{module:0,pyq:0,qb:0,book:0},mock:false,custom:true});
+  inp.value='';
+  jjSave(chapters);
+  render();
+  jjToast('Added "'+name+'"');
+}
+function resetJournal(){
+  if(!confirm('Reset the whole journal back to the default JEE syllabus? This clears all your progress.')) return;
+  localStorage.removeItem(JJ_KEY);
+  chapters=jjLoad();
+  render();
+  jjToast('Journal reset to defaults');
+}
+function exportJournal(){
+  const STATUS_LBL={backlog:'Backlog',not_taught:'Not thought in class yet',thought:'Thought'};
+  const lines=['Subject,Group,Chapter,Status,Module,PYQ,Question Bank,External Book,Mock Test,Readiness'];
+  chapters.forEach(c=>{
+    lines.push([c.subject,c.group||'',c.name,STATUS_LBL[c.status]||c.status,
+      (c.practiced.module||0)+'%',(c.practiced.pyq||0)+'%',
+      (c.practiced.qb||0)+'%',(c.practiced.book||0)+'%',
+      c.mock?'Yes':'No',c.mock?chapterPrepScore(c)+'%':'']
+      .map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(','));
+  });
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='jee-study-journal.csv'; a.click();
+  URL.revokeObjectURL(url);
+  jjToast('Exported CSV');
+}
+
+/* =================== RENDER =================== */
+function chapterCleared(c){ return c.status==='thought' && RES_KEYS.every(r=>c.practiced[r.k]===100); }
+/* Thought, at least one practice option rated above 0%, but not all four at 100% — "in progress". */
+function chapterPartial(c){
+  if(c.status!=='thought' || chapterCleared(c)) return false;
+  return RES_KEYS.some(r=>c.practiced[r.k]>0);
+}
+
+/* Preparedness for a chapter flagged for a mock test: 0 unless the chapter has
+   been "Thought" in class, then weighted by each practice option's rating (0-100%) —
+   Module and PYQ carry the most weight (40% each), External Book is next (15%),
+   Question Bank counts least (5%). A resource rated 50% only earns half its weight. */
+function chapterPrepScore(c){
+  if(c.status!=='thought') return 0;
+  const earned=RES_KEYS.reduce((a,r)=>a+r.weight*((c.practiced[r.k]||0)/100),0);
+  return Math.round(earned);
+}
+
+/* Average rating (0-100) for each resource type across a set of chapters — used to draw the
+   practice-balance radar chart and to spot which resource type is being neglected. */
+function avgPracticed(list){
+  const out={};
+  if(!list.length){ RES_KEYS.forEach(r=>out[r.k]=0); return out; }
+  RES_KEYS.forEach(r=>{
+    out[r.k]=Math.round(list.reduce((a,c)=>a+(c.practiced[r.k]||0),0)/list.length);
+  });
+  return out;
+}
+
+/* Renders a 4-axis spider/radar chart (SVG) for Module / PYQ / QB / External Book ratings. */
+function radarChart(values,size){
+  size=size||180;
+  const c=size/2, r=c-32, n=RES_KEYS.length;
+  const angle=i=> -Math.PI/2 + i*(2*Math.PI/n);
+  let grid='';
+  [25,50,75,100].forEach(pct=>{
+    const pts=RES_KEYS.map((_,i)=>{
+      const rad=r*pct/100;
+      return (c+rad*Math.cos(angle(i))).toFixed(1)+','+(c+rad*Math.sin(angle(i))).toFixed(1);
+    }).join(' ');
+    grid+=`<polygon class="radar-grid" points="${pts}"/>`;
+  });
+  let axis='';
+  RES_KEYS.forEach((rk,i)=>{
+    const x=c+r*Math.cos(angle(i)), y=c+r*Math.sin(angle(i));
+    axis+=`<line class="radar-axis" x1="${c}" y1="${c}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+    const lx=c+(r+18)*Math.cos(angle(i)), ly=c+(r+18)*Math.sin(angle(i));
+    axis+=`<text class="radar-label" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}">${rk.lbl.replace('Practiced ','')}</text>`;
+  });
+  const dataPts=RES_KEYS.map((rk,i)=>{
+    const val=values[rk.k]||0, rad=r*val/100;
+    return (c+rad*Math.cos(angle(i))).toFixed(1)+','+(c+rad*Math.sin(angle(i))).toFixed(1);
+  }).join(' ');
+  const dots=RES_KEYS.map((rk,i)=>{
+    const val=values[rk.k]||0, rad=r*val/100;
+    const x=c+rad*Math.cos(angle(i)), y=c+rad*Math.sin(angle(i));
+    return `<circle class="radar-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${grid}${axis}<polygon class="radar-fig" points="${dataPts}"/>${dots}</svg>`;
+}
+
+/* Auto-generated study recommendations based on current ratings, backlog, and mock-test flags. */
+function buildRecommendations(){
+  const recs=[];
+  const totalBacklog=chapters.filter(c=>c.status==='backlog').length;
+  if(totalBacklog>0){
+    recs.push(`You have <b>${totalBacklog}</b> chapter${totalBacklog===1?'':'s'} marked as <b>Backlog</b> — clearing these to at least "Thought" should come before polishing chapters you've already started.`);
+  }
+  const thought=chapters.filter(c=>c.status==='thought');
+  if(thought.length){
+    const avg=avgPracticed(thought);
+    const weakest=RES_KEYS.reduce((a,r)=>avg[r.k]<avg[a.k]?r:a, RES_KEYS[0]);
+    const strongest=RES_KEYS.reduce((a,r)=>avg[r.k]>avg[a.k]?r:a, RES_KEYS[0]);
+    recs.push(`Across the ${thought.length} chapter${thought.length===1?'':'s'} you've started, <b>${weakest.full}</b> is your weakest practice type at an average of <b>${avg[weakest.k]}%</b>. It's worth ${weakest.weight}% of a chapter's mock-test readiness, so raising it will move your readiness score the most per chapter.`);
+    if(strongest.k!==weakest.k){
+      recs.push(`<b>${strongest.full}</b> is furthest along at <b>${avg[strongest.k]}%</b> average — keep it topped up, but shift extra time toward the weaker areas above.`);
+    }
+  } else {
+    recs.push('Mark a chapter as "Thought" and rate your Module/PYQ/QB/Book practice to see personalised recommendations here.');
+  }
+  const subjScores=['Physics','Chemistry','Maths'].map(s=>{
+    const list=chapters.filter(c=>c.subject===s && c.status!=='not_taught');
+    if(!list.length) return null;
+    return {s,avg:Math.round(list.reduce((a,c)=>a+chapterPrepScore(c),0)/list.length),count:list.length};
+  }).filter(Boolean);
+  if(subjScores.length>1){
+    const weakestSubj=subjScores.reduce((a,b)=>b.avg<a.avg?b:a);
+    recs.push(`<b>${weakestSubj.s}</b> is trailing your other subjects with an average readiness of <b>${weakestSubj.avg}%</b> across ${weakestSubj.count} started chapter${weakestSubj.count===1?'':'s'}.`);
+  }
+  const mockWeak=chapters.filter(c=>c.mock && c.status==='thought').sort((a,b)=>chapterPrepScore(a)-chapterPrepScore(b)).slice(0,3);
+  if(mockWeak.length){
+    recs.push(`For your upcoming mock test, prioritise: ${mockWeak.map(c=>`<b>${escHtml(c.name)}</b> (${chapterPrepScore(c)}%)`).join(', ')}.`);
+  }
+  return recs;
+}
+
+function subjColor(s){ return s==='Physics'?'#5a9fd4':s==='Chemistry'?'#4a9a6a':'#c9952a'; }
+
+/* Every backlog chapter + every "Thought" chapter that isn't fully cleared, gathered in one
+   place as actionable objectives — each with a one-tap action to move it forward. */
+function objBacklogCard(c){
+  return `<div class="obj-card is-backlog">
+    <div class="obj-top">
+      <span class="subj-dot" style="background:${subjColor(c.subject)}"></span>
+      <span class="obj-name">${escHtml(c.name)}</span>
+      ${c.mock?'<span class="obj-mock-flag" title="Flagged for upcoming mock test"><i class="ti ti-target-arrow"></i></span>':''}
+      <span class="obj-pill backlog">Backlog</span>
+    </div>
+    <div class="obj-action">
+      <span class="obj-goal">Objective: get it taught in class, then start practicing</span>
+      <button class="obj-btn" onclick="setStatus('${c.id}','thought')">Mark as Thought</button>
+    </div>
+  </div>`;
+}
+function objUnfinishedCard(c){
+  const remaining=RES_KEYS.filter(r=>(c.practiced[r.k]||0)<100);
+  const done=RES_KEYS.length-remaining.length;
+  const score=chapterPrepScore(c);
+  const chips=remaining.map(r=>{
+    const val=c.practiced[r.k]||0;
+    return `<button class="obj-chip" title="Jump ${r.full} to 100%" onclick="setPracticedPct('${c.id}','${r.k}',100)">${r.lbl.replace('Practiced ','')} ${val}%&rarr;100%</button>`;
+  }).join('');
+  return `<div class="obj-card is-progress">
+    <div class="obj-top">
+      <span class="subj-dot" style="background:${subjColor(c.subject)}"></span>
+      <span class="obj-name">${escHtml(c.name)}</span>
+      ${c.mock?'<span class="obj-mock-flag" title="Flagged for upcoming mock test"><i class="ti ti-target-arrow"></i></span>':''}
+      <span class="obj-pill ${prepTier(score)}">${done}/4 done &middot; ${score}% ready</span>
+    </div>
+    <div class="obj-action">
+      <span class="obj-goal">Objective: finish ${remaining.map(r=>r.lbl.replace('Practiced ','')).join(', ')}</span>
+      <div class="obj-chips">${chips}</div>
+    </div>
+  </div>`;
+}
+function renderObjectives(){
+  const wrap=document.getElementById('objectives-wrap');
+  if(!wrap) return;
+  const sortFn=(a,b)=>{ if(a.mock!==b.mock) return a.mock?-1:1; return a.subject.localeCompare(b.subject); };
+  const backlogChs=chapters.filter(c=>c.status==='backlog').sort(sortFn);
+  const unfinishedChs=chapters.filter(c=>c.status==='thought' && !chapterCleared(c)).sort(sortFn);
+  const total=backlogChs.length+unfinishedChs.length;
+  if(!total){
+    wrap.innerHTML=`<div class="obj-head">Objectives</div>
+      <div class="empty-msg" style="padding:24px 10px">Nothing in backlog and no unfinished chapters &mdash; you're fully caught up.</div>`;
+    return;
+  }
+  let html=`<div class="obj-head">Objectives <span class="obj-count">${total} chapter${total===1?'':'s'} need attention</span></div>`;
+  if(backlogChs.length){
+    html+=`<div class="obj-group-label">Backlog (${backlogChs.length}) &mdash; get these taught</div>`;
+    html+=backlogChs.map(objBacklogCard).join('');
+  }
+  if(unfinishedChs.length){
+    html+=`<div class="obj-group-label">In progress (${unfinishedChs.length}) &mdash; finish the remaining practice</div>`;
+    html+=unfinishedChs.map(objUnfinishedCard).join('');
+  }
+  wrap.innerHTML=html;
+}
+function renderRadar(){
+  const wrap=document.getElementById('radar-wrap');
+  if(!wrap) return;
+  const thought=chapters.filter(c=>c.status==='thought');
+  const mockThought=chapters.filter(c=>c.mock && c.status==='thought');
+  const overallAvg=avgPracticed(thought);
+  const mockAvg=avgPracticed(mockThought);
+  const recs=buildRecommendations();
+  wrap.innerHTML=`
+    <div class="radar-head">Practice Balance</div>
+    <div class="radar-grid-wrap">
+      <div class="radar-card">
+        ${radarChart(overallAvg,180)}
+        <div class="radar-title">All started chapters (${thought.length})</div>
+      </div>
+      <div class="radar-card">
+        ${mockThought.length?radarChart(mockAvg,180):'<div class="empty-msg" style="padding:26px 10px 6px;font-size:11.5px">No chapters flagged for a mock test yet</div>'}
+        <div class="radar-title">Mock test chapters (${mockThought.length})</div>
+      </div>
+    </div>
+    <div class="reco-head">Recommendations</div>
+    <ul class="reco-list">${recs.map(r=>`<li>${r}</li>`).join('')}</ul>
+  `;
+}
+function prepTier(score){
+  if(score>=75) return 'high';
+  if(score>=40) return 'mid';
+  return 'low';
+}
+function prepColorVar(tier){
+  return tier==='high' ? 'var(--good)' : tier==='mid' ? '#c9952a' : 'var(--bad)';
+}
+
+function renderStats(){
+  const grid=document.getElementById('stats-grid');
+  const subjects=['Physics','Chemistry','Maths'];
+  const totalChapters=chapters.length;
+  const totalCleared=chapters.filter(chapterCleared).length;
+  const totalBacklog=chapters.filter(c=>c.status==="backlog").length;
+
+  // Chapters still sitting at the default "Not thought in class yet" status haven't
+  // been engaged with at all, so they're excluded from readiness averages —
+  // otherwise every fresh chapter would drag the score toward 0 for no reason.
+  function readinessStats(list){
+    const counted=list.filter(c=>c.status!=='not_taught');
+    if(!counted.length) return {avg:0,count:0};
+    const avg=Math.round(counted.reduce((a,c)=>a+chapterPrepScore(c),0)/counted.length);
+    return {avg,count:counted.length};
+  }
+
+  let html='';
+  html+=`<div class="stat-card">
+    <div class="stat-num accent">${totalCleared}<span style="font-size:13px;color:rgba(255,255,255,.3)"> / ${totalChapters}</span></div>
+    <div class="stat-label">Chapters cleared</div>
+    <div class="stat-bar"><div class="stat-bar-fill" style="width:${totalChapters?Math.round(totalCleared/totalChapters*100):0}%"></div></div>
+  </div>`;
+  const totalPartial=chapters.filter(chapterPartial).length;
+  html+=`<div class="stat-card">
+    <div class="stat-num" style="color:#c9952a">${totalPartial}</div>
+    <div class="stat-label">Partially cleared</div>
+  </div>`;
+  const overall=readinessStats(chapters);
+  const overallTier=prepTier(overall.avg);
+  html+=`<div class="stat-card">
+    <div class="stat-num" style="color:${overall.count?prepColorVar(overallTier):'inherit'}">${overall.count?overall.avg+'%':'—'}</div>
+    <div class="stat-label">JEE readiness${overall.count?' ('+overall.count+' ch.)':''}</div>
+    ${overall.count?`<div class="stat-bar"><div class="stat-bar-fill" style="width:${overall.avg}%;background:${prepColorVar(overallTier)}"></div></div>`:''}
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num bad">${totalBacklog}</div>
+    <div class="stat-label">Backlog chapters</div>
+  </div>`;
+  const mockChs=chapters.filter(c=>c.mock);
+  const mock=readinessStats(mockChs);
+  const mockTier=prepTier(mock.avg);
+  html+=`<div class="stat-card">
+    <div class="stat-num" style="color:${mock.count?prepColorVar(mockTier):'inherit'}">${mock.count?mock.avg+'%':'—'}</div>
+    <div class="stat-label">Mock test readiness${mock.count?' ('+mock.count+' ch.)':''}</div>
+    ${mock.count?`<div class="stat-bar"><div class="stat-bar-fill" style="width:${mock.avg}%;background:${prepColorVar(mockTier)}"></div></div>`:''}
+  </div>`;
+  subjects.forEach(s=>{
+    const subjChs=chapters.filter(c=>c.subject===s);
+    const cleared=subjChs.filter(chapterCleared).length;
+    html+=`<div class="stat-card">
+      <div class="stat-num" style="color:${s==='Physics'?'#5a9fd4':s==='Chemistry'?'#4a9a6a':'#c9952a'}">${cleared}<span style="font-size:13px;color:rgba(255,255,255,.3)"> / ${subjChs.length}</span></div>
+      <div class="stat-label">${s}</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${subjChs.length?Math.round(cleared/subjChs.length*100):0}%;background:${s==='Physics'?'#5a9fd4':s==='Chemistry'?'#4a9a6a':'#c9952a'}"></div></div>
+    </div>`;
+  });
+  grid.innerHTML=html;
+}
+
+function passesFilter(c){
+  if(jjState.subjFilter!=='all' && c.subject!==jjState.subjFilter) return false;
+  if(jjState.backlogOnly && c.status!=='backlog') return false;
+  if(jjState.mockOnly && !c.mock) return false;
+  if(jjState.search && !c.name.toLowerCase().includes(jjState.search)) return false;
+  return true;
+}
+
+function renderChapterRow(c){
+  const statusBtns=STATUS_OPTS.map(s=>`
+    <button class="status-opt${c.status===s.k?' active':''}" data-k="${s.k}"
+      title="${c.status===s.k?'Click to unmark':'Mark chapter as '+s.lbl.toLowerCase()}"
+      onclick="setStatus('${c.id}','${s.k}')">${s.lbl}</button>`).join('');
+  const subOpts = c.status==='thought' ? `
+    <div class="sub-opts">
+      ${RES_KEYS.map(r=>{
+        const val=c.practiced[r.k]||0;
+        const btns=[25,50,75,100].map(p=>`
+          <button class="pct-opt${val===p?' active':''}"
+            title="Rate ${r.full} at ${p}%${val===p?' (tap again to clear)':''}"
+            onclick="setPracticedPct('${c.id}','${r.k}',${p})">${p}</button>`).join('');
+        return `<div class="pct-row">
+          <span class="pct-label" title="${r.weight}% of mock-test readiness">${r.lbl.replace('Practiced ','')}</span>
+          <div class="pct-btns">${btns}</div>
+          <span class="pct-val">${val}%</span>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+  const prepScore=chapterPrepScore(c);
+  const prepPill = c.mock ? `<span class="prep-pill ${prepTier(prepScore)}" title="Mock test readiness for this chapter">${prepScore}% ready</span>` : '';
+  const partialPill = chapterPartial(c) ? `<span class="partial-pill" title="At least one practice option done, but not all four">Partially cleared</span>` : '';
+  return `
+  <div class="chap-row${c.status==='backlog'?' backlog':''}${c.status==='thought'?' thought':''}${chapterPartial(c)?' partial':''}${chapterCleared(c)?' cleared':''}">
+    <div class="chap-top">
+      <div class="chap-name">
+        <input class="chap-name-edit" value="${escHtml(c.name)}" onchange="renameChapter('${c.id}',this.value)">
+      </div>
+      ${partialPill}
+      ${prepPill}
+      <button class="chap-mock-btn${c.mock?' active':''}" title="${c.mock?'Remove from upcoming mock test':'Flag for upcoming mock test'}" onclick="toggleMock('${c.id}')"><i class="ti ti-target-arrow"></i></button>
+      ${c.custom?`<button class="chap-del" title="Remove chapter" onclick="deleteChapter('${c.id}')"><i class="ti ti-trash"></i></button>`:''}
+    </div>
+    <div class="status-row">${statusBtns}</div>
+    ${subOpts}
+  </div>`;
+}
+
+function escHtml(s){ return (s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+
+function renderSubject(subject){
+  const groups=[...new Set(chapters.filter(c=>c.subject===subject).map(c=>c.group||''))];
+  const hasGroups=groups.some(g=>g);
+  let body='';
+  if(hasGroups){
+    ['Physical','Inorganic','Organic',''].forEach(g=>{
+      const list=chapters.filter(c=>c.subject===subject && (c.group||'')===g && passesFilter(c));
+      if(!list.length) return;
+      if(g) body+=`<div class="grp-label">${g}</div>`;
+      body+=list.map(renderChapterRow).join('');
+    });
+  } else {
+    const list=chapters.filter(c=>c.subject===subject && passesFilter(c));
+    body+=list.map(renderChapterRow).join('');
+  }
+  const visibleCount=chapters.filter(c=>c.subject===subject && passesFilter(c)).length;
+  const totalCount=chapters.filter(c=>c.subject===subject).length;
+  if(!body && (jjState.search||jjState.backlogOnly)) body='';
+  return `
+  <div class="subj-section">
+    <div class="subj-head">
+      <div class="subj-name ${subject.toLowerCase()}">${subject}</div>
+      <div class="subj-count">${visibleCount}/${totalCount} shown</div>
+    </div>
+    ${body}
+    <div class="add-row">
+      <input type="text" id="add-inp-${subject}" placeholder="Add a ${subject.toLowerCase()} chapter…" onkeydown="if(event.key==='Enter')addChapter('${subject}')">
+      <button onclick="addChapter('${subject}')"><i class="ti ti-plus"></i></button>
+    </div>
+  </div>`;
+}
+
+function render(){
+  renderStats();
+  renderRadar();
+  renderObjectives();
+  const wrap=document.getElementById('main-wrap');
+  const subjects = jjState.subjFilter==='all' ? ['Physics','Chemistry','Maths'] : [jjState.subjFilter];
+  const anyVisible = chapters.some(c=>subjects.includes(c.subject) && passesFilter(c));
+  if(!anyVisible && (jjState.search||jjState.backlogOnly)){
+    wrap.innerHTML=subjects.map(renderSubject).join('') +
+      `<div class="empty-msg">No chapters match your filters.</div>`;
+  } else {
+    wrap.innerHTML=subjects.map(renderSubject).join('');
+  }
+  const totalBacklog=chapters.filter(c=>c.status==="backlog").length;
+  document.getElementById('hdr-sub').textContent = totalBacklog
+    ? totalBacklog+' chapter'+(totalBacklog===1?'':'s')+' in backlog'
+    : 'Physics · Chemistry · Maths';
+}
+
+render();
+</script>
+<script>
+/* ---- Canopus global terminal shortcut: redirects into index.html's Terminal page ---- */
+(function(){
+  var SC_KEY='canopus_term_shortcut';
+  function getShortcut(){
+    try{var raw=localStorage.getItem(SC_KEY);if(raw)return JSON.parse(raw);}catch(e){}
+    return {alt:true,ctrl:false,shift:false,meta:false,key:'`'};
+  }
+  function matches(e,sc){
+    if(!sc||!sc.key)return false;
+    return !!sc.ctrl===e.ctrlKey&&!!sc.alt===e.altKey&&!!sc.shift===e.shiftKey&&!!sc.meta===e.metaKey&&(e.key||'').toLowerCase()===sc.key.toLowerCase();
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(matches(e,getShortcut())){
+      e.preventDefault();
+      window.location.href='index.html?openTerminal=1';
+    }
+  },true);
+})();
+</script>
+<script>
+/* ---- Canopus: local keyboard shortcut to hide/show this page's header (persists across all Canopus pages) ---- */
+(function(){
+  var nav=document.getElementById('app-nav')||document.querySelector('header');
+  if(!nav)return;
+  function setHidden(hidden){
+    document.documentElement.classList.toggle('chdr-hidden',hidden);
+    try{localStorage.setItem('canopusHeaderHidden',hidden?'1':'0');}catch(e){}
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key||'').toLowerCase()==='h'){
+      e.preventDefault();
+      setHidden(!document.documentElement.classList.contains('chdr-hidden'));
+    }
+  },true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mercury — Library · Canopus</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="retro-theme.css">
+<link rel="stylesheet" href="vhs-theme.css">
+<link rel="stylesheet" href="harsh-mode.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Accent system (shared with the rest of Canopus) ── */
+:root,body[data-accent="white"]{
+  --accent:#fff;--accent-hover:#ddd;--accent-on:#000;--accent-muted:#2a2a2a;--accent-soft:rgba(255,255,255,.06);
+}
+body[data-accent="blue"]{
+  --accent:#5a9fd4;--accent-hover:#4a8fc4;--accent-on:#000;--accent-muted:#2a4a6a;--accent-soft:rgba(90,159,212,.12);
+}
+body[data-accent="green"]{
+  --accent:#4a9a6a;--accent-hover:#3a8a5a;--accent-on:#000;--accent-muted:#1a3a2a;--accent-soft:rgba(74,154,106,.12);
+}
+body[data-accent="amber"]{
+  --accent:#c9952a;--accent-hover:#b8851a;--accent-on:#000;--accent-muted:#4a3a1a;--accent-soft:rgba(201,149,42,.12);
+}
+body[data-accent="pink"]{
+  --accent:#e0629c;--accent-hover:#cf4f8a;--accent-on:#000;--accent-muted:#4a1a32;--accent-soft:rgba(224,98,156,.12);
+}
+:root{
+  --lib-bg:#000;--lib-panel:#0a0a0a;--lib-panel-hi:#111;--lib-line:#1a1a1a;
+  --lib-text-hi:#EDEDEE;--lib-text-lo:#8B8E94;--lib-text-faint:#4C4F55;
+  --radius:14px;
+}
+body.grey{--lib-bg:#0A0A0B;--lib-panel:#111214;--lib-panel-hi:#17181B;--lib-line:#212327}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--lib-bg);color:var(--lib-text-hi);font-family:'Work Sans',sans-serif;font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--accent-muted);color:var(--lib-text-hi)}
+a{color:var(--accent)}
+
+/* ── NAV (iconic Canopus header) ── */
+html.chdr-hidden #app-nav{display:none!important}
+#app-nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) 14px calc(24px + env(safe-area-inset-left));z-index:100;background:linear-gradient(var(--lib-bg) 70%,transparent);pointer-events:none}
+#app-nav>*{pointer-events:auto}
+.nav-logo-wrap{display:flex;align-items:center;gap:6px;text-decoration:none}
+.nav-logo{font-size:11px;font-weight:500;letter-spacing:.18em;color:rgba(255,255,255,.7);text-transform:uppercase}
+.nav-links{display:flex;gap:2px;padding:2px;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-link{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;color:#666;transition:color .2s,background .2s;border:none;background:none;letter-spacing:.06em;font-family:'Inter',sans-serif;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.nav-link.active{color:var(--accent);background:var(--accent-soft)}
+.nav-link:hover:not(.active){color:#aaa}
+.nav-util{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.nav-fs{width:30px;height:30px;border-radius:7px;background:transparent;border:none;color:#666;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:color .2s}
+.nav-fs:hover{color:#ccc}
+.nav-accent-pop{position:fixed;right:24px;top:52px;background:var(--lib-panel);border:0.5px solid var(--lib-line);border-radius:10px;padding:8px 10px;z-index:110;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:7px}
+.nav-accent-pop.open{display:flex}
+.accent-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--swatch);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.accent-swatch:hover{transform:scale(1.08)}
+.accent-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--swatch)}
+.accent-swatch[data-accent="white"]{--swatch:#fff}
+.accent-swatch[data-accent="blue"]{--swatch:#5a9fd4}
+.accent-swatch[data-accent="green"]{--swatch:#4a9a6a}
+.accent-swatch[data-accent="amber"]{--swatch:#c9952a}
+.accent-swatch[data-accent="pink"]{--swatch:#e0629c}
+.nav-pop-sep{width:0.5px;align-self:stretch;background:#222;margin:0 1px}
+.surface-swatch{width:22px;height:22px;border-radius:50%;border:0.5px solid #333;background:var(--sw);cursor:pointer;transition:transform .12s,box-shadow .12s;padding:0;flex-shrink:0}
+.surface-swatch:hover{transform:scale(1.08)}
+.surface-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--sw)}
+.surface-swatch[data-surface="black"]{--sw:#000;border-color:#444}
+.surface-swatch[data-surface="grey"]{--sw:#3a3b3e}
+
+@media(max-width:680px){
+  #app-nav{padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 16px calc(16px + env(safe-area-inset-left))}
+  .nav-logo-wrap{display:none}
+  .nav-links{max-width:calc(100vw - 128px)}
+}
+
+/* ── Page header ── */
+.lib-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:26px;flex-wrap:wrap}
+.lib-brand-row{display:flex;align-items:center;gap:10px;min-width:0}
+.lib-brand-mark{width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.lib-title{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;color:var(--lib-text-hi);margin:0;display:flex;align-items:center;gap:2px;flex-wrap:wrap;min-width:0}
+.lib-celestial{font-weight:700}
+.lib-paren{font-weight:400;opacity:.5;font-size:.62em;letter-spacing:.02em;margin-left:5px;white-space:nowrap}
+.lib-info-btn{width:19px;height:19px;border-radius:50%;border:0.5px solid var(--lib-text-faint);background:none;color:var(--lib-text-faint);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;margin-left:6px;flex-shrink:0;transition:all .2s}
+.lib-info-btn:hover{color:var(--lib-text-hi);border-color:var(--lib-text-hi)}
+.lib-sub{font-size:12px;color:var(--lib-text-faint);letter-spacing:.02em;margin-left:40px;display:block;margin-top:1px;max-width:420px}
+
+/* ── Naming info modal ── */
+.lib-info-bg{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
+.lib-info-bg.open{opacity:1;pointer-events:auto}
+.lib-info-modal{position:relative;background:var(--lib-panel-hi);border:0.5px solid var(--lib-line);border-radius:16px;padding:26px 26px 22px;width:min(480px,100%);max-height:82vh;overflow-y:auto;font-family:'Work Sans',sans-serif}
+.lib-info-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:8px;border:0.5px solid var(--lib-line);background:none;color:var(--lib-text-hi);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.lib-info-close:hover{border-color:var(--lib-text-lo)}
+.lib-info-heading{font-family:'Fraunces',serif;font-size:19px;font-weight:500;margin-bottom:4px;color:var(--lib-text-hi)}
+.lib-info-heading b{color:var(--accent)}
+.lib-info-assoc{font-size:11px;color:var(--lib-text-faint);letter-spacing:.04em;font-style:italic;margin-bottom:12px}
+.lib-info-text{font-size:13px;color:var(--lib-text-lo);line-height:1.7;margin-bottom:12px}
+.lib-info-tags{font-size:10.5px;color:var(--lib-text-faint);letter-spacing:.05em;text-transform:uppercase;padding-top:10px;border-top:0.5px solid var(--lib-line)}
+.lib-search-wrap{position:relative;margin-bottom:16px}
+.lib-search-wrap i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--lib-text-faint);font-size:15px;pointer-events:none}
+.lib-search{width:100%;background:var(--lib-panel);border:0.5px solid var(--lib-line);border-radius:11px;padding:12px 14px 12px 40px;font-size:13.5px;color:var(--lib-text-hi);font-family:'Work Sans',sans-serif;transition:border-color .15s}
+.lib-search::placeholder{color:var(--lib-text-faint)}
+.lib-search:focus{outline:none;border-color:var(--accent-muted)}
+
+/* ── Tabs ── */
+.lib-tabs{display:flex;gap:8px;position:relative;z-index:1;margin-bottom:2px}
+.lib-tab{display:flex;align-items:center;gap:9px;padding:14px 4px 14px;background:none;border:none;cursor:pointer;color:var(--lib-text-faint);font-family:'Work Sans',sans-serif;font-size:14px;font-weight:500;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;margin-right:22px}
+.lib-tab i{font-size:16px}
+.lib-tab.active{border-color:var(--accent);color:var(--accent)}
+.lib-tab .cnt{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--lib-text-faint);background:var(--lib-panel);border:0.5px solid var(--lib-line);border-radius:20px;padding:1px 7px}
+
+/* ── Intro blurb per section ── */
+.lib-wrap{max-width:840px;margin:0 auto;padding:88px 24px 120px;position:relative;z-index:1}
+.lib-intro{margin:22px 0 30px;padding:18px 20px;border-radius:var(--radius);border:0.5px solid var(--lib-line);background:linear-gradient(155deg,var(--lib-panel-hi),var(--lib-panel) 65%)}
+.lib-intro h2{font-family:'Fraunces',serif;font-weight:500;font-size:17px;margin:0 0 6px;color:var(--lib-text-hi)}
+.lib-intro p{margin:0;font-size:13px;color:var(--lib-text-lo);max-width:640px}
+
+/* ── Entry list ── */
+.lib-list{display:flex;flex-direction:column;gap:14px}
+.lib-card{background:var(--lib-panel);border:0.5px solid var(--lib-line);border-radius:var(--radius);padding:20px 22px;transition:border-color .18s,transform .15s}
+.lib-card:hover{border-color:#333;transform:translateY(-1px)}
+.lib-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:10px;flex-wrap:wrap}
+.lib-card-name{font-family:'Fraunces',serif;font-size:19px;font-weight:500;color:var(--lib-text-hi);letter-spacing:-.01em}
+.lib-card-name .orig{font-family:'Work Sans',sans-serif;font-weight:400;font-size:13px;color:var(--lib-text-faint);margin-left:8px}
+.lib-tagpill{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;border:0.5px solid var(--lib-line);color:var(--lib-text-lo);background:var(--lib-panel-hi)}
+.lib-meta-row{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:12px;font-size:11px;color:var(--lib-text-faint);letter-spacing:.02em}
+.lib-meta-row b{color:var(--lib-text-lo);font-weight:500}
+.lib-meta-row i{margin-right:4px;font-size:12px;color:var(--accent)}
+.lib-listen-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:0.5px solid var(--lib-line);background:var(--lib-panel-hi);color:var(--lib-text-lo);font-size:11px;letter-spacing:.03em;cursor:pointer;font-family:'Work Sans',sans-serif;margin-bottom:10px}
+.lib-listen-btn:hover{color:var(--lib-text-hi);border-color:#3a3a3a}
+.tts-playing{color:var(--accent)!important;border-color:var(--accent)!important}
+.lib-fields{display:grid;gap:10px}
+.lib-field-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--lib-text-faint);margin-bottom:3px;font-weight:600}
+.lib-field-txt{font-size:13.5px;color:#C7C8CB;line-height:1.65}
+.lib-note{margin-top:12px;padding:9px 12px;border-radius:8px;background:var(--lib-panel-hi);border:0.5px solid var(--lib-line);font-size:11.5px;color:var(--lib-text-lo);display:flex;gap:8px;align-items:flex-start}
+.lib-note i{flex-shrink:0;margin-top:1px;font-size:13px;color:var(--accent)}
+
+.lib-empty{text-align:center;padding:70px 20px;color:var(--lib-text-faint)}
+.lib-empty i{font-size:24px;display:block;margin-bottom:12px}
+
+@media(max-width:680px){
+  .lib-wrap{padding:calc(84px + env(safe-area-inset-top)) 16px calc(100px + env(safe-area-inset-bottom))}
+  .lib-sub{display:block;margin-left:0;margin-top:6px}
+  .lib-card{padding:16px 16px}
+  .lib-card-name{font-size:17px}
+  .lib-tabs{gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .lib-tabs::-webkit-scrollbar{display:none}
+  .lib-tab{margin-right:14px;padding:12px 2px}
+}
+
+/* ── Small phones ── */
+@media(max-width:420px){
+  .lib-wrap{padding:calc(78px + env(safe-area-inset-top)) 12px calc(90px + env(safe-area-inset-bottom))}
+  .lib-brand-mark{width:26px;height:26px;font-size:13px}
+  .lib-title{font-size:19px}
+  .lib-paren{font-size:.58em}
+  .lib-sub{font-size:11px;max-width:none}
+  .lib-search{padding:11px 12px 11px 38px;font-size:13px}
+  .lib-tab{font-size:12.5px}
+  .lib-tab .cnt{font-size:9.5px;padding:1px 6px}
+  .lib-intro{padding:14px 15px}
+  .lib-intro h2{font-size:15.5px}
+  .lib-intro p{font-size:12.5px}
+  .lib-card{padding:14px 13px;border-radius:11px}
+  .lib-card-head{gap:8px}
+  .lib-card-name{font-size:15.5px}
+  .lib-card-name .orig{display:block;margin-left:0;margin-top:3px}
+  .lib-meta-row{font-size:10.5px;gap:5px 10px}
+  .lib-field-txt{font-size:13px}
+  .lib-info-modal{padding:22px 18px 18px}
+}
+</style>
+</head>
+<body data-accent="white" data-track-feature="library">
+<script src="retro-theme.js"></script>
+<script src="vhs-theme.js"></script>
+<script src="harsh-mode.js"></script>
+<script src="tracker.js"></script>
+
+<nav id="app-nav">
+  <a class="nav-logo-wrap" href="index.html">
+    <span class="nav-logo">Canopus</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html#focus">Focus</a>
+    <a class="nav-link" href="index.html#schedule">Schedule</a>
+    <a class="nav-link" href="index.html#progress">Progress</a>
+    <a class="nav-link" href="index.html#sky">Sky</a>
+    <a class="nav-link" href="index.html#capsule">Capsule</a>
+    <a class="nav-link" href="index.html#flight">Flight</a>
+    <a class="nav-link" href="index.html#passport">Passport</a>
+    <a class="nav-link" href="vault.html">Vault</a>
+    <a class="nav-link" href="empires.html">Empires</a>
+    <a class="nav-link" href="conflicts.html">Conflicts</a>
+    <a class="nav-link" href="index.html#literature">Literature</a>
+    <a class="nav-link" href="sirius.html">Sirius</a>
+    <a class="nav-link active" href="library.html">Library</a>
+    <a class="nav-link" href="index.html#features">Features</a>
+    <a class="nav-link" href="interests.html">Interests</a>
+    <a class="nav-link" href="index.html?openTerminal=1">Terminal</a>
+  </div>
+  <div class="nav-util">
+    <button class="nav-fs" id="accent-picker-btn" onclick="toggleAccentPicker(event)" aria-label="Accent color" title="Accent color"><i class="ti ti-palette"></i></button>
+    <button class="nav-fs" id="theme-toggle-btn" onclick="toggleFS()" aria-label="Fullscreen" title="Fullscreen"><i class="ti ti-maximize"></i></button>
+  </div>
+</nav>
+<script>
+/* ── Nav header: keep the open feature's tab centered in the scrollable
+   mobile strip, but leave it wherever the user scrolls it once they've
+   touched/dragged the strip themselves. ── */
+(function(){
+  function setup(){
+    var navLinks=document.querySelector('#app-nav .nav-links');
+    if(!navLinks) return;
+    var userTouching=false;
+    var releaseTimer=null;
+    function touchStart(){ userTouching=true; clearTimeout(releaseTimer); }
+    function touchEnd(){ clearTimeout(releaseTimer); releaseTimer=setTimeout(function(){ userTouching=false; },150); }
+    navLinks.addEventListener('touchstart',touchStart,{passive:true});
+    navLinks.addEventListener('touchend',touchEnd,{passive:true});
+    navLinks.addEventListener('touchcancel',touchEnd,{passive:true});
+    navLinks.addEventListener('mousedown',touchStart);
+    window.addEventListener('mouseup',touchEnd);
+    window.centerActiveNav=function(smooth){
+      if(userTouching) return;
+      var active=navLinks.querySelector('.nav-link.active');
+      if(!active) return;
+      active.scrollIntoView({behavior:smooth?'smooth':'auto',inline:'center',block:'nearest'});
+    };
+    window.centerActiveNav(false);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup);
+  else setup();
+})();
+</script>
+<div class="nav-accent-pop" id="navAccentPop">
+  <button class="accent-swatch" data-accent="white" onclick="setAppAccent('white')" title="White" aria-label="White accent"></button>
+  <button class="accent-swatch" data-accent="blue" onclick="setAppAccent('blue')" title="Blue" aria-label="Blue accent"></button>
+  <button class="accent-swatch" data-accent="green" onclick="setAppAccent('green')" title="Green" aria-label="Green accent"></button>
+  <button class="accent-swatch" data-accent="amber" onclick="setAppAccent('amber')" title="Amber" aria-label="Amber accent"></button>
+  <button class="accent-swatch" data-accent="pink" onclick="setAppAccent('pink')" title="Pink" aria-label="Pink accent"></button>
+  <span class="nav-pop-sep"></span>
+  <button class="surface-swatch" data-surface="black" onclick="setAppSurface('black')" title="Black" aria-label="Black surface"></button>
+  <button class="surface-swatch" data-surface="grey" onclick="setAppSurface('grey')" title="Grey" aria-label="Grey surface"></button>
+</div>
+
+<div class="lib-wrap">
+
+  <div class="lib-header">
+    <div class="lib-brand-row">
+      <span class="lib-brand-mark"><i class="ti ti-books"></i></span>
+      <div>
+        <h1 class="lib-title"><span class="lib-celestial">Mercury</span><span class="lib-paren">(Library)</span><button class="lib-info-btn" onclick="openLibInfo()" title="Why Mercury?" aria-label="Why is this section named Mercury?"><i class="ti ti-info-circle"></i></button></h1>
+        <span class="lib-sub">Named after Budha — philosophy &amp; the speeches that moved history</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="lib-search-wrap">
+    <i class="ti ti-search"></i>
+    <input class="lib-search" id="libSearch" type="text" placeholder="Search this shelf…" oninput="libRender()">
+  </div>
+
+  <div class="lib-tabs">
+    <button class="lib-tab active" data-tab="philosophy" onclick="libSwitchTab('philosophy')"><i class="ti ti-brain"></i>Philosophy <span class="cnt" id="philCount">0</span></button>
+    <button class="lib-tab" data-tab="speeches" onclick="libSwitchTab('speeches')"><i class="ti ti-microphone-2"></i>Speeches <span class="cnt" id="spCount">0</span></button>
+  </div>
+
+  <div id="philosophy-panel">
+    <div class="lib-intro">
+      <h2>Library of Philosophy</h2>
+      <p>Nineteen schools of thought, spanning three thousand years and every inhabited continent — each one a different answer to the same handful of questions: how should we live, what can we know, and what do we owe each other.</p>
+    </div>
+    <div class="lib-list" id="philList"></div>
+  </div>
+
+  <div id="speeches-panel" style="display:none">
+    <div class="lib-intro">
+      <h2>Library of Speeches</h2>
+      <p>Moments where spoken words changed the course of events — courtrooms, battlefields, funerals, and podiums where a single address outlived the occasion that produced it. Full texts aren't reproduced here (many remain protected works); each entry covers who spoke, when, why it mattered, and what it left behind.</p>
+    </div>
+    <div class="lib-list" id="spList"></div>
+  </div>
+
+  <div class="lib-empty" id="libEmpty" style="display:none">
+    <i class="ti ti-books-off"></i>
+    Nothing on this shelf matches that search.
+  </div>
+
+</div>
+
+<div class="lib-info-bg" id="libInfoBg" onclick="if(event.target===this)closeLibInfo()">
+  <div class="lib-info-modal" id="libInfoBody"></div>
+</div>
+
+<script>
+/* ── shared nav: accent picker + fullscreen (persists via the same keys as the rest of Canopus) ── */
+const ACCENT_KEY='dayplan_accent';
+const SURFACE_KEY='dayplan_surface';
+const APP_ACCENTS=['white','blue','green','amber','pink'];
+const APP_SURFACES=['black','grey'];
+let appAccent='white';
+let appSurface='black';
+
+function updateAccentSwatches(){
+  document.querySelectorAll('.accent-swatch').forEach(s=>{
+    s.classList.toggle('active',s.dataset.accent===appAccent);
+  });
+  document.querySelectorAll('.surface-swatch').forEach(s=>{
+    s.classList.toggle('active',s.dataset.surface===appSurface);
+  });
+}
+function applyAppAccent(){
+  document.body.dataset.accent=appAccent;
+  document.body.classList.toggle('grey',appSurface==='grey');
+  updateAccentSwatches();
+}
+function loadAppAccent(){
+  try{
+    const a=localStorage.getItem(ACCENT_KEY);
+    const s=localStorage.getItem(SURFACE_KEY);
+    if(a&&APP_ACCENTS.includes(a)) appAccent=a;
+    if(s&&APP_SURFACES.includes(s)) appSurface=s;
+  }catch(e){}
+  applyAppAccent();
+}
+function setAppAccent(accent){
+  if(!APP_ACCENTS.includes(accent)) return;
+  appAccent=accent;
+  applyAppAccent();
+  try{ localStorage.setItem(ACCENT_KEY,appAccent); }catch(e){}
+  closeAccentPicker();
+}
+function setAppSurface(surface){
+  if(!APP_SURFACES.includes(surface)) return;
+  appSurface=surface;
+  applyAppAccent();
+  try{ localStorage.setItem(SURFACE_KEY,appSurface); }catch(e){}
+  closeAccentPicker();
+}
+function toggleAccentPicker(e){
+  if(e)e.stopPropagation();
+  document.getElementById('navAccentPop').classList.toggle('open');
+}
+function closeAccentPicker(){
+  document.getElementById('navAccentPop').classList.remove('open');
+}
+function toggleFS(){
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+document.addEventListener('click',e=>{
+  const accentPop=document.getElementById('navAccentPop');
+  const accentBtn=document.getElementById('accent-picker-btn');
+  if(accentPop&&!accentPop.contains(e.target)&&accentBtn&&!accentBtn.contains(e.target))closeAccentPicker();
+});
+loadAppAccent();
+
+/* ── Naming info: why "Mercury" ── */
+function openLibInfo(){
+  document.getElementById('libInfoBody').innerHTML=`
+    <button class="lib-info-close" onclick="closeLibInfo()"><i class="ti ti-x"></i></button>
+    <div class="lib-info-heading"><b>Mercury</b> (Library of Philosophy &amp; Speeches)</div>
+    <div class="lib-info-assoc">Hindu association: Budha</div>
+    <div class="lib-info-text">In Hindu astrology, <strong>Budha</strong> (Mercury) is the swift, articulate prince of the gods — ruler of intellect, discernment, and the spoken word. Where Venus gives knowledge its beauty, Mercury gives it its edge: the reasoned argument, the closely built system of thought, the speech that moves a crowd or bends the course of history. The Library is named <strong>Mercury</strong> because clear thinking and clear speech have always been how humanity argues its way toward truth — gathering the world's great schools of philosophy and its most consequential speeches under one roof.</div>
+    <div class="lib-info-tags">Reason · Rhetoric · Discernment · Argument · Eloquence</div>`;
+  document.getElementById('libInfoBg').classList.add('open');
+}
+function closeLibInfo(){ document.getElementById('libInfoBg').classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLibInfo(); });
+
+const PHILOSOPHY = [
+{
+  name:'Stoicism', era:'c. 300 BCE — Athens', region:'Greece / Rome',
+  thinkers:'Zeno of Citium, Cleanthes, Chrysippus, Seneca, Epictetus, Marcus Aurelius',
+  core:'Virtue is the only true good, and everything else — wealth, health, reputation — is "indifferent." Peace comes from focusing entirely on what is within your control (your judgments and actions) and accepting what is not, while living in accordance with reason and nature.',
+  concepts:'Virtue ethics, the dichotomy of control, apatheia (freedom from destructive passion), living in accordance with nature, the discipline of judgment, desire, and action',
+  legacy:'The most quietly influential philosophy in the modern self-help and resilience movement; a direct ancestor of cognitive behavioral therapy\'s idea that suffering comes less from events than from our judgments about them.'
+},
+{
+  name:'Epicureanism', era:'c. 307 BCE — Athens', region:'Greece',
+  thinkers:'Epicurus, Lucretius',
+  core:'The highest good is pleasure, but understood narrowly as ataraxia — freedom from mental disturbance and bodily pain — rather than indulgence. Achieved through modest living, close friendship, and dispelling irrational fears, especially fear of death and the gods.',
+  concepts:'Ataraxia (freedom from mental disturbance), aponia (absence of bodily pain), atomism, the tetrapharmakos (\'four-part cure\'), friendship as the highest earthly good',
+  legacy:'Widely caricatured in its own time and since as mere hedonism; in fact one of the earliest systematic materialist philosophies, and an ancestor of later utilitarian and secular ethical thought.'
+},
+{
+  name:'Pyrrhonism (Skepticism)', era:'c. 3rd century BCE — Elis', region:'Greece',
+  thinkers:'Pyrrho, Sextus Empiricus',
+  core:'Because certainty about most matters is unattainable, the wise response is to suspend judgment (epoché) rather than commit to unprovable beliefs. This suspension, paradoxically, produces the tranquility that dogmatic certainty promises but fails to deliver.',
+  concepts:'Epoché (suspension of judgment), the modes of Aenesidemus, isostheneia (equal strength of opposing arguments), ataraxia reached through non-belief',
+  legacy:'Directly shaped the demand for evidence at the heart of the scientific method, and later inspired Descartes\' method of doubting everything as a starting point for certain knowledge.'
+},
+{
+  name:'Platonism', era:'c. 387 BCE — Athens', region:'Greece',
+  thinkers:'Plato',
+  core:'The physical world we perceive is a shifting, imperfect shadow of a higher realm of eternal, unchanging Forms — the true objects of knowledge. A just society, in turn, should be guided by philosopher-rulers capable of grasping the Form of the Good directly.',
+  concepts:'The Theory of Forms, the Allegory of the Cave, the tripartite soul, philosopher-kings, recollection (anamnesis)',
+  legacy:'The bedrock of nearly all subsequent Western metaphysics; profoundly shaped early Christian theology through thinkers who read Plato\'s "higher realm" as compatible with the divine.'
+},
+{
+  name:'Aristotelianism', era:'c. 335 BCE — Athens', region:'Greece',
+  thinkers:'Aristotle',
+  core:'Knowledge is built from careful observation and logical classification, not abstract Forms. Ethical virtue is a habituated mean between two extremes (courage between recklessness and cowardice), and everything in nature has a purpose (telos) it strives to fulfil.',
+  concepts:'The four causes, the golden mean, telos (purpose), eudaimonia (flourishing), syllogistic logic',
+  legacy:'Founded formal logic and much of biology as disciplines; rediscovered and fused with Christian theology by Thomas Aquinas, becoming the backbone of medieval scholastic thought.'
+},
+{
+  name:'Confucianism', era:'c. 5th century BCE — Lu, China', region:'China / East Asia',
+  thinkers:'Confucius (Kongzi), Mencius, Xunzi',
+  core:'Social harmony flows from personal virtue: ren (benevolence toward others), li (ritual propriety and correct conduct), and filial piety within a web of defined relationships. Government should model and cultivate virtue in its people through education, not fear.',
+  concepts:'Ren (benevolence), li (ritual propriety), the junzi (exemplary person), the Rectification of Names, filial piety (xiao)',
+  legacy:'Shaped Chinese, Korean, Japanese, and Vietnamese governance, education, and family life for over two thousand years, and still underpins much of East Asian civic culture today.'
+},
+{
+  name:'Taoism (Daoism)', era:'c. 6th century BCE (traditional) — China', region:'China',
+  thinkers:'Laozi, Zhuangzi',
+  core:'True wisdom lies in aligning oneself with the Tao — the unnameable, natural way underlying all things — rather than forcing outcomes. Wu wei, or effortless, non-striving action, achieves more than rigid control; softness and yielding ultimately outlast force.',
+  concepts:'The Tao, wu wei (effortless action), yin and yang, ziran (naturalness), the uncarved block (pu)',
+  legacy:'Deeply shaped Chinese art, medicine, and martial arts, and fed directly into the development of Chan/Zen Buddhism as it moved through China into Japan.'
+},
+{
+  name:'Buddhist Philosophy', era:'c. 5th century BCE — northern India', region:'South &amp; East Asia',
+  thinkers:'Siddhartha Gautama (the Buddha), Nagarjuna, Buddhaghosa',
+  core:'The Four Noble Truths hold that life entails suffering, that suffering arises from craving and attachment, that it can be ended, and that an Eightfold Path of ethical and mental discipline leads there. Underlying this is the doctrine that nothing — including the self — is permanent or fixed.',
+  concepts:'The Four Noble Truths, the Eightfold Path, anatta (non-self), dependent origination, impermanence (anicca)',
+  legacy:'Spread across nearly all of Asia in distinct regional forms, and in the last century has shaped Western psychology and philosophy of mind through the modern mindfulness movement.'
+},
+{
+  name:'Vedanta', era:'systematized c. 8th century CE (roots older) — India', region:'India',
+  thinkers:'Badarayana, Adi Shankara, Ramanuja',
+  core:'Built on commentary to the Upanishads, Vedanta holds that Brahman (ultimate reality) and Atman (the individual self) are, at the deepest level, one and the same. Suffering and separateness are products of maya (illusion); liberation (moksha) comes through realizing this underlying unity.',
+  concepts:'Brahman and Atman, maya (illusion), moksha (liberation), the three paths of jnana, bhakti, and karma yoga',
+  legacy:'Became the dominant school of classical Hindu philosophy and, through 19th–20th century figures like Vivekananda, a major channel through which Indian thought reached global audiences.'
+},
+{
+  name:'Nyaya', era:'systematized c. 2nd century CE — India', region:'India',
+  thinkers:'Akshapada Gautama, Vatsyayana',
+  core:'A rigorous school of logic and epistemology built around pramana — the valid means of knowledge, namely perception, inference, comparison, and reliable testimony. Correct reasoning, carefully tested against these means, is itself a path toward liberation from error and suffering.',
+  concepts:'Pramana (valid means of knowledge), the five-step syllogism, epistemic realism, formal debate methodology (tarka)',
+  legacy:'One of history\'s most sophisticated formal logical systems, developed independently of and roughly contemporary with Aristotelian logic in the Mediterranean world.'
+},
+{
+  name:'Sufism', era:'c. 8th century CE onward — Middle East', region:'Islamic world',
+  thinkers:'Rabia al-Adawiyya, Al-Ghazali, Rumi, Ibn Arabi',
+  core:'The mystical current within Islam, holding that direct, experiential knowledge of the divine — reached through love, discipline, remembrance (dhikr), and the guidance of a teacher — matters as much as outward doctrine and law.',
+  concepts:'Dhikr (remembrance), fana (annihilation of the ego), the murshid–murid (teacher–student) bond, the stations (maqamat) of the spiritual path',
+  legacy:'Produced some of the world\'s greatest devotional poetry, and shaped Islamic art, music, and popular spiritual practice from West Africa to Southeast Asia.'
+},
+{
+  name:'Rationalism', era:'17th century — continental Europe', region:'Europe',
+  thinkers:'René Descartes, Baruch Spinoza, Gottfried Leibniz',
+  core:'Reason, not the senses, is the most trustworthy path to knowledge; some truths can be established with certainty through logical deduction alone, in the way mathematics builds proofs from self-evident axioms.',
+  concepts:'Innate ideas, deductive certainty, methodological doubt, mind–body dualism (Descartes), substance monism (Spinoza)',
+  legacy:'Laid the philosophical groundwork for modern philosophy of mind and for treating the physical world as something describable through mathematical law.'
+},
+{
+  name:'Empiricism', era:'17th–18th century — Britain', region:'Britain',
+  thinkers:'John Locke, George Berkeley, David Hume',
+  core:'All knowledge ultimately derives from sensory experience; the mind begins as a blank slate (tabula rasa) rather than possessing innate ideas, and even our confidence in cause and effect is really just a habit formed from repeated observation.',
+  concepts:'Tabula rasa, primary vs secondary qualities, induction, the problem of causation (Hume), skepticism about a unified self',
+  legacy:'Provided the philosophical foundation for the scientific method\'s reliance on observation and experiment, and for modern experimental psychology.'
+},
+{
+  name:'Kantian Idealism', era:'late 18th century — Königsberg', region:'Germany',
+  thinkers:'Immanuel Kant',
+  core:'The mind is not a passive recorder of reality but actively structures raw experience through built-in categories like space, time, and causality — meaning we can only ever know "appearances," never things as they are in themselves. Morality, in turn, rests on universalizable duty (the categorical imperative), not on consequences or desires.',
+  concepts:'The categorical imperative, phenomena vs noumena, the synthetic a priori, transcendental idealism, autonomy of the will',
+  legacy:'Attempted a grand reconciliation of rationalism and empiricism and reshaped almost every subsequent school of Western philosophy, from idealism to phenomenology to modern ethics.'
+},
+{
+  name:'Utilitarianism', era:'late 18th–19th century — Britain', region:'Britain',
+  thinkers:'Jeremy Bentham, John Stuart Mill',
+  core:'The right action is whichever produces the greatest total happiness (or the least suffering) for the greatest number of people; outcomes, carefully weighed, are what make an act moral — not intentions, rules, or tradition.',
+  concepts:'The greatest happiness principle, act vs rule utilitarianism, the hedonic calculus, the harm principle (Mill)',
+  legacy:'Remains one of the two or three dominant frameworks in modern ethics, and underlies much of contemporary economics, public health, and policy cost-benefit analysis.'
+},
+{
+  name:'Existentialism', era:'19th–20th century — Europe', region:'Europe',
+  thinkers:'Søren Kierkegaard, Friedrich Nietzsche, Jean-Paul Sartre, Simone de Beauvoir, Albert Camus',
+  core:'Human beings are not born with a fixed nature or purpose; "existence precedes essence," meaning we must create meaning and identity through free, authentic choices — often against the backdrop of an indifferent or even absurd universe.',
+  concepts:'\'Existence precedes essence,\' radical freedom, authenticity, the absurd, angst and \'bad faith\'',
+  legacy:'Reshaped 20th-century literature, theatre, and popular thinking about freedom, anxiety, and authenticity, and gave modern therapy much of its vocabulary around meaning-making.'
+},
+{
+  name:'Phenomenology', era:'early 20th century — Germany', region:'Germany',
+  thinkers:'Edmund Husserl, Martin Heidegger, Maurice Merleau-Ponty',
+  core:'Rather than theorizing about an external world, phenomenology examines consciousness and experience exactly as they present themselves — "bracketing" assumptions about underlying reality to study the structures of perception, time, and embodiment directly.',
+  concepts:'Intentionality, the epoché (bracketing), the lifeworld (Lebenswelt), being-in-the-world (Heidegger)',
+  legacy:'Fed directly into existentialism and later into cognitive science and philosophy of mind\'s attempts to describe subjective experience rigorously.'
+},
+{
+  name:'Pragmatism', era:'late 19th century — United States', region:'United States',
+  thinkers:'Charles Sanders Peirce, William James, John Dewey',
+  core:'The meaning and truth of an idea lie in its practical consequences and usefulness in guiding action, not in some abstract correspondence to a fixed reality. Beliefs are tools, tested and revised by how well they work.',
+  concepts:'The pragmatic maxim, truth as \'what works,\' instrumentalism, fallibilism, radical empiricism (James)',
+  legacy:'The most distinctly American philosophical export; shaped modern education theory, legal reasoning, and later strands of analytic philosophy.'
+},
+{
+  name:'Ubuntu Philosophy', era:'pre-colonial origins, articulated widely 20th century — Southern Africa', region:'Southern Africa',
+  thinkers:'Nguni Bantu oral tradition; articulated by Desmond Tutu, John Mbiti',
+  core:'Often summarized as "a person is a person through other persons" — identity, morality, and even personhood itself are fundamentally relational, formed through community rather than achieved by isolated individuals.',
+  concepts:'Relational personhood, communal restorative justice, interdependence over individualism, hospitality and shared humanity',
+  legacy:'Explicitly shaped South Africa\'s post-apartheid Truth and Reconciliation process, and remains a touchstone in African political and ethical philosophy.'
+},
+{
+  name:'Jainism', era:'traditionally ancient, systematized c. 6th century BCE — India', region:'India',
+  thinkers:'Mahavira, Parshvanatha (traditional 23rd Tirthankara)',
+  core:'Liberation comes through strict non-violence (ahimsa) toward all living beings, non-attachment (aparigraha), and the gradual shedding of karma — understood as a subtle physical substance that binds the soul — through ascetic discipline and right conduct.',
+  concepts:'Ahimsa (non-violence), anekantavada (many-sidedness of truth), aparigraha (non-possession), the three jewels of right faith, knowledge, and conduct',
+  legacy:'Its radical commitment to non-violence directly influenced Mahatma Gandhi\'s philosophy of satyagraha, and anekantavada anticipated modern ideas about perspectival, pluralistic truth.'
+},
+{
+  name:'Legalism', era:'c. 4th–3rd century BCE — China', region:'China',
+  thinkers:'Han Feizi, Shang Yang, Li Si',
+  core:'Human nature is fundamentally self-interested, so social order requires strict, uniformly enforced laws and harsh, predictable punishments rather than an appeal to virtue or ritual. A strong, centralized state — not moral cultivation — is what actually holds society together.',
+  concepts:'Fa (codified law), shu (statecraft technique), shi (positional power), collective responsibility, reward-and-punishment governance',
+  legacy:'Provided the administrative backbone of China\'s first unified empire under Qin Shi Huang, and despite being publicly denounced by later Confucian dynasties, its bureaucratic and legal machinery quietly persisted underneath Confucian rhetoric for two millennia.'
+},
+{
+  name:'Zoroastrianism', era:'traditionally 2nd millennium BCE, flourished 6th century BCE onward — Persia', region:'Persia (Iran)',
+  thinkers:'Zoroaster (Zarathustra)',
+  core:'The cosmos is the arena of a moral struggle between Ahura Mazda, the wise lord of truth and light, and Angra Mainyu, the spirit of falsehood and chaos. Humans, endowed with free will, must actively choose good thoughts, good words, and good deeds to align themselves with truth (asha) and tip the cosmic balance.',
+  concepts:'Asha (truth/cosmic order) vs druj (falsehood), free will and moral choice, the Amesha Spentas (divine attributes), a final judgment and restoration of the world (frashokereti)',
+  legacy:'One of the first religions built around a cosmic struggle between good and evil, a coherent afterlife of judgment, and a coming savior figure — ideas widely believed by scholars to have influenced later Jewish, Christian, and Islamic eschatology.'
+},
+{
+  name:'Social Contract Theory', era:'17th–18th century — Europe', region:'Europe',
+  thinkers:'Thomas Hobbes, John Locke, Jean-Jacques Rousseau',
+  core:'Political authority is legitimate only insofar as it derives, at least hypothetically, from the consent of those governed — individuals trade some of their natural freedom for the security and order that only organized society can provide, though thinkers disagreed sharply on how much freedom to trade, and to whom.',
+  concepts:'The state of nature, natural rights, the general will (Rousseau), government by consent, the right of revolution (Locke)',
+  legacy:'Directly shaped the founding documents of the American and French Revolutions, and remains the philosophical starting point for most modern liberal democratic theory.'
+},
+{
+  name:'Marxism', era:'mid-19th century — Germany / Britain', region:'Germany / Britain',
+  thinkers:'Karl Marx, Friedrich Engels',
+  core:'History is driven by material and economic conditions rather than ideas — specifically by class struggle between those who own the means of production and those whose labor they exploit. Capitalism, like the feudal systems before it, carries the internal contradictions that will eventually drive its own overthrow, leading toward a classless, communist society.',
+  concepts:'Historical materialism, class struggle, surplus value and exploitation, alienation, base and superstructure',
+  legacy:'Shaped 20th-century political history more directly than perhaps any other body of philosophy, inspiring revolutions and states across dozens of countries, while its critique of alienation and capital continues to influence academic sociology, economics, and cultural theory today.'
+},
+{
+  name:'Absurdism', era:'mid-20th century — France', region:'France',
+  thinkers:'Albert Camus',
+  core:'Human beings instinctively seek meaning and rational order in a universe that offers none — the \'absurd\' is precisely this collision between our hunger for meaning and the world\'s indifferent silence. Rather than escaping the absurd through suicide or religious faith, Camus argued for embracing it through defiant, lucid revolt, living fully in spite of — not because of — ultimate meaninglessness.',
+  concepts:'The absurd, philosophical suicide (rejected as a response), lucid revolt, the myth of Sisyphus as a metaphor for the human condition',
+  legacy:'Often grouped with existentialism, though Camus himself resisted the label; deeply shaped postwar literature and remains widely read as a secular framework for facing meaninglessness without despair.'
+},
+{
+  name:'Postmodernism (Post-structuralism)', era:'mid–late 20th century — France', region:'France',
+  thinkers:'Michel Foucault, Jacques Derrida, Jean-François Lyotard',
+  core:'Grand, unifying explanations of truth, history, or human nature — \'metanarratives\' — are inherently suspect: meaning is always unstable, historically situated, and bound up with power. Texts and social structures can be \'deconstructed\' to reveal the assumptions and hierarchies hidden inside them.',
+  concepts:'Deconstruction, the collapse of metanarratives, power/knowledge (Foucault), différance, discourse as a site of power',
+  legacy:'Reshaped literary theory, cultural studies, and historiography; its skepticism toward totalizing systems influenced fields from architecture to gender studies, while drawing sustained criticism for perceived relativism.'
+},
+{
+  name:'Feminist Philosophy', era:'19th century onward, distinct academic field from the 1970s — global', region:'Global (major currents in Europe & United States)',
+  thinkers:'Mary Wollstonecraft, Simone de Beauvoir, bell hooks, Judith Butler',
+  core:'Examines how gender shapes — and has been shaped by — philosophy, ethics, knowledge, and social structures, challenging the assumption that reason and the philosophical \'subject\' are neutral or gender-blind. Ranges from arguments for basic legal and political equality to deeper critiques of how categories like gender and the body are themselves constructed.',
+  concepts:'De Beauvoir\'s account of woman as socially \'become\' rather than born, intersectionality, \'the personal is political,\' gender performativity (Butler), standpoint theory',
+  legacy:'Transformed nearly every branch of academic philosophy — ethics, epistemology, political theory — and fed directly into the legal, social, and political gains of successive waves of the feminist movement.'
+}
+];
+
+const SPEECHES = [
+{
+  name:'Funeral Oration', speaker:'Pericles', year:'c. 431 BCE', place:'Athens, Greece',
+  context:'Delivered, as recorded by the historian Thucydides, to honor Athenian soldiers killed in the first year of the Peloponnesian War.',
+  significance:'Less an elegy than a defense of Athenian democracy itself — praising a city open to public participation and merit rather than birth. It set the template for using a eulogy to articulate a whole civic ideal.',
+  legacy:'One of the earliest and most influential statements of democratic values in the historical record, still assigned in classrooms as a founding text of Western political thought.'
+},
+{
+  name:'First Oration Against Catiline', speaker:'Marcus Tullius Cicero', year:'63 BCE', place:'Rome',
+  context:'Delivered before the Roman Senate, publicly denouncing Catiline\'s conspiracy to violently overthrow the Republic — with the conspirator reportedly seated in the chamber as Cicero spoke.',
+  significance:'A masterclass in rhetorical escalation, mixing outrage, evidence, and moral pressure to force Catiline to flee Rome that same night.',
+  legacy:'Studied for over two thousand years as a model of persuasive oratory and courtroom-style political rhetoric.'
+},
+{
+  name:'Speech to the Troops at Tilbury', speaker:'Elizabeth I', year:'1588', place:'Tilbury, England',
+  context:'Delivered to English land forces gathered to repel an anticipated invasion by the Spanish Armada.',
+  significance:'Elizabeth deliberately confronted the era\'s assumptions about female weakness, asserting the heart and resolve of a monarch regardless of her sex.',
+  legacy:'Remains a touchstone reference for steadfast leadership delivered in person at a moment of existential national threat.'
+},
+{
+  name:'Surrender Speech', speaker:'Chief Joseph (Hin-mah-too-yah-lat-kekt)', year:'1877', place:'Bear Paw, Montana',
+  context:'Delivered after a roughly 1,200-mile retreat of the Nez Perce toward the Canadian border, pursued and finally cornered by the U.S. Army.',
+  significance:'A plain, unadorned account of exhaustion, loss, and grief for a people who had run out of options — cited ever since as a rare first-person account of the human cost of the Indian Wars.',
+  legacy:'Became one of the most quoted Native American speeches in U.S. history, though historians note the widely circulated English text was recorded and possibly polished by an army officer rather than transcribed verbatim.'
+},
+{
+  name:'"Ain\'t I a Woman?"', speaker:'Sojourner Truth', year:'1851', place:'Akron, Ohio',
+  context:'Delivered largely without preparation at the Ohio Women\'s Rights Convention by a formerly enslaved woman addressing a mostly white audience.',
+  significance:'Linked the fight for abolition directly to the fight for women\'s rights, challenging assumptions about both race and gender in the same breath.',
+  legacy:'A foundational text for what would later be called intersectional feminism — though the two surviving transcriptions differ significantly, and historians debate how closely either reflects Truth\'s actual words and dialect.'
+},
+{
+  name:'The Gettysburg Address', speaker:'Abraham Lincoln', year:'1863', place:'Gettysburg, Pennsylvania',
+  context:'Delivered at the dedication of a national cemetery for soldiers killed at the Battle of Gettysburg, months into the U.S. Civil War.',
+  significance:'In roughly two minutes, reframed the war as a test of whether a nation founded on liberty and equality could survive — deliberately brief in contrast to the two-hour oration that preceded it.',
+  legacy:'One of the most quoted speeches in American history, now inscribed in stone at the Lincoln Memorial.'
+},
+{
+  name:'"Is It a Crime for a U.S. Citizen to Vote?"', speaker:'Susan B. Anthony', year:'1873', place:'Monroe County, New York',
+  context:'Delivered on a speaking tour after her arrest and trial for illegally casting a vote in the 1872 presidential election.',
+  significance:'Argued, county by county before her trial, that the Fourteenth Amendment already guaranteed women the right to vote as citizens — an argument the courts rejected but the public increasingly found persuasive.',
+  legacy:'Helped shift the suffrage movement\'s strategy toward constitutional and legal argument, feeding into the eventual Nineteenth Amendment.'
+},
+{
+  name:'"Freedom or Death"', speaker:'Emmeline Pankhurst', year:'1913', place:'Hartford, Connecticut',
+  context:'Delivered to an American audience while touring to explain and defend the British suffragette movement\'s escalating militant tactics.',
+  significance:'Explicitly compared the suffragettes to earlier revolutionaries willing to risk imprisonment, hunger strikes, and death for a political cause.',
+  legacy:'One of the clearest historical statements of the moral logic behind civil disobedience in pursuit of political rights.'
+},
+{
+  name:'"We Shall Fight on the Beaches"', speaker:'Winston Churchill', year:'1940', place:'House of Commons, London',
+  context:'Delivered after the evacuation of Allied forces from Dunkirk, with a German invasion of Britain considered a real possibility.',
+  significance:'Refused to entertain any scenario of surrender or negotiation, projecting total defiance at Britain\'s most militarily vulnerable moment of the war.',
+  legacy:'Became emblematic of wartime resolve and is still one of the most recognizable pieces of political rhetoric in English.'
+},
+{
+  name:'"Infamy Speech"', speaker:'Franklin D. Roosevelt', year:'1941', place:'U.S. Capitol, Washington D.C.',
+  context:'Delivered to a joint session of Congress the day after the Japanese attack on Pearl Harbor, requesting a declaration of war.',
+  significance:'In under seven minutes, unified American public opinion — previously divided on entering the war — almost overnight.',
+  legacy:'One of the shortest speeches on this list and among the most consequential; Congress declared war within an hour of its conclusion.'
+},
+{
+  name:'"Quit India" Speech', speaker:'Mahatma Gandhi', year:'1942', place:'Bombay (Mumbai), India',
+  context:'Delivered to launch the Quit India Movement, the final major campaign of the Indian independence struggle against British colonial rule.',
+  significance:'Called for immediate, nonviolent, mass civil disobedience under the banner "Do or Die," accepting that leadership would likely mean arrest.',
+  legacy:'Accelerated the political endgame of British rule in India, which ended five years later.'
+},
+{
+  name:'"Tryst with Destiny"', speaker:'Jawaharlal Nehru', year:'1947', place:'New Delhi, India',
+  context:'Delivered to India\'s Constituent Assembly at midnight as British colonial rule formally ended and the country gained independence.',
+  significance:'Framed independence not as an ending but as an awakening — a long-deferred promise finally being redeemed, for India and for the wider colonized world.',
+  legacy:'Regarded as one of the defining speeches of 20th-century decolonization, still played annually on India\'s Independence Day.'
+},
+{
+  name:'Inaugural Address', speaker:'John F. Kennedy', year:'1961', place:'U.S. Capitol, Washington D.C.',
+  context:'Delivered at the height of the Cold War, as a new, younger generation of American leadership took office.',
+  significance:'Reframed the presidency and citizenship itself around collective service and sacrifice rather than individual entitlement.',
+  legacy:'Directly inspired the founding of the Peace Corps and remains a widely cited touchstone for civic duty in American political rhetoric.'
+},
+{
+  name:'"I Have a Dream"', speaker:'Martin Luther King Jr.', year:'1963', place:'Lincoln Memorial, Washington D.C.',
+  context:'The closing address of the March on Washington for Jobs and Freedom, delivered to roughly a quarter of a million people.',
+  significance:'Framed racial equality not as a break from American ideals but as their overdue fulfillment, blending biblical cadence with constitutional appeal.',
+  legacy:'Among the most studied speeches in modern history and a catalyst for the Civil Rights Act of 1964. The full text remains under copyright to the King estate, so it is described here rather than reproduced.'
+},
+{
+  name:'"I Am Prepared to Die"', speaker:'Nelson Mandela', year:'1964', place:'Rivonia Trial, Pretoria, South Africa',
+  context:'Delivered from the dock as a statement in his own defense, facing charges that carried a possible death sentence for anti-apartheid activity.',
+  significance:'Publicly and permanently committed Mandela to the cause of a free, non-racial democracy, regardless of personal cost — a stance that shaped the following three decades of his life.',
+  legacy:'Became a founding document of the global anti-apartheid movement and one of the defining statements of 20th-century human rights advocacy.'
+},
+{
+  name:'2004 Democratic National Convention Keynote', speaker:'Barack Obama', year:'2004', place:'Boston, Massachusetts',
+  context:'Delivered by a then-largely unknown Illinois state senator, invited to give the keynote address at the party\'s national convention.',
+  significance:'Argued against a divided "red state, blue state" vision of the country in favor of shared national identity, delivered with striking rhetorical polish for a relatively obscure speaker.',
+  legacy:'Widely credited with launching Obama\'s national political career, four years before his election as president.'
+},
+{
+  name:'UN Youth Assembly Speech', speaker:'Malala Yousafzai', year:'2013', place:'United Nations, New York',
+  context:'Delivered on her sixteenth birthday, roughly eight months after she was shot by the Taliban for advocating girls\' access to education in Pakistan.',
+  significance:'Explicitly reframed the assassination attempt as having strengthened rather than silenced her cause, calling for books and pens as the world\'s most powerful weapons.',
+  legacy:'Became a defining global symbol for girls\' education and contributed to her becoming the youngest-ever Nobel Peace Prize laureate the following year.'
+},
+{
+  name:'Reply to Governor Isaac Stevens (disputed)', speaker:'Attributed to Chief Seattle (Si\'ahl)', year:'1854', place:'Puget Sound, Washington Territory',
+  context:'Purportedly delivered in response to a U.S. government offer to purchase Suquamish and Duwamish land.',
+  significance:'Popular versions call for stewardship of the land and warn against its exploitation — but no contemporary transcript survives, and the most widely circulated English text was demonstrably written decades later by a screenwriter.',
+  legacy:'Included here with its asterisk intact: a striking example of how oratory can be mythologized and rewritten long after the fact, and still shape how a historical figure is remembered.'
+}
+];
+
+/* ============ READ ALOUD (text-to-speech, female voice) ============ */
+var __ttsVoices = [];
+var __ttsActiveBtn = null;
+function __ttsLoadVoices(){ __ttsVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
+if('speechSynthesis' in window){ __ttsLoadVoices(); window.speechSynthesis.onvoiceschanged = __ttsLoadVoices; }
+function __ttsFemaleVoice(){
+  if(!__ttsVoices.length) __ttsLoadVoices();
+  var pref = /female|zira|samantha|victoria|karen|moira|tessa|susan|fiona|kate|serena|allison|ava|salli|joanna|kimberly|amy|emma|ivy|jenny/i;
+  return __ttsVoices.find(function(v){ return pref.test(v.name) && /^en/i.test(v.lang); })
+      || __ttsVoices.find(function(v){ return pref.test(v.name); })
+      || __ttsVoices.find(function(v){ return /^en/i.test(v.lang) && !/male/i.test(v.name); })
+      || __ttsVoices[0] || null;
+}
+function __ttsResetBtn(btn){ if(!btn) return; btn.classList.remove('tts-playing'); btn.innerHTML = btn.dataset.ttsLabel || '<i class="ti ti-volume"></i>Listen'; }
+function ttsToggle(text, btn){
+  if(!('speechSynthesis' in window)){
+    if(window.median && window.median.window && typeof window.median.window.open==='function'){
+      if(confirm('Read-aloud isn\'t available inside the app. Open this page in your browser to listen?')){
+        window.median.window.open(window.location.href, 'external');
+      }
+    } else {
+      alert('Read-aloud is not supported in this browser.');
+    }
+    return;
+  }
+  var synth = window.speechSynthesis;
+  if(synth.speaking){
+    var wasSameBtn = (__ttsActiveBtn === btn);
+    synth.cancel(); __ttsResetBtn(__ttsActiveBtn); __ttsActiveBtn = null;
+    if(wasSameBtn) return;
+  }
+  var utter = new SpeechSynthesisUtterance(text);
+  var voice = __ttsFemaleVoice();
+  if(voice) utter.voice = voice;
+  utter.rate = 0.98; utter.pitch = 1.05;
+  utter.onend = function(){ __ttsResetBtn(btn); if(__ttsActiveBtn===btn) __ttsActiveBtn=null; };
+  utter.onerror = function(){ __ttsResetBtn(btn); if(__ttsActiveBtn===btn) __ttsActiveBtn=null; };
+  synth.speak(utter);
+  if(btn){ if(!btn.dataset.ttsLabel) btn.dataset.ttsLabel = btn.innerHTML; btn.classList.add('tts-playing'); btn.innerHTML = '<i class="ti ti-player-stop"></i>Stop'; __ttsActiveBtn = btn; }
+}
+function libReadCard(btn){ ttsToggle(btn.getAttribute('data-tts')||'', btn); }
+
+function libEsc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+
+function libCardPhil(p){
+  const fullText = [p.name, p.era, p.region, 'Core idea. '+p.core, 'Key concepts. '+p.concepts, 'Legacy. '+p.legacy].join('. ');
+  return `<div class="lib-card">
+    <div class="lib-card-head">
+      <div class="lib-card-name">${libEsc(p.name)}</div>
+      <span class="lib-tagpill">${libEsc(p.era)}</span>
+    </div>
+    <div class="lib-meta-row"><span><i class="ti ti-map-pin"></i><b>${libEsc(p.region)}</b></span><span><i class="ti ti-users"></i>${libEsc(p.thinkers)}</span></div>
+    <button class="lib-listen-btn" onclick="libReadCard(this)" data-tts="${libEsc(fullText)}"><i class="ti ti-volume"></i>Listen</button>
+    <div class="lib-fields">
+      <div><div class="lib-field-lbl">Core idea</div><div class="lib-field-txt">${libEsc(p.core)}</div></div>
+      <div><div class="lib-field-lbl">Key concepts</div><div class="lib-field-txt">${libEsc(p.concepts)}</div></div>
+      <div><div class="lib-field-lbl">Legacy</div><div class="lib-field-txt">${libEsc(p.legacy)}</div></div>
+    </div>
+  </div>`;
+}
+
+function libCardSpeech(s){
+  const fullText = [s.name, 'by '+s.speaker, s.year, s.place, 'Context. '+s.context, 'Why it mattered. '+s.significance, 'Legacy. '+s.legacy].join('. ');
+  return `<div class="lib-card">
+    <div class="lib-card-head">
+      <div class="lib-card-name">${libEsc(s.name)}<span class="orig">— ${libEsc(s.speaker)}</span></div>
+      <span class="lib-tagpill">${libEsc(s.year)}</span>
+    </div>
+    <div class="lib-meta-row"><span><i class="ti ti-map-pin"></i><b>${libEsc(s.place)}</b></span></div>
+    <button class="lib-listen-btn" onclick="libReadCard(this)" data-tts="${libEsc(fullText)}"><i class="ti ti-volume"></i>Listen</button>
+    <div class="lib-fields">
+      <div><div class="lib-field-lbl">Context</div><div class="lib-field-txt">${libEsc(s.context)}</div></div>
+      <div><div class="lib-field-lbl">Why it mattered</div><div class="lib-field-txt">${libEsc(s.significance)}</div></div>
+      <div><div class="lib-field-lbl">Legacy</div><div class="lib-field-txt">${libEsc(s.legacy)}</div></div>
+    </div>
+    ${/disputed|copyright/i.test(s.legacy+s.significance)?`<div class="lib-note"><i class="ti ti-alert-triangle"></i>${/copyright/i.test(s.legacy)?'Full text protected by copyright and not reproduced — summarized here instead.':'Authenticity of the exact wording is historically disputed.'}</div>`:''}
+  </div>`;
+}
+
+let libTab='philosophy';
+function libSwitchTab(t){
+  libTab=t;
+  document.querySelectorAll('.lib-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  document.getElementById('philosophy-panel').style.display=(t==='philosophy')?'':'none';
+  document.getElementById('speeches-panel').style.display=(t==='speeches')?'':'none';
+  libRender();
+}
+
+function libRender(){
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  const q=(document.getElementById('libSearch').value||'').trim().toLowerCase();
+  const philMatch = q ? PHILOSOPHY.filter(p=>(p.name+p.era+p.region+p.thinkers+p.core+p.concepts).toLowerCase().includes(q)) : PHILOSOPHY;
+  const spMatch = q ? SPEECHES.filter(s=>(s.name+s.speaker+s.year+s.place+s.context+s.significance).toLowerCase().includes(q)) : SPEECHES;
+
+  document.getElementById('philCount').textContent = PHILOSOPHY.length;
+  document.getElementById('spCount').textContent = SPEECHES.length;
+
+  document.getElementById('philList').innerHTML = philMatch.map(libCardPhil).join('');
+  document.getElementById('spList').innerHTML = spMatch.map(libCardSpeech).join('');
+
+  const activeCount = libTab==='philosophy' ? philMatch.length : spMatch.length;
+  document.getElementById('libEmpty').style.display = activeCount===0 ? 'block' : 'none';
+}
+
+libRender();
+</script>
+<script>
+/* ---- Canopus global terminal shortcut: redirects into index.html's Terminal page ---- */
+(function(){
+  var SC_KEY='canopus_term_shortcut';
+  function getShortcut(){
+    try{var raw=localStorage.getItem(SC_KEY);if(raw)return JSON.parse(raw);}catch(e){}
+    return {alt:true,ctrl:false,shift:false,meta:false,key:'`'};
+  }
+  function matches(e,sc){
+    if(!sc||!sc.key)return false;
+    return !!sc.ctrl===e.ctrlKey&&!!sc.alt===e.altKey&&!!sc.shift===e.shiftKey&&!!sc.meta===e.metaKey&&(e.key||'').toLowerCase()===sc.key.toLowerCase();
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(matches(e,getShortcut())){
+      e.preventDefault();
+      window.location.href='index.html?openTerminal=1';
+    }
+  },true);
+})();
+</script>
+<script>
+/* ---- Canopus: local keyboard shortcut to hide/show this page's header (persists across all Canopus pages) ---- */
+(function(){
+  var nav=document.getElementById('app-nav')||document.querySelector('header');
+  if(!nav)return;
+  function setHidden(hidden){
+    document.documentElement.classList.toggle('chdr-hidden',hidden);
+    try{localStorage.setItem('canopusHeaderHidden',hidden?'1':'0');}catch(e){}
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key||'').toLowerCase()==='h'){
+      e.preventDefault();
+      setHidden(!document.documentElement.classList.contains('chdr-hidden'));
+    }
+  },true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+/* ══════════════════════════════════════════════════════════════════
+   CANOPUS — GLOBAL VHS TAPE THEME
+   Shared across index.html, jeejournal.html, library.html, sirius.html
+   and vault.html. Activated app-wide by running `theme vhs` in the
+   Terminal (persisted in localStorage under 'canopus_term_theme').
+   Every page checks that key on load and toggles html.vhs-mode.
+   ══════════════════════════════════════════════════════════════════ */
+
+html.vhs-mode,
+html.vhs-mode body{
+  background:#000 !important;
+}
+
+html.vhs-mode body,
+html.vhs-mode body *{
+  font-family:'IBM Plex Mono',ui-monospace,'SFMono-Regular','Courier New',monospace !important;
+  color:#ECE6D6 !important;
+  background-color:transparent !important;
+  background-image:none !important;
+  border-color:rgba(236,230,214,.22) !important;
+  box-shadow:none !important;
+  text-shadow:-1.5px 0 rgba(255,45,140,.55),1.5px 0 rgba(50,220,255,.55) !important;
+  text-decoration-color:rgba(236,230,214,.45) !important;
+  outline-color:rgba(255,45,140,.5) !important;
+}
+
+/* icon font (Tabler Icons) only renders from its own private-use-area
+   codepoints — restore it here so the blanket font-family override
+   above doesn't turn every icon glyph into monospace garbage. */
+html.vhs-mode .ti,
+html.vhs-mode .ti::before,
+html.vhs-mode .ti::after{
+  font-family:'tabler-icons' !important;
+}
+
+/* full-viewport overlays & modals need an opaque backdrop or whatever
+   was open behind them shows through once backgrounds go transparent */
+html.vhs-mode [class*="overlay"],
+html.vhs-mode [class*="modal"]{
+  background-color:#000 !important;
+}
+
+html.vhs-mode body *::before,
+html.vhs-mode body *::after{
+  color:#ECE6D6 !important;
+  border-color:rgba(236,230,214,.22) !important;
+  text-shadow:-1px 0 rgba(255,45,140,.4),1px 0 rgba(50,220,255,.4) !important;
+}
+
+/* headings & strong emphasis run brighter with a heavier colour-fringe,
+   like the title card burned into an old tape */
+html.vhs-mode h1, html.vhs-mode h2, html.vhs-mode h3, html.vhs-mode h4, html.vhs-mode h5,
+html.vhs-mode strong, html.vhs-mode b{
+  color:#fff !important;
+  text-shadow:-2px 0 rgba(255,45,140,.7),2px 0 rgba(50,220,255,.7) !important;
+}
+
+/* links, buttons, inputs, active nav pick up the amber "timecode" color */
+html.vhs-mode a, html.vhs-mode button, html.vhs-mode .nav-link,
+html.vhs-mode input, html.vhs-mode select, html.vhs-mode textarea{
+  color:#FFD24D !important;
+  border-color:rgba(255,210,77,.35) !important;
+  caret-color:#FFD24D !important;
+}
+html.vhs-mode a:hover, html.vhs-mode button:hover, html.vhs-mode .nav-link:hover,
+html.vhs-mode .nav-link.active{
+  color:#FF3E9D !important;
+  text-shadow:-1px 0 rgba(255,45,140,.8),1px 0 rgba(50,220,255,.8) !important;
+}
+html.vhs-mode ::placeholder{
+  color:rgba(236,230,214,.32) !important;
+  -webkit-text-fill-color:rgba(236,230,214,.32) !important;
+}
+html.vhs-mode ::selection{ background:rgba(255,45,140,.35); color:#000; }
+
+/* muted / secondary text stays legible but dimmer, no colour-fringe */
+html.vhs-mode [class*="dim"], html.vhs-mode [class*="muted"], html.vhs-mode [class*="hint"],
+html.vhs-mode [class*="sub"], html.vhs-mode small{
+  color:#9C9686 !important;
+  text-shadow:none !important;
+}
+
+/* images / video / svg / canvas get a warm, slightly-soft tape-dub look */
+html.vhs-mode img, html.vhs-mode video, html.vhs-mode svg, html.vhs-mode canvas{
+  filter:saturate(1.5) contrast(1.08) brightness(1.03) hue-rotate(-4deg) blur(.3px) !important;
+  opacity:.94;
+}
+
+/* scrollbars */
+html.vhs-mode{ scrollbar-color:#ECE6D6 #000; }
+html.vhs-mode ::-webkit-scrollbar{ background:#000; }
+html.vhs-mode ::-webkit-scrollbar-thumb{ background:#5c5646; }
+
+/* full-viewport tape overlay, injected by vhs-theme.js:
+   static noise, scanlines, an occasional tracking-glitch band, a
+   vignette, an in-corner timestamp readout, and a blinking REC light. */
+#vhs-global-overlay{position:fixed;inset:0;pointer-events:none;z-index:2147483000;overflow:hidden}
+#vhs-global-overlay .vhs-noise{
+  position:absolute;inset:-10%;width:120%;height:120%;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity:.05;
+  mix-blend-mode:overlay;
+  animation:vhsNoiseShift .5s steps(2) infinite;
+}
+#vhs-global-overlay .vhs-scanlines{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.22) 3px,rgba(0,0,0,0) 4px);
+}
+#vhs-global-overlay .vhs-vignette{
+  position:absolute;inset:0;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.5),inset 0 0 220px rgba(0,0,0,.85);
+}
+#vhs-global-overlay .vhs-tracking{
+  position:absolute;left:0;right:0;height:14px;top:-20px;
+  background:linear-gradient(rgba(255,255,255,.08),rgba(80,220,255,.14),rgba(255,45,140,.12),rgba(255,255,255,.06));
+  mix-blend-mode:screen;
+  opacity:0;
+  animation:vhsTracking 9s ease-in-out infinite;
+}
+#vhs-global-overlay .vhs-timestamp{
+  position:absolute;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;font-weight:500;letter-spacing:.04em;line-height:1.5;
+  color:#FFD24D;
+  text-shadow:-1px 0 rgba(255,45,140,.6),1px 0 rgba(50,220,255,.6),0 0 6px rgba(255,210,77,.4);
+  opacity:.85;
+}
+#vhs-global-overlay .vhs-rec{
+  position:absolute;right:18px;top:calc(18px + env(safe-area-inset-top));
+  display:flex;align-items:center;gap:6px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;font-weight:600;letter-spacing:.08em;
+  color:#fff;
+  text-shadow:0 0 6px rgba(255,255,255,.5);
+  opacity:.85;
+}
+#vhs-global-overlay .vhs-rec-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#ff3b3b;
+  box-shadow:0 0 6px rgba(255,59,59,.9);
+  animation:vhsRecBlink 1s step-start infinite;
+}
+@keyframes vhsNoiseShift{
+  0%{transform:translate(0,0)}
+  50%{transform:translate(-2%,1%)}
+  100%{transform:translate(1%,-1%)}
+}
+@keyframes vhsTracking{
+  0%,92%,100%{opacity:0;top:-20px}
+  93%{opacity:.9;top:22%}
+  94%{opacity:.7;top:22%}
+  95%{opacity:0;top:22%}
+  96%{opacity:.8;top:61%}
+  97%{opacity:0;top:61%}
+}
+@keyframes vhsRecBlink{
+  0%,49%{opacity:1}
+  50%,100%{opacity:.15}
+}
+
+/* ── TIME CAPSULE — VHS COMPATIBILITY FIXES ──
+   Same reasoning as the retro theme: memory photos/videos should stay
+   readable and cards/modals need a real background or they lose all
+   structure against the black page. */
+html.vhs-mode #page-capsule img,
+html.vhs-mode #page-capsule video,
+html.vhs-mode .cap-preview img,
+html.vhs-mode .cap-preview video,
+html.vhs-mode .cap-mtile img,
+html.vhs-mode #capLightboxInner img,
+html.vhs-mode #capLightboxInner video{
+  filter:saturate(1.5) contrast(1.08) brightness(1.03) hue-rotate(-4deg) !important;
+  opacity:1 !important;
+}
+html.vhs-mode #page-capsule .cap-card,
+html.vhs-mode #page-capsule .cap-echo,
+html.vhs-mode #page-capsule .cap-echo-card,
+html.vhs-mode #page-capsule .cap-link,
+html.vhs-mode #page-capsule .cap-tag,
+html.vhs-mode #page-capsule .cap-mtile,
+html.vhs-mode #page-capsule .cap-mtile-blank,
+html.vhs-mode #page-capsule .cap-media,
+html.vhs-mode #page-capsule .cap-media-tile,
+html.vhs-mode .cap-composer,
+html.vhs-mode .cap-comp-text{
+  background-color:rgba(236,230,214,.05) !important;
+}
+html.vhs-mode .cap-overlay{
+  background-color:rgba(0,0,0,.75) !important;
+}
+html.vhs-mode #page-capsule .cap-actions button{
+  background-color:rgba(236,230,214,.08) !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.5) !important;
+}
+html.vhs-mode #page-capsule .cap-media-more,
+html.vhs-mode #page-capsule .cap-media-count,
+html.vhs-mode #page-capsule .cap-media-play,
+html.vhs-mode .cap-mtile-play,
+html.vhs-mode .cap-mtile-remove,
+html.vhs-mode .cap-mtile-size,
+html.vhs-mode .cap-preview-remove{
+  background-color:rgba(0,0,0,.55) !important;
+}
+html.vhs-mode .cap-lb-close,
+html.vhs-mode .cap-lb-download,
+html.vhs-mode .cap-lb-nav{
+  background-color:rgba(0,0,0,.5) !important;
+}
