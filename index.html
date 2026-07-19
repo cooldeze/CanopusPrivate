@@ -7266,6 +7266,9 @@ document.addEventListener('DOMContentLoaded',()=>{
 .tut-step-text{font-size:11px;color:#555;line-height:1.75;letter-spacing:.02em}
 .tut-step-text b{color:#888;font-weight:500}
 .tut-kbd{display:inline-block;background:var(--surf-panel-hi);border:0.5px solid #2a2a2a;border-radius:4px;padding:1px 6px;font-size:10px;color:#aaa;font-family:'Inter',sans-serif;letter-spacing:.04em}
+.tut-callout{background:rgba(255,196,0,.07);border:0.5px solid rgba(255,196,0,.35);border-left:3px solid #ffc400;border-radius:6px;padding:12px 14px;margin-top:14px;font-size:12px;line-height:1.6;color:#e8dcb8}
+.tut-callout b{color:#ffc400}
+.tut-callout .tut-callout-title{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#ffc400;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .tut-footer{display:flex;align-items:center;justify-content:space-between;padding:0 26px 22px}
 .tut-nav-btns{display:flex;gap:8px}
 .tut-nav-btn{padding:8px 20px;border-radius:8px;font-size:11px;cursor:pointer;border:0.5px solid #222;background:#0d0d0d;color:#888;font-family:'Inter',sans-serif;letter-spacing:.06em;transition:all .18s}
@@ -7296,6 +7299,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       <button class="tut-tab" onclick="tutGoTo(3)">Timers</button>
       <button class="tut-tab" onclick="tutGoTo(4)">Flight Mode</button>
       <button class="tut-tab" onclick="tutGoTo(5)">Tips</button>
+      <button class="tut-tab" onclick="tutGoTo(6)">Alfred</button>
     </div>
     <div class="tut-body">
 
@@ -7389,6 +7393,32 @@ document.addEventListener('DOMContentLoaded',()=>{
         </div>
       </div>
 
+      <!-- 6: Alfred -->
+      <div class="tut-section" id="tut-sec-6">
+        <p class="tut-intro">Alfred is a local AI assistant built into the Terminal, powered by a model running on your own computer via Ollama — nothing is sent to the cloud.</p>
+        <div class="tut-steps">
+          <div class="tut-step"><div class="tut-step-num">1</div><div class="tut-step-text">Make sure <b>Ollama</b> is installed and running on your computer (look for the llama icon in your system tray).</div></div>
+          <div class="tut-step"><div class="tut-step-num">2</div><div class="tut-step-text">Open <b>Terminal</b> from the top nav bar.</div></div>
+          <div class="tut-step"><div class="tut-step-num">3</div><div class="tut-step-text">Type <b>ask &lt;your question&gt;</b> or <b>alfred &lt;your question&gt;</b> and press Enter.</div></div>
+          <div class="tut-step"><div class="tut-step-num">4</div><div class="tut-step-text">Alfred's reply streams in below your question, right in the Terminal log.</div></div>
+        </div>
+        <div class="tut-callout">
+          <div class="tut-callout-title"><i class="ti ti-bulb"></i> Opening Ollama's own chat window</div>
+          Alfred (above) talks to Ollama automatically in the background — you never need to open Ollama yourself for normal use. But if you ever want to chat with the model directly, outside of Canopus:
+          <br><br>
+          <b>1.</b> Open the <b>Ollama</b> app from your Start menu (Windows) or Applications (Mac) — this is the same app you installed, separate from Canopus.<br>
+          <b>2.</b> Its window has a chat box built in — type a model name (e.g. <b>llama3.2:1b</b>) at the top if prompted, then chat directly.<br>
+          <b>3.</b> This chat is completely separate from Alfred in Canopus — closing it does <b>not</b> stop Ollama from running in the background, so Alfred will keep working as long as the tray icon is present.
+          <br><br>
+          <b>Alfred says "unreachable"?</b> Open Command Prompt and run:<br>
+          <span class="tut-kbd">set OLLAMA_ORIGINS=*</span> then <span class="tut-kbd">ollama serve</span><br>
+          Keep that window open — this is the most reliable fix if the tray app alone doesn't work.
+          <br><br>
+          <b>Alfred feels slow to respond?</b> By default Ollama unloads the model after 5 minutes idle, so the next question has to reload it first. To keep it loaded longer, run before <span class="tut-kbd">ollama serve</span>:<br>
+          <span class="tut-kbd">set OLLAMA_KEEP_ALIVE=30m</span>
+        </div>
+      </div>
+
     </div>
     <div class="tut-footer">
       <div class="tut-dots" id="tut-dots"></div>
@@ -7402,7 +7432,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 <script>
 (function(){
-  const TOTAL=6;
+  const TOTAL=7;
   let cur=0;
   const dotsEl=document.getElementById('tut-dots');
   // Build dots
@@ -10987,6 +11017,18 @@ function termInit(){
     if(wrap)wrap.addEventListener('click',()=>input.focus());
   }
   termInitGlobe();
+  termWarmAlfred();
+}
+function termWarmAlfred(){
+  // Silently pings Ollama so the model is already loaded into memory by the
+  // time the user types a real question — avoids the ~10s cold-start wait.
+  if(window._alfredWarmed)return;
+  window._alfredWarmed=true;
+  fetch('http://localhost:11434/api/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:TERM_OLLAMA_MODEL,stream:false,messages:[{role:'user',content:'hi'}]})
+  }).catch(()=>{ window._alfredWarmed=false; });
 }
 
 let termCapture=null; // when set to an array, termAppendLine buffers into it instead of the DOM (used by piping)
@@ -11010,6 +11052,78 @@ function termScrollToBottom(){
 }
 function termOk(text){termAppendLine(text,'term-ok term-flash');}
 function termErr(text){termAppendLine(text,'term-err term-flash-err');}
+
+/* ---- Terminal: local Alfred (Ollama) ---- */
+const TERM_OLLAMA_URL='http://localhost:11434/api/chat';
+const TERM_OLLAMA_MODEL='llama3.2:1b';
+const TERM_ALFRED_SYSTEM='You are Alfred, a calm, dry-witted, unfailingly polite personal assistant embedded in a terminal inside a productivity app called Canopus. Reply in 1-2 short sentences, never more, unless the user explicitly asks for detail.';
+async function termAsk(question){
+  if(!question){termErr('PLEASE TYPE YOUR PROMPT AFTER "ask" OR "alfred" IN THE COMMAND PANEL — e.g. ask how are you');return;}
+  const startTime=performance.now();
+  const replyLine=termAppendLine('ALFRED IS THINKING (0.0s)','term-dim');
+  const thinkTimer=setInterval(()=>{
+    if(replyLine){
+      const elapsed=((performance.now()-startTime)/1000).toFixed(1);
+      replyLine.textContent='ALFRED IS THINKING ('+elapsed+'s)';
+      termScrollToBottom();
+    }
+  },100);
+  let res;
+  try{
+    res=await fetch(TERM_OLLAMA_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:TERM_OLLAMA_MODEL,
+        stream:true,
+        options:{num_predict:100},
+        messages:[
+          {role:'system',content:TERM_ALFRED_SYSTEM},
+          {role:'user',content:question}
+        ]
+      })
+    });
+  }catch(e){
+    clearInterval(thinkTimer);
+    if(replyLine)replyLine.remove();
+    termErr('ALFRED UNREACHABLE — IS OLLAMA RUNNING? (ollama serve)');
+    return;
+  }
+  if(!res.ok||!res.body){
+    clearInterval(thinkTimer);
+    if(replyLine)replyLine.remove();
+    termErr('ALFRED ERROR — OLLAMA RESPONDED WITH STATUS '+res.status);
+    return;
+  }
+  const reader=res.body.getReader();
+  const decoder=new TextDecoder();
+  let full='';
+  let started=false;
+  while(true){
+    const {done,value}=await reader.read();
+    if(done)break;
+    const chunk=decoder.decode(value,{stream:true});
+    chunk.split('\n').filter(Boolean).forEach(line=>{
+      try{
+        const json=JSON.parse(line);
+        if(json.message&&json.message.content){
+          if(!started){
+            started=true;
+            clearInterval(thinkTimer);
+            if(replyLine)replyLine.className='term-line term-accent';
+          }
+          full+=json.message.content;
+          if(replyLine)replyLine.textContent=full;
+          termScrollToBottom();
+        }
+      }catch(e){/* ignore partial JSON lines */}
+    });
+  }
+  clearInterval(thinkTimer);
+  const totalTime=((performance.now()-startTime)/1000).toFixed(1);
+  if(!full.trim()&&replyLine)replyLine.textContent='(NO RESPONSE)';
+  termAppendLine('— responded in '+totalTime+'s','term-dim');
+}
 
 function termToggleHeader(rest){
   const nav=document.getElementById('app-nav');
@@ -11215,7 +11329,7 @@ const TERM_QUICK_COMMANDS=[
   'history','history clear','echo','roll','roll 2d6','flip','matrix',
   'alias','alias list','alias rm','man','sysmon','backup','restore','zeus','zeus restore','reload'
 ];
-const TERM_TOP_COMMANDS=['help','clear','status','open','goto','report','accent','surface','theme','shortcut','set','fs','ls','dir','cd','cat','read','pwd','calc','time','date','sysinfo','battery','uptime','search','find','note','history','echo','roll','flip','matrix','alias','man','sysmon','backup','restore','zeus','reload','grep','harsh','country'];
+const TERM_TOP_COMMANDS=['help','clear','status','open','goto','report','accent','surface','theme','shortcut','set','fs','ls','dir','cd','cat','read','pwd','calc','time','date','sysinfo','battery','uptime','search','find','note','history','echo','roll','flip','matrix','alias','man','sysmon','backup','restore','zeus','reload','grep','harsh','country','ask','alfred'];
 let termGhostSuggestion=''; // the full suggested command string, or '' if none
 
 function termGhostEl(){ return document.getElementById('term-ghost'); }
@@ -11283,6 +11397,10 @@ function termComputeInlineSuggestion(value){
   if(verb==='harsh'){
     const match=['on','off'].find(s=>s.startsWith(pl));
     return match?{full:verbRaw+' '+match}:null;
+  }
+  if(verb==='ask'||verb==='alfred'){
+    if(!partialRaw)return {full:verbRaw+' what should i focus on right now'};
+    return null;
   }
   return null;
 }
@@ -11443,6 +11561,8 @@ function termRunSingle(raw,depth){
         'note clear       clear all saved notes',
         'history          show recent commands typed this session',
         'echo <text>      print text back',
+        'ask <question>   ask Alfred (your local AI) a question',
+        '                 if unreachable, run in cmd: set OLLAMA_ORIGINS=* & ollama serve',
         'roll / roll 2d6  roll dice (default 1d6)',
         'flip             flip a coin',
         'matrix           toggle a falling-code overlay (type again to stop)',
@@ -11581,6 +11701,9 @@ function termRunSingle(raw,depth){
       break;
     case 'echo':
       termAppendLine(restRaw||'','term-table');
+      break;
+    case 'ask': case 'alfred':
+      termAsk(restRaw);
       break;
     case 'roll': {
       const m=(rest||'1d6').match(/^(\d*)d(\d+)$/i);
