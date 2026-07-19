@@ -11055,9 +11055,49 @@ function termErr(text){termAppendLine(text,'term-err term-flash-err');}
 
 /* ---- Terminal: local Alfred (Ollama) ---- */
 const TERM_OLLAMA_URL='http://localhost:11434/api/chat';
-const TERM_OLLAMA_MODEL='llama3.2:1b';
+const TERM_OLLAMA_TAGS_URL='http://localhost:11434/api/tags';
+const TERM_OLLAMA_DEFAULT_MODEL='llama3.2:1b';
+let TERM_OLLAMA_MODEL=localStorage.getItem('canopus_alfred_model')||TERM_OLLAMA_DEFAULT_MODEL;
+async function termModel(restRaw){
+  const arg=(restRaw||'').trim();
+  if(!arg){
+    termAppendLine('CURRENT MODEL: '+TERM_OLLAMA_MODEL,'term-dim');
+    termAppendLine('TRY: model list   /   model <name>   e.g. model qwen2.5:1.5b','term-dim');
+    return;
+  }
+  if(arg.toLowerCase()==='list'){
+    let res;
+    try{ res=await fetch(TERM_OLLAMA_TAGS_URL); }
+    catch(e){ termErr('ALFRED UNREACHABLE — IS OLLAMA RUNNING? (ollama serve)'); return; }
+    if(!res.ok){ termErr('COULD NOT FETCH MODEL LIST — STATUS '+res.status); return; }
+    const data=await res.json();
+    const models=(data&&data.models)||[];
+    if(!models.length){ termAppendLine('NO MODELS INSTALLED — RUN: ollama pull <name>','term-dim'); return; }
+    termAppendLine('INSTALLED MODELS:','term-ok');
+    models.forEach(m=>{
+      const mark=m.name===TERM_OLLAMA_MODEL?' *':'';
+      termAppendLine('  '+m.name+mark,'term-dim');
+    });
+    return;
+  }
+  if(arg.toLowerCase()==='reset'){
+    TERM_OLLAMA_MODEL=TERM_OLLAMA_DEFAULT_MODEL;
+    localStorage.setItem('canopus_alfred_model',TERM_OLLAMA_MODEL);
+    window._alfredWarmed=false;
+    termOk('MODEL RESET TO DEFAULT: '+TERM_OLLAMA_MODEL);
+    termWarmAlfred();
+    return;
+  }
+  TERM_OLLAMA_MODEL=arg;
+  localStorage.setItem('canopus_alfred_model',TERM_OLLAMA_MODEL);
+  window._alfredWarmed=false;
+  termOk('ALFRED WILL NOW USE: '+TERM_OLLAMA_MODEL);
+  termAppendLine('(if you haven\'t downloaded it yet, run: ollama pull '+TERM_OLLAMA_MODEL+')','term-dim');
+  termWarmAlfred();
+}
 const TERM_ALFRED_SYSTEM='You are Alfred, a calm, dry-witted, unfailingly polite personal assistant embedded in a terminal inside a productivity app called Canopus. Reply in 1-2 short sentences, never more, unless the user explicitly asks for detail.';
-async function termAsk(question){
+const TERM_ALFRED_SYSTEM_DETAIL='You are Alfred, a calm, dry-witted, unfailingly polite personal assistant embedded in a terminal inside a productivity app called Canopus. The user has explicitly asked for a detailed, in-depth answer — take the space you need to explain thoroughly and clearly, with structure (short paragraphs or a numbered list) where it helps, rather than compressing everything into one or two sentences.';
+async function termAsk(question,detail){
   if(!question){termErr('PLEASE TYPE YOUR PROMPT AFTER "ask" OR "alfred" IN THE COMMAND PANEL — e.g. ask how are you');return;}
   const startTime=performance.now();
   const replyLine=termAppendLine('ALFRED IS THINKING (0.0s)','term-dim');
@@ -11076,9 +11116,9 @@ async function termAsk(question){
       body:JSON.stringify({
         model:TERM_OLLAMA_MODEL,
         stream:true,
-        options:{num_predict:100},
+        options:{num_predict:detail?600:100},
         messages:[
-          {role:'system',content:TERM_ALFRED_SYSTEM},
+          {role:'system',content:detail?TERM_ALFRED_SYSTEM_DETAIL:TERM_ALFRED_SYSTEM},
           {role:'user',content:question}
         ]
       })
@@ -11329,7 +11369,7 @@ const TERM_QUICK_COMMANDS=[
   'history','history clear','echo','roll','roll 2d6','flip','matrix',
   'alias','alias list','alias rm','man','sysmon','backup','restore','zeus','zeus restore','reload'
 ];
-const TERM_TOP_COMMANDS=['help','clear','status','open','goto','report','accent','surface','theme','shortcut','set','fs','ls','dir','cd','cat','read','pwd','calc','time','date','sysinfo','battery','uptime','search','find','note','history','echo','roll','flip','matrix','alias','man','sysmon','backup','restore','zeus','reload','grep','harsh','country','ask','alfred'];
+const TERM_TOP_COMMANDS=['help','clear','status','open','goto','report','accent','surface','theme','shortcut','set','fs','ls','dir','cd','cat','read','pwd','calc','time','date','sysinfo','battery','uptime','search','find','note','history','echo','roll','flip','matrix','alias','man','sysmon','backup','restore','zeus','reload','grep','harsh','country','ask','alfred','model','detail','setup'];
 let termGhostSuggestion=''; // the full suggested command string, or '' if none
 
 function termGhostEl(){ return document.getElementById('term-ghost'); }
@@ -11398,9 +11438,13 @@ function termComputeInlineSuggestion(value){
     const match=['on','off'].find(s=>s.startsWith(pl));
     return match?{full:verbRaw+' '+match}:null;
   }
-  if(verb==='ask'||verb==='alfred'){
+  if(verb==='ask'||verb==='alfred'||verb==='detail'){
     if(!partialRaw)return {full:verbRaw+' what should i focus on right now'};
     return null;
+  }
+  if(verb==='model'){
+    const match=['list','reset'].find(s=>s.startsWith(pl));
+    return match?{full:verbRaw+' '+match}:null;
   }
   return null;
 }
@@ -11460,6 +11504,7 @@ function termBoot(){
       setTimeout(()=>{
         termAppendLine('',null);
         termAppendLine("Type 'help' to list commands.",'term-dim');
+        termAppendLine("New to Alfred? Type 'setup' for a step-by-step guide.",'term-dim');
         termAppendLine('Global shortcut: '+termShortcutLabel(termGetShortcut())+" — type 'set shortcut' to change it.",'term-dim');
         const input=document.getElementById('term-input');
         if(input)input.focus();
@@ -11563,6 +11608,13 @@ function termRunSingle(raw,depth){
         'echo <text>      print text back',
         'ask <question>   ask Alfred (your local AI) a question',
         '                 if unreachable, run in cmd: set OLLAMA_ORIGINS=* & ollama serve',
+        'ask -d <question> ask Alfred for a longer, in-depth answer',
+        'detail <question> same as "ask -d" — a dedicated detailed-answer command',
+        'setup            plain-language, step-by-step guide to installing/running Alfred',
+        'model            show which Ollama model Alfred is currently using',
+        'model list       list every model you have downloaded (marks the active one)',
+        'model <name>     switch Alfred to a different model — e.g. model qwen2.5:1.5b',
+        'model reset      switch Alfred back to the default model (llama3.2:1b)',
         'roll / roll 2d6  roll dice (default 1d6)',
         'flip             flip a coin',
         'matrix           toggle a falling-code overlay (type again to stop)',
@@ -11702,8 +11754,20 @@ function termRunSingle(raw,depth){
     case 'echo':
       termAppendLine(restRaw||'','term-table');
       break;
-    case 'ask': case 'alfred':
-      termAsk(restRaw);
+    case 'ask': case 'alfred': {
+      let q=restRaw, wantDetail=false;
+      if(/^-d\s+/i.test(q)){ wantDetail=true; q=q.replace(/^-d\s+/i,''); }
+      termAsk(q,wantDetail);
+      break;
+    }
+    case 'detail':
+      termAsk(restRaw,true);
+      break;
+    case 'setup':
+      termSetupGuide();
+      break;
+    case 'model':
+      termModel(restRaw);
       break;
     case 'roll': {
       const m=(rest||'1d6').match(/^(\d*)d(\d+)$/i);
@@ -11847,6 +11911,48 @@ const TERM_MAN={
   sysmon:['USAGE: sysmon  |  sysmon stop','Shows a single line of live-updating system stats (clock, memory, online','status, session uptime) until stopped.'],
   grep:['USAGE: <command> | grep <term>','Runs <command>, then only prints the lines from its output that contain','<term> (case-insensitive). EXAMPLE: history | grep open']
 };
+function termSetupGuide(){
+  const L=(t,c)=>termAppendLine(t,c||'term-dim');
+  termAppendLine('ALFRED SETUP GUIDE — FOR FIRST-TIME SETUP','term-accent');
+  L(' ');
+  L('Alfred is a little AI helper that lives on YOUR computer (not the','term-dim');
+  L('internet). To use him, one small free program called "Ollama" needs','term-dim');
+  L('to be running in the background. Follow these steps once, in order:','term-dim');
+  L(' ');
+  termAppendLine('STEP 1 — Install Ollama (only needed the first time ever)','term-ok');
+  L('  Go to ollama.com/download in your web browser, click the button for');
+  L('  Windows, open the downloaded file, and click through the installer');
+  L('  like any normal program. You only ever do this once.');
+  L(' ');
+  termAppendLine('STEP 2 — Download Alfred\'s "brain" (a model, first time only)','term-ok');
+  L('  Open the Windows search bar, type "cmd", press Enter to open a black');
+  L('  window called Command Prompt. Type this and press Enter:');
+  termAppendLine('    ollama pull llama3.2:1b','term-cmd');
+  L('  Wait for it to finish downloading (a progress bar will fill up).');
+  L('  This is the "model" — think of it as Alfred\'s brain being installed.');
+  L(' ');
+  termAppendLine('STEP 3 — Start Ollama (do this every time before using Alfred)','term-ok');
+  L('  Find the file called run-alfred.bat or start-alfred.bat and double');
+  L('  click it. A black window titled "Alfred (Ollama) Server" will open.');
+  L('  LEAVE THAT WINDOW OPEN — do not close it. Minimizing it is fine.');
+  L('  It is only "on" for Alfred while that window stays open.');
+  L(' ');
+  termAppendLine('STEP 4 — Talk to Alfred right here','term-ok');
+  L('  Come back to this Terminal and type:');
+  termAppendLine('    ask hello there','term-cmd');
+  L('  If he replies, you are done! If you see "ALFRED UNREACHABLE", the');
+  L('  black window from Step 3 probably isn\'t open — go back and open it.');
+  L(' ');
+  termAppendLine('EVERY TIME AFTER THIS, YOU ONLY NEED STEP 3 THEN STEP 4.','term-accent');
+  L(' ');
+  termAppendLine('OTHER HANDY COMMANDS','term-ok');
+  L('  ask <question>       quick question, short answer');
+  L('  ask -d <question>    or "detail <question>" — a longer, fuller answer');
+  L('  model                see which brain (model) Alfred is using');
+  L('  model list            see every brain you\'ve downloaded');
+  L(' ');
+  L('Type "setup" any time to see this guide again.','term-dim');
+}
 function termMan(topic){
   topic=(topic||'').trim().toLowerCase();
   if(!topic){termErr('TRY: man <command>   e.g. man calc');return;}
