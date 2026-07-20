@@ -1633,6 +1633,11 @@ html,body{overflow-x:hidden}
 @keyframes termFlashErr{0%{background:rgba(193,112,90,.2)}100%{background:transparent}}
 .term-table{color:rgba(255,255,255,.55)}
 .term-table .term-th{color:rgba(255,255,255,.3);letter-spacing:.08em}
+.term-model-bar{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 8px;font-family:'IBM Plex Mono',monospace}
+.term-model-bar:empty{padding:0}
+.term-model-chip{background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.14);color:rgba(255,255,255,.55);font-size:10.5px;letter-spacing:.02em;padding:4px 10px;border-radius:20px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:background .15s,color .15s,border-color .15s}
+.term-model-chip:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+.term-model-chip.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
 .term-inputrow{display:flex;align-items:center;gap:8px;padding:12px 20px calc(16px + env(safe-area-inset-bottom));border-top:0.5px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;position:relative;z-index:2}
 .term-prompt{color:var(--accent);font-size:12.5px;flex-shrink:0;letter-spacing:.02em}
 .term-input{position:relative;z-index:1;width:100%;background:none;border:none;outline:none;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.01em;caret-color:var(--accent)}
@@ -2399,6 +2404,7 @@ html.crt-retro .cap-lb-nav{
   </div>
   <div class="term-wrap">
     <div class="term-log" id="term-log"></div>
+    <div class="term-model-bar" id="term-model-bar"></div>
     <div class="term-inputrow">
       <span class="term-prompt" id="term-prompt">canopus&gt;</span>
       <span class="term-input-wrap">
@@ -11018,6 +11024,7 @@ function termInit(){
   }
   termInitGlobe();
   termWarmAlfred();
+  termRenderModelBar();
 }
 function termWarmAlfred(){
   // Silently pings Ollama so the model is already loaded into memory by the
@@ -11063,6 +11070,7 @@ async function termModel(restRaw){
   if(!arg){
     termAppendLine('CURRENT MODEL: '+TERM_OLLAMA_MODEL,'term-dim');
     termAppendLine('TRY: model list   /   model <name>   e.g. model qwen2.5:1.5b','term-dim');
+    termAppendLine('TIP: click a chip above the input box to switch instantly.','term-dim');
     return;
   }
   if(arg.toLowerCase()==='list'){
@@ -11081,19 +11089,59 @@ async function termModel(restRaw){
     return;
   }
   if(arg.toLowerCase()==='reset'){
-    TERM_OLLAMA_MODEL=TERM_OLLAMA_DEFAULT_MODEL;
-    localStorage.setItem('canopus_alfred_model',TERM_OLLAMA_MODEL);
-    window._alfredWarmed=false;
-    termOk('MODEL RESET TO DEFAULT: '+TERM_OLLAMA_MODEL);
-    termWarmAlfred();
+    await termSwitchModel(TERM_OLLAMA_DEFAULT_MODEL,'MODEL RESET TO DEFAULT: ');
     return;
   }
-  TERM_OLLAMA_MODEL=arg;
+  await termSwitchModel(arg,'ALFRED WILL NOW USE: ');
+}
+// Shared by the "model <name>" command and the clickable model chips above
+// the input box, so both paths behave identically.
+async function termSwitchModel(name,okPrefix){
+  TERM_OLLAMA_MODEL=name;
   localStorage.setItem('canopus_alfred_model',TERM_OLLAMA_MODEL);
   window._alfredWarmed=false;
-  termOk('ALFRED WILL NOW USE: '+TERM_OLLAMA_MODEL);
-  termAppendLine('(if you haven\'t downloaded it yet, run: ollama pull '+TERM_OLLAMA_MODEL+')','term-dim');
+  termOk((okPrefix||'ALFRED WILL NOW USE: ')+TERM_OLLAMA_MODEL);
+  // Check whether it's actually pulled yet, so the user finds out now rather
+  // than after typing a whole question and hitting a 400/404 from Ollama.
+  try{
+    const tagRes=await fetch(TERM_OLLAMA_TAGS_URL);
+    if(tagRes.ok){
+      const tagData=await tagRes.json();
+      const installed=(tagData&&tagData.models)||[];
+      const have=installed.some(m=>m.name===TERM_OLLAMA_MODEL||m.model===TERM_OLLAMA_MODEL);
+      if(!have){
+        termAppendLine('  ⚠ NOT DOWNLOADED YET — RUN: ollama pull '+TERM_OLLAMA_MODEL,'term-dim');
+      }
+    }
+  }catch(e){ /* Ollama unreachable — termWarmAlfred below will report that */ }
   termWarmAlfred();
+  termRenderModelBar();
+}
+/* ---- Terminal: clickable model bar (avoids retyping "model <name>") ---- */
+async function termRenderModelBar(){
+  const bar=document.getElementById('term-model-bar');
+  if(!bar)return;
+  let models=[];
+  try{
+    const res=await fetch(TERM_OLLAMA_TAGS_URL);
+    if(res.ok){
+      const data=await res.json();
+      models=(data&&data.models)||[];
+    }
+  }catch(e){ /* Ollama unreachable — leave bar as-is, ask/model commands will report it */ return; }
+  bar.innerHTML='';
+  if(!models.length)return;
+  models.forEach(m=>{
+    const name=m.name||m.model;
+    if(!name)return;
+    const chip=document.createElement('button');
+    chip.type='button';
+    chip.className='term-model-chip'+(name===TERM_OLLAMA_MODEL?' active':'');
+    chip.textContent=name;
+    chip.title='Switch Alfred to '+name;
+    chip.addEventListener('click',()=>{ if(name!==TERM_OLLAMA_MODEL)termSwitchModel(name,'ALFRED WILL NOW USE: '); });
+    bar.appendChild(chip);
+  });
 }
 const TERM_ALFRED_SYSTEM='You are Alfred, a calm, dry-witted, unfailingly polite personal assistant embedded in a terminal inside a productivity app called Canopus. Reply in 1-2 short sentences, never more, unless the user explicitly asks for detail.';
 const TERM_ALFRED_SYSTEM_DETAIL='You are Alfred, a calm, dry-witted, unfailingly polite personal assistant embedded in a terminal inside a productivity app called Canopus. The user has explicitly asked for a detailed, in-depth answer — take the space you need to explain thoroughly and clearly, with structure (short paragraphs or a numbered list) where it helps, rather than compressing everything into one or two sentences.';
@@ -11132,7 +11180,21 @@ async function termAsk(question,detail){
   if(!res.ok||!res.body){
     clearInterval(thinkTimer);
     if(replyLine)replyLine.remove();
-    termErr('ALFRED ERROR — OLLAMA RESPONDED WITH STATUS '+res.status);
+    let detailMsg='';
+    try{
+      const errBody=await res.clone().json();
+      if(errBody&&errBody.error)detailMsg=errBody.error;
+    }catch(e){
+      try{ detailMsg=(await res.text())||''; }catch(e2){}
+    }
+    if(detailMsg){
+      termErr('ALFRED ERROR ('+res.status+'): '+detailMsg);
+      if(/not found/i.test(detailMsg)){
+        termAppendLine('  → RUN: ollama pull '+TERM_OLLAMA_MODEL+'   THEN TRY AGAIN','term-dim');
+      }
+    } else {
+      termErr('ALFRED ERROR — OLLAMA RESPONDED WITH STATUS '+res.status);
+    }
     return;
   }
   const reader=res.body.getReader();
@@ -11558,8 +11620,17 @@ function termRunSingle(raw,depth){
   let cmd=raw.replace(/\//g,' ').trim();
   const parts=cmd.split(/\s+/);
   const verb=(parts[0]||'').toLowerCase();
-  const rest=parts.slice(1).join(' ').toLowerCase();
-  const restRaw=parts.slice(1).join(' '); // case-preserved, for file/folder names
+  let rest=parts.slice(1).join(' ').toLowerCase();
+  let restRaw=parts.slice(1).join(' '); // case-preserved, for file/folder names
+  // 'model' names and 'ask'/'alfred'/'detail' questions may legitimately contain
+  // a '/' (e.g. huihui_ai/llama3.2-abliterate:1b) — for these, use the ORIGINAL
+  // text instead of the slash-stripped version so it isn't corrupted.
+  if(verb==='model'||verb==='ask'||verb==='alfred'||verb==='detail'){
+    const origTrimmed=raw.trim();
+    const spaceIdx=origTrimmed.search(/\s/);
+    restRaw=spaceIdx===-1?'':origTrimmed.slice(spaceIdx+1).trim();
+    rest=restRaw.toLowerCase();
+  }
   if(depth<6){
     const aliases=termAliasLoad();
     if(aliases[verb]&&!TERM_TOP_COMMANDS.includes(verb)){
@@ -11606,6 +11677,9 @@ function termRunSingle(raw,depth){
         'note clear       clear all saved notes',
         'history          show recent commands typed this session',
         'echo <text>      print text back',
+        'alfred           (alone) toggle Alfred mode — every line becomes a question,',
+        '                 no need to type ask/alfred/detail each time. Prefix a line',
+        '                 with $ to run a real command, e.g. $model list, $exit',
         'ask <question>   ask Alfred (your local AI) a question',
         '                 if unreachable, run in cmd: set OLLAMA_ORIGINS=* & ollama serve',
         'ask -d <question> ask Alfred for a longer, in-depth answer',
@@ -11814,7 +11888,49 @@ function termRunSingle(raw,depth){
 }
 
 /* ---- Terminal: command chaining (;) and output piping (| grep) ---- */
+let termAlfredMode=false;
+function termSetPrompt(text){
+  const el=document.getElementById('term-prompt');
+  if(el)el.textContent=text;
+  const input=document.getElementById('term-input');
+  if(input)input.placeholder=termAlfredMode?"ask anything, or $command":"type 'help'";
+}
 function termRun(raw){
+  const trimmed=raw.trim();
+  // Bare "alfred" toggles a persistent chat mode: once on, whatever you type
+  // is sent straight to Alfred as a question — no need to prefix "ask" /
+  // "alfred" / "detail" every time. Prefix a line with "$" to run a normal
+  // terminal command while still in this mode, e.g. "$model list", "$exit".
+  if(/^alfred$/i.test(trimmed)){
+    termAlfredMode=!termAlfredMode;
+    if(termAlfredMode){
+      termOk('ALFRED MODE ON — just type your question and press enter.');
+      termAppendLine('  prefix a line with $ for a normal command — e.g. $model list, $exit','term-dim');
+      termAppendLine('  start a question with -d for a detailed answer','term-dim');
+      termSetPrompt('alfred>');
+    } else {
+      termOk('ALFRED MODE OFF.');
+      termSetPrompt('canopus>');
+    }
+    return;
+  }
+  if(termAlfredMode){
+    if(trimmed.startsWith('$')){
+      const cmdRaw=trimmed.slice(1).trim();
+      if(!cmdRaw||/^exit$/i.test(cmdRaw)){
+        termAlfredMode=false;
+        termOk('ALFRED MODE OFF.');
+        termSetPrompt('canopus>');
+        return;
+      }
+      termSplitChain(cmdRaw).forEach(seg=>termRunSegment(seg,0));
+      return;
+    }
+    let q=raw,wantDetail=false;
+    if(/^-d\s+/i.test(q)){ wantDetail=true; q=q.replace(/^-d\s+/i,''); }
+    termAsk(q,wantDetail);
+    return;
+  }
   termSplitChain(raw).forEach(seg=>termRunSegment(seg,0));
 }
 function termSplitChain(raw){
