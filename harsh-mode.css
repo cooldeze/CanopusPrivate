@@ -1,38 +1,59 @@
 /* ══════════════════════════════════════════════════════════════════
-   CANOPUS — HARSH UI MODE (v2: clean, flat, purely functional)
+   CANOPUS — HARSH UI MODE (v4: cmd — a literal Command Prompt skin)
    Shared across index.html, jeejournal.html, library.html, empires.html,
    conflicts.html and interests.html. Activated app-wide by running
    `harsh on` (or just `harsh` to toggle) in the Terminal, persisted in
    localStorage under 'canopus_harsh_ui'. Every page checks that key on
    load and toggles html.harsh-ui, same as html.crt-retro.
 
-   Philosophy: this is NOT a cmd.exe cosplay skin. It's the app with
-   every non-functional flourish removed — one background, one
-   foreground colour, flat 1px borders, no shadow/glow/gradient/motion,
-   no decorative imagery. The Terminal becomes the landing screen (see
-   index.html's canopusGetHarsh() check); every other page is still
-   reachable with `open <page>` from there, just stripped down to
-   whatever it needs to actually work.
+   PHILOSOPHY (v4 — reverses v1's stated philosophy on purpose): this
+   now IS the cmd.exe cosplay skin. Reference: Windows Command Prompt —
+   #0c0c0c background, flat light-grey (#ccc) text, no icons, no boxes,
+   no colour, one blinking block cursor. Every page becomes plain text
+   on a plain field: no borders, no accent colour, no icon glyphs
+   anywhere. Structure comes from line breaks and spacing only, the way
+   a shell prints output.
+
+   THE ONE EXCEPTION: the flight tracker (`.flight-overlay` and
+   everything inside it — the globe, its icons, its own panel styling,
+   its own animations/transitions) is explicitly carved out of every
+   harsh rule below and rendered completely untouched, exactly as it
+   looks with harsh mode off. Every stripping rule in this file has a
+   matching `:not(.flight-overlay):not(.flight-overlay *)` (or, for
+   the couple of rules that target .flight-overlay's own container,
+   an equivalent early-return) so nothing here ever reaches into it.
+   If a future flight-tracker element sits OUTSIDE `.flight-overlay`
+   in the DOM, it needs the same :not() pair added or it'll get
+   stripped like everything else.
+
+   The same carve-out now also covers `.jarvis-lock-overlay` (the
+   password-lock HUD screen): it's another deliberate full-colour,
+   animated experience that should look identical whether harsh mode
+   is on or off, so every :not(.flight-overlay) pair below has a
+   matching :not(.jarvis-lock-overlay) pair alongside it.
    ══════════════════════════════════════════════════════════════════ */
 
 html.harsh-ui{
-  --harsh-bg:#000;
-  --harsh-fg:#e8e8e8;
-  --harsh-dim:#777;
-  --harsh-border:#3a3a3a;
+  --harsh-bg:#0c0c0c;   /* classic cmd.exe console background */
+  --harsh-fg:#ccc;      /* classic cmd.exe default text colour */
+  --harsh-dim:#7a7a7a;  /* secondary/disabled text — cmd has no real equivalent, kept subtle */
 }
 
 html.harsh-ui, html.harsh-ui body{
   background:var(--harsh-bg) !important;
 }
 
-/* flatten everything: no radius, no glow, no gradient, no motion.
-   :not(.ti) is required — .ti is the Tabler icon font, which renders
-   its glyphs via a custom @font-face; forcing monospace onto it turns
-   every icon into an empty tofu box. */
+/* flatten everything to plain text on a plain field: no radius, no
+   glow, no gradient, no motion, no icon font. :not(.ti) stops icon
+   glyphs being forced onto the body monospace stack (moot now that
+   .ti is hidden outright below, but harmless to keep). The
+   :not(.flight-overlay):not(.flight-overlay *) pair is the carve-out
+   described above — it's appended to every stripping rule in this
+   file so the flight tracker renders exactly as it does with harsh
+   mode off. */
 html.harsh-ui body,
-html.harsh-ui body *:not(.ti){
-  font-family:'IBM Plex Mono',ui-monospace,'SF Mono','JetBrains Mono','Courier New',monospace !important;
+html.harsh-ui body *:not(.ti):not(.flight-overlay):not(.flight-overlay *):not(.jarvis-lock-overlay):not(.jarvis-lock-overlay *){
+  font-family:'Cascadia Mono','Consolas','IBM Plex Mono',ui-monospace,'Courier New',monospace !important;
   background-color:transparent !important;
   background-image:none !important;
   border-radius:0 !important;
@@ -42,27 +63,40 @@ html.harsh-ui body *:not(.ti){
   -webkit-backdrop-filter:none !important;
   transition:none !important;
   animation:none !important;
+  border:none !important;
+  letter-spacing:normal !important;
 }
-html.harsh-ui body *::before,
-html.harsh-ui body *::after{
+html.harsh-ui body *:not(.flight-overlay):not(.flight-overlay *):not(.jarvis-lock-overlay):not(.jarvis-lock-overlay *)::before,
+html.harsh-ui body *:not(.flight-overlay):not(.flight-overlay *):not(.jarvis-lock-overlay):not(.jarvis-lock-overlay *)::after{
   box-shadow:none !important;
   text-shadow:none !important;
   background-image:none !important;
   animation:none !important;
 }
 
+/* the terminal's own blinking block cursor is the one animation this
+   file explicitly keeps — cmd.exe's whole identity is that blinking
+   caret at the end of the prompt line. Coloured plain foreground, not
+   the app's accent, to match a real console (no custom accent colours
+   in cmd.exe). */
+html.harsh-ui .term-cursor{
+  animation:termBlink 1s step-end infinite !important;
+  background:var(--harsh-fg) !important;
+}
+
 /* full-screen overlays and modal backdrops MUST stay opaque, or
-   whatever page/mode was open underneath bleeds straight through them
-   (this is what was happening to the flight tracker). Every overlay
-   in this codebase follows the same naming convention — a class
-   ending in "-overlay" or "-bg", or an id ending in "-bg" — across
-   index.html (.flight-overlay, .fs-overlay, .nm-modal-bg, .tut-bg,
-   .cap-overlay, .kbd-sheet-bg, .start-modal-bg, .pfp-crop-bg,
-   #pp-root, #pp-modal), conflicts.html (.flow-overlay,
+   whatever page/mode was open underneath bleeds straight through them.
+   Every overlay in this codebase follows the same naming convention —
+   a class ending in "-overlay" or "-bg", or an id ending in "-bg" —
+   across index.html (.flight-overlay, .fs-overlay, .nm-modal-bg,
+   .tut-bg, .cap-overlay, .kbd-sheet-bg, .start-modal-bg,
+   .pfp-crop-bg, #pp-root, #pp-modal), conflicts.html (.flow-overlay,
    .flow-node-modal-bg), empires.html (#em-compare-bg, #em-timeline-bg,
    #em-info-bg), vault.html (.ex-modal-bg), library.html
    (.lib-info-bg) and sirius.html (.sq-modal-bg) — so one rule covers
-   all of them, present and future. */
+   all of them. .flight-overlay is included here on purpose: it still
+   needs to stay opaque so pages under it don't bleed through, this
+   just sets its own background, not its children's styling. */
 html.harsh-ui body [class*="-overlay"],
 html.harsh-ui body [class*="-bg"],
 html.harsh-ui body [id*="-bg"],
@@ -71,116 +105,82 @@ html.harsh-ui body #pp-modal{
   background:#000 !important;
 }
 
-/* one background, one foreground, one dim tone, one border colour —
-   no palette borrowing from the CRT retro theme, no "which mode am I
-   in" ambiguity */
-html.harsh-ui body,
-html.harsh-ui body *{
+/* one background, one foreground tone, no accent colour anywhere — a
+   real console doesn't have a theme picker. Links/buttons/active nav
+   all collapse to the same plain foreground; nothing is ever brighter
+   or a different hue than anything else. Flight tracker excluded, as
+   above. */
+html.harsh-ui body *:not(.flight-overlay):not(.flight-overlay *):not(.jarvis-lock-overlay):not(.jarvis-lock-overlay *){
   color:var(--harsh-fg) !important;
-  border-color:var(--harsh-border) !important;
 }
-html.harsh-ui a,
-html.harsh-ui button,
+html.harsh-ui a:not(.flight-overlay *):not(.jarvis-lock-overlay *),
+html.harsh-ui button:not(.flight-overlay *):not(.jarvis-lock-overlay *),
 html.harsh-ui .nav-link.active{
-  color:#fff !important;
+  color:var(--harsh-fg) !important;
+}
+html.harsh-ui *:focus-visible:not(.flight-overlay *):not(.jarvis-lock-overlay *){
+  outline:1px solid var(--harsh-fg) !important;
+  outline-offset:1px;
 }
 html.harsh-ui #crt-global-overlay{
   display:none !important;
 }
 
-/* only plain <img>/<video> (photos, illustrations) are decoration in
-   this app — those are removed outright. svg and canvas are left
-   alone by default because across Canopus they're almost always
-   functional content, not decoration: the conflicts globe (#globe-svg),
-   the empires chart canvas (#em-canvas), the flight tracker globe
-   (#globe-canvas), the terminal globe, the Sky star map — hiding those
-   breaks the page rather than cleaning it up. Icon glyphs (.ti) are
-   obviously functional and stay untouched. If a genuinely decorative
-   svg/canvas ever needs hiding, mark it .harsh-hide explicitly rather
-   than hiding svg/canvas by default. */
-html.harsh-ui img,
-html.harsh-ui video{
-  display:none !important;
-}
-html.harsh-ui svg.harsh-hide,
-html.harsh-ui canvas.harsh-hide{
+/* no icons anywhere outside the flight tracker — full stop. Not
+   dimmed, not restyled: gone. This is the app-wide version of "no
+   icons or stuff". */
+html.harsh-ui .ti:not(.flight-overlay *){
   display:none !important;
 }
 
-/* ── Redesigned header ──────────────────────────────────────────────
-   A bare titlebar, nothing else. In harsh mode pages are switched by
-   typing `open <page>` in the Terminal, and you get back with
-   whatever key combo `shortcut` reports — so tabs, the profile
-   button, and the theme pickers all disappear. All that's left is a
-   dim app name on the left and the "more" dots button on the right,
-   standing in for a window's kebab menu. */
+/* only plain <img>/<video> (photos, illustrations) are decoration in
+   this app — removed outright, flight tracker excluded. svg and
+   canvas are left alone by default because across Canopus they're
+   almost always functional content, not decoration: the conflicts
+   globe (#globe-svg), the empires chart canvas (#em-canvas), the
+   terminal globe, the Sky star map — hiding those breaks the page
+   rather than cleaning it up. If a genuinely decorative svg/canvas
+   ever needs hiding, mark it .harsh-hide explicitly. */
+html.harsh-ui img:not(.flight-overlay *),
+html.harsh-ui video:not(.flight-overlay *){
+  display:none !important;
+}
+html.harsh-ui svg.harsh-hide:not(.flight-overlay *),
+html.harsh-ui canvas.harsh-hide:not(.flight-overlay *){
+  display:none !important;
+}
+
+/* ── Header: bare titlebar, no icons, no menu button ────────────────
+   In harsh mode pages are switched by typing `open <page>` in the
+   Terminal (`open flight` reaches the flight tracker same as always)
+   — so tabs, the profile button, the theme pickers AND the "more"
+   dots icon all disappear. Nothing is left but a dim app name; there
+   is no remaining clickable icon in the header at all. */
 html.harsh-ui .nav-links,
 html.harsh-ui .brand-mark,
 html.harsh-ui .nav-logo-info,
 html.harsh-ui .nav-profile-btn,
-html.harsh-ui .nav-fs:not(#navMoreBtn){
+html.harsh-ui .nav-fs{
   display:none !important;
 }
 html.harsh-ui #app-nav{
   background:var(--harsh-bg) !important;
-  border-bottom:1px solid var(--harsh-border);
-  height:32px !important;
-  min-height:32px !important;
-  padding:0 12px !important;
-  justify-content:space-between;
+  border-bottom:none !important;
+  height:28px !important;
+  min-height:28px !important;
+  padding:0 10px !important;
 }
 html.harsh-ui .nav-logo{
-  font-size:11px !important;
-  letter-spacing:.04em !important;
-  color:var(--harsh-dim) !important;
-}
-html.harsh-ui #navMoreBtn{
-  display:flex !important;
+  font-size:12px !important;
   color:var(--harsh-fg) !important;
 }
 
 /* the Terminal fills the full width, flush left — the header already
-   reads as the titlebar, so the body stays edge-to-edge instead of a
-   floating card */
+   reads as a titlebar, so the body stays edge-to-edge like a real
+   console window instead of a floating card */
 html.harsh-ui #page-terminal.active .term-wrap{
   max-width:none !important;
   margin:0 !important;
-}
-
-/* flat 1px square-cornered borders on structural containers instead
-   of shadowed panels — every "surface" is just a border, nothing is
-   raised or lit.
-
-   IMPORTANT: across every page in this app, "-card-", "-modal-",
-   "-panel-" and "-pop-" (with a trailing dash) name a SUB-PART of a
-   container, never the container itself — e.g. .info-card-title,
-   .info-card-blurb, .info-card-h, .nm-modal-text, .nm-modal-heading,
-   .sq-modal-quote, .ft-card-name, .lt-card-title, .sky-card-row,
-   .vt-card-top, .lib-card-head, .in-card-h2, .timer-panel-top,
-   .nav-pop-sep. The container itself is always the bare form with no
-   trailing dash: .info-card, .nm-modal, .sq-modal, .ft-card, .lt-card,
-   .sky-card, .vt-card, .lib-card. Without the :not() exclusions below,
-   every one of those sub-parts also matches the broad [class*="card"]
-   / [class*="modal"] selectors and gets its own border, so a single
-   card ends up as a stack of nested boxes (title boxed, blurb boxed,
-   each heading boxed, etc.) instead of one bordered surface. */
-html.harsh-ui [class*="panel"]:not([class*="-panel-"]),
-html.harsh-ui [class*="card"]:not([class*="-card-"]),
-html.harsh-ui [class*="modal"]:not([class*="-modal-"]),
-html.harsh-ui [class*="pop"]:not([class*="-pop-"]),
-html.harsh-ui button,
-html.harsh-ui input:not(.term-input),
-html.harsh-ui select,
-html.harsh-ui textarea{
-  border:1px solid var(--harsh-border) !important;
-}
-
-/* the terminal input is a real <input> element but should stay
-   borderless/blended into the input row, matching its normal (non-
-   harsh) styling — the row itself already has a top border to
-   separate it from the output log */
-html.harsh-ui .term-input{
-  border:none !important;
 }
 
 /* purely decorative extras: gone */
@@ -188,18 +188,34 @@ html.harsh-ui .founder-note-btn{
   display:none !important;
 }
 
-/* belt-and-braces: the :not(.ti) exclusion above should already stop
-   icons from being forced onto the monospace font, but this restates
-   it explicitly and directly on .ti (matching the exact selector
-   Tabler's own stylesheet uses) so there's no dependence on selector
-   ordering between stylesheets. If icons still show as empty boxes
-   after this, the icon font itself isn't loading (network/CDN issue),
-   not a harsh-mode CSS problem. */
-html.harsh-ui .ti{
-  font-family:'tabler-icons' !important;
+/* terminal input: kill the browser's default focus ring (a plain
+   :focus outline/box-shadow the browser adds, not covered by the
+   :focus-visible rule above since browsers don't always treat a text
+   input as needing :focus-visible) and fix the placeholder colour,
+   since ::placeholder is a pseudo-element the blanket `color` rule
+   can't reach. #term-input covers the actual input id; the
+   .term-wrap input selector is kept as a fallback in case markup
+   changes. */
+html.harsh-ui .term-wrap input,
+html.harsh-ui #term-input{
+  outline:none !important;
+  box-shadow:none !important;
+  border:none !important;
+  background:transparent !important;
+}
+html.harsh-ui .term-wrap input:focus,
+html.harsh-ui #term-input:focus{
+  outline:none !important;
+  box-shadow:none !important;
+}
+html.harsh-ui .term-wrap input::placeholder,
+html.harsh-ui #term-input::placeholder{
+  color:var(--harsh-dim) !important;
+  opacity:1 !important;
 }
 
-/* plain scrollbars, no glow on the thumb */
-html.harsh-ui{ scrollbar-color:#666 #000; }
-html.harsh-ui ::-webkit-scrollbar{ background:#000; }
-html.harsh-ui ::-webkit-scrollbar-thumb{ background:#666 !important; }
+/* plain scrollbars — cmd.exe's are flat grey on black, no glow */
+html.harsh-ui{ scrollbar-color:#4d4d4d #0c0c0c; scrollbar-width:thin; }
+html.harsh-ui ::-webkit-scrollbar{ background:#0c0c0c; width:8px; height:8px; }
+html.harsh-ui ::-webkit-scrollbar-thumb{ background:#4d4d4d !important; }
+html.harsh-ui .flight-overlay ::-webkit-scrollbar-thumb{ background:revert !important; }

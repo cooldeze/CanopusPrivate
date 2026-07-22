@@ -3,6 +3,8 @@
 <head>
 <script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
 <script>(function(){try{if(localStorage.getItem('canopus_harsh_ui')==='1')document.documentElement.classList.add('harsh-ui');}catch(e){}})();</script>
+<script>(function(){try{if(localStorage.getItem('canopus_lock_enabled')==='1'&&localStorage.getItem('canopus_lock_hash'))document.documentElement.classList.add('app-locked');}catch(e){}})();</script>
+<script>(function(){try{if(localStorage.getItem('canopus_access_granted')!=='1')document.documentElement.classList.add('access-locked');}catch(e){}})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Canopus</title>
@@ -1708,7 +1710,56 @@ html,body{overflow-x:hidden}
    source order. */
 .term-line.term-cmd.term-comment{color:rgba(255,255,255,.34);font-style:italic}
 
-/* ── TERMINAL: rotating globe (same GeoJSON earth model as the flight tracker, b&w), fills the unused right-hand space on wide screens ── */
+/* ── TERMINAL: split layout for the "zeus flight" mini panel — terminal stays on
+   the left, the (real, shared) Flight Tracker overlay gets docked into the right
+   pane instead of covering the whole screen. ── */
+.term-split{flex:1;display:flex;flex-direction:row;min-height:0;width:100%}
+.term-wrap{min-width:0}
+.term-flight-dock{display:none;flex-direction:column;width:0;flex-shrink:0;overflow:hidden;position:relative;background:#000;border-left:0.5px solid rgba(255,255,255,.14)}
+.term-flight-dock.open{display:flex;width:min(48vw,560px)}
+.term-flight-dock-inner{position:relative;width:100%;height:100%;overflow:hidden}
+#page-terminal.term-flight-split .term-globe-wrap{display:none!important}
+/* The Flight Tracker overlay, when docked inside the Terminal's split pane,
+   fills that pane instead of the full viewport (it's normally position:fixed;inset:0). */
+.flight-overlay.term-embed{position:absolute;inset:0;z-index:5}
+@media(max-width:860px){
+  /* Not enough room to split — the mini panel takes over like a normal full-screen
+     modal on narrow screens, same as opening the flight tracker any other way. */
+  .term-flight-dock.open{position:fixed;inset:0;width:100%;z-index:400;border-left:none}
+}
+/* ── Mini panel content layout (desktop widths only — the >860px split view).
+   The globe fills the ENTIRE pane; the setup form and the live HUD float on
+   top of it as overlays — same idea as the full-screen tracker, just scoped
+   to this pane instead of the whole viewport. The HUD is normally
+   position:fixed, which anchors to the browser window rather than this
+   docked pane — switching it to position:absolute here keeps it floating
+   within the globe's own box instead of drifting relative to the full page. ── */
+@media(min-width:861px){
+  .flight-overlay.term-embed #globe-canvas{width:100%;height:100%}
+  .flight-overlay.term-embed .flight-header{padding:12px 16px}
+  .flight-overlay.term-embed .flight-mode-toggle,
+  .flight-overlay.term-embed .sat-legend,
+  .flight-overlay.term-embed #idle-flights-badge,
+  .flight-overlay.term-embed .globe-spin-ctrl{display:none!important}
+  /* Setup: skip straight to the duration/destination/break form (not the
+     mode-picker cards for World Traffic / Pomodoro / PomoMix) — but keep
+     the destination fields and "load from schedule" so the route is still
+     fully customisable from the panel itself. */
+  .flight-overlay.term-embed .flight-setup{padding:56px 14px 28px}
+  .flight-overlay.term-embed #flight-mode-picker,
+  .flight-overlay.term-embed .flight-setup-title button{display:none!important}
+  .flight-overlay.term-embed .flight-setup-title{margin-bottom:18px}
+  /* HUD floats within the globe pane (bottom-centered) instead of being
+     fixed to the whole viewport. */
+  .flight-overlay.term-embed .flight-hud{
+    position:absolute;left:50%;right:auto;bottom:16px;transform:translateX(-50%);
+    width:min(340px,88%);
+  }
+  .flight-overlay.term-embed .flight-hud-handle,
+  .flight-overlay.term-embed .flight-hud-reset,
+  .flight-overlay.term-embed .flight-hud-resize{display:none!important}
+  .flight-overlay.term-embed .flight-timer{font-size:clamp(32px,6vw,48px)}
+}
 .term-globe-wrap{display:none;position:fixed;top:0;right:0;bottom:0;left:920px;align-items:center;justify-content:center;pointer-events:none;z-index:0;overflow:hidden}
 @media(min-width:1280px){.term-globe-wrap{display:flex}}
 .term-globe-stage{position:relative;width:min(320px,26vw);aspect-ratio:1;opacity:.7}
@@ -1838,6 +1889,171 @@ html.crt-retro .cap-lb-download,
 html.crt-retro .cap-lb-nav{
   background-color:rgba(0,0,0,.5) !important;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   JARVIS APP LOCK — full-screen password gate, styled like an
+   Iron-Man-style HUD boot screen. Shown whenever html carries the
+   .app-locked class (set pre-paint in <head> if a lock password is
+   saved and enabled, exactly like the harsh-ui check above it, so
+   there's no flash of unlocked content). Password is never stored
+   in plaintext — only a salted SHA-256 hex digest in localStorage
+   (canopus_lock_salt / canopus_lock_hash), compared client-side.
+   This is a local single-user app so this is meant to keep the UI
+   private on a shared machine, not to be cryptographically hardened.
+   ══════════════════════════════════════════════════════════════ */
+.jarvis-lock-overlay{
+  position:fixed;inset:0;z-index:9999;display:none;
+  align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 42%,#04141c 0%,#010203 68%,#000 100%);
+  opacity:1;transition:opacity .55s ease;
+  font-family:'IBM Plex Mono',ui-monospace,monospace;
+}
+html.app-locked .jarvis-lock-overlay{display:flex}
+html.app-locked body{overflow:hidden}
+.jarvis-lock-overlay.jl-closing{opacity:0}
+
+.jarvis-hud{position:relative;display:flex;flex-direction:column;align-items:center;gap:18px;width:min(90vw,360px);text-align:center}
+.jarvis-hud.jl-shake{animation:jlShake .5s ease}
+@keyframes jlShake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(7px)}
+  60%{transform:translateX(-5px)}
+  80%{transform:translateX(3px)}
+}
+
+/* ── CHAOS BURST: fired on any wrong password / wrong code word.
+   Shakes and hue-flickers the whole screen (not just the HUD box) and
+   scatters glitching, scrambling text fragments across the viewport
+   for ~0.9s so a wrong entry feels like the whole app is misbehaving,
+   not a polite little wiggle. ── */
+#jlChaosLayer{position:fixed;inset:0;z-index:10050;pointer-events:none;overflow:hidden}
+.jl-chaos-frag{position:absolute;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:600;white-space:nowrap;color:#ff3b3b;text-shadow:0 0 6px rgba(255,59,59,.9),2px 0 0 rgba(0,255,255,.55),-2px 0 0 rgba(255,0,255,.5);opacity:0;letter-spacing:.04em;will-change:transform,opacity;animation:jlFragPop var(--dur,.7s) ease-out forwards;animation-delay:var(--delay,0s)}
+@keyframes jlFragPop{
+  0%{opacity:0;transform:scale(.4) rotate(var(--rot,0deg)) translate(0,0);filter:blur(2px)}
+  8%{opacity:1;filter:blur(0)}
+  70%{opacity:1}
+  100%{opacity:0;transform:scale(1.15) rotate(var(--rot,0deg)) translate(var(--dx,0px),var(--dy,0px));filter:blur(1px)}
+}
+html.jl-chaos-active{animation:jlChaosShake .12s linear infinite}
+@keyframes jlChaosShake{
+  0%{transform:translate(0,0)}
+  20%{transform:translate(-3px,2px)}
+  40%{transform:translate(3px,-2px)}
+  60%{transform:translate(-2px,-3px)}
+  80%{transform:translate(2px,3px)}
+  100%{transform:translate(0,0)}
+}
+html.jl-chaos-active body{animation:jlChaosHue .18s steps(2) infinite}
+@keyframes jlChaosHue{
+  0%{filter:contrast(1.3) saturate(1.8) hue-rotate(-8deg)}
+  50%{filter:contrast(1.5) saturate(2) hue-rotate(10deg) invert(.04)}
+  100%{filter:contrast(1.3) saturate(1.8) hue-rotate(-8deg)}
+}
+.jarvis-status.jl-scramble,.jarvis-error.jl-scramble{color:#ff3b3b!important;text-shadow:0 0 8px rgba(255,59,59,.8),1px 0 0 rgba(0,255,255,.5),-1px 0 0 rgba(255,0,80,.5)!important}
+
+.jarvis-rings{width:190px;height:190px;overflow:visible;filter:drop-shadow(0 0 10px rgba(79,216,255,.35))}
+.jr-ring{fill:none;stroke:#2a7d96;stroke-width:1;opacity:.55;transform-origin:150px 150px}
+.jr-ring-1{stroke:#4fd8ff;stroke-width:1.2;stroke-dasharray:14 10;animation:jrSpin 14s linear infinite}
+.jr-ring-2{stroke:#3aa8c8;stroke-dasharray:2 6;animation:jrSpinRev 10s linear infinite}
+.jr-ring-3{stroke:#4fd8ff;opacity:.4;animation:jrSpin 22s linear infinite}
+.jr-core{fill:rgba(79,216,255,.08);stroke:#4fd8ff;stroke-width:1.4;animation:jrPulse 2.6s ease-in-out infinite}
+@keyframes jrSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes jrSpinRev{from{transform:rotate(360deg)}to{transform:rotate(0deg)}}
+@keyframes jrPulse{
+  0%,100%{opacity:.75;filter:drop-shadow(0 0 2px #4fd8ff)}
+  50%{opacity:1;filter:drop-shadow(0 0 12px #4fd8ff)}
+}
+.jarvis-hud.jl-granted .jr-core{animation:jrFlash .5s ease-out 2}
+@keyframes jrFlash{
+  0%{fill:rgba(79,216,255,.08)}
+  50%{fill:rgba(79,216,255,.55)}
+  100%{fill:rgba(79,216,255,.08)}
+}
+
+.jarvis-status{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#4fd8ff;text-shadow:0 0 8px rgba(79,216,255,.6);white-space:nowrap}
+.jarvis-hud.jl-denied .jarvis-status{color:#ff5a5a;text-shadow:0 0 8px rgba(255,90,90,.6)}
+.jarvis-sub{font-size:10.5px;letter-spacing:.06em;color:#5f9aab;min-height:14px}
+.jarvis-welcome{font-size:15px;letter-spacing:.03em;color:#eafcff;text-shadow:0 0 12px rgba(79,216,255,.5);min-height:20px}
+.jarvis-welcome:not(:empty)::after{content:'';display:inline-block;width:7px;height:14px;margin-left:2px;background:#4fd8ff;vertical-align:-2px;animation:termBlink 1s step-end infinite}
+
+.jarvis-input{width:100%;background:rgba(79,216,255,.05);border:0.5px solid #1f5b6e;border-radius:8px;padding:11px 14px;color:#eafcff;font-family:inherit;font-size:13px;letter-spacing:.1em;text-align:center;outline:none;transition:border-color .2s,box-shadow .2s}
+.jarvis-input::placeholder{color:#4a7c8c;letter-spacing:.1em}
+.jarvis-input:focus{border-color:#4fd8ff;box-shadow:0 0 0 3px rgba(79,216,255,.12)}
+.jarvis-submit{width:100%;background:rgba(79,216,255,.1);border:0.5px solid #2a7d96;border-radius:8px;padding:10px;color:#4fd8ff;font-family:inherit;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:background .2s,border-color .2s}
+.jarvis-submit:hover{background:rgba(79,216,255,.18);border-color:#4fd8ff}
+.jarvis-error{font-size:10.5px;color:#ff5a5a;min-height:13px;letter-spacing:.04em}
+.jarvis-links{display:flex;align-items:center;justify-content:center;gap:8px;font-size:10.5px;margin-top:2px}
+.jarvis-link{color:#5f9aab;cursor:pointer;letter-spacing:.03em;transition:color .2s}
+.jarvis-link:hover{color:#4fd8ff;text-decoration:underline}
+.jarvis-link-danger{color:#a85555}
+.jarvis-link-danger:hover{color:#ff6a6a}
+.jarvis-link-sep{color:#2a4a54}
+.jarvis-hint{font-size:10.5px;color:#7fa4b0;line-height:1.5;margin-bottom:2px}
+
+/* ── App Lock settings modal (set / change / disable password) ── */
+.jl-settings-modal{width:320px}
+.jl-settings-head{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#eee;margin-bottom:18px}
+.jl-settings-head i{color:var(--accent,#4fd8ff);font-size:16px}
+.jl-field-label{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#888;margin:0 0 6px}
+.jl-input{width:100%;background:#111;border:0.5px solid #2a2a2a;border-radius:8px;padding:10px 12px;color:#eee;font-family:'IBM Plex Mono',monospace;font-size:13px;outline:none;margin-bottom:12px;box-sizing:border-box;transition:border-color .2s}
+.jl-input:focus{border-color:var(--accent,#4fd8ff)}
+.jl-btn{width:100%;background:var(--accent,#4fd8ff);color:var(--accent-on,#000);border:none;border-radius:8px;padding:11px;font-size:12.5px;font-weight:600;letter-spacing:.03em;cursor:pointer;margin-bottom:8px;transition:opacity .2s}
+.jl-btn:hover{opacity:.85}
+.jl-btn-ghost{width:100%;background:transparent;border:0.5px solid #333;color:#ccc;border-radius:8px;padding:10px;font-size:12px;cursor:pointer;margin-bottom:8px}
+.jl-btn-ghost:hover{border-color:#555}
+.jl-btn-danger{width:100%;background:transparent;border:none;color:#ff6a6a;font-size:11.5px;cursor:pointer;padding:6px;text-align:center}
+.jl-btn-danger:hover{text-decoration:underline}
+.jl-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid #222;margin-bottom:14px}
+.jl-row-label{font-size:13px;color:#ddd}
+.jl-row-sub{font-size:10.5px;color:#777;margin-top:2px}
+.jl-error{font-size:11px;color:#ff6a6a;margin:-4px 0 10px;min-height:13px}
+.jl-hint{font-size:11px;color:#888;line-height:1.5;margin-bottom:14px}
+
+/* ══════════════════════════════════════════════════════════════
+   ACCESS QUIZ GATE — shown to any visitor before the site loads at
+   all (sits above even the Jarvis app-lock, z-index-wise). This is
+   a quiz: every question must be answered correctly in one go, then
+   the visitor is told to message the site's creator for an access
+   code; entering the right code unlocks the site for that browser
+   (canopus_access_granted='1' in localStorage). Like the app-lock
+   above, the code is never compared in plaintext — only its salted
+   SHA-256 hex digest — but since this is all client-side, anyone
+   reading the page source can see the quiz's correct answers and
+   the code's hash. This is a friction gate to keep the link from
+   being casually shared/wandered into, not real security. ══════ */
+.access-quiz-gate{
+  position:fixed;inset:0;z-index:20000;display:none;
+  align-items:center;justify-content:center;overflow-y:auto;
+  padding:40px 16px;box-sizing:border-box;
+  background:radial-gradient(circle at 50% 42%,#04141c 0%,#010203 68%,#000 100%);
+  font-family:'IBM Plex Mono',ui-monospace,monospace;
+}
+html.access-locked .access-quiz-gate{display:flex}
+html.access-locked body{overflow:hidden}
+.aqg-card{width:min(92vw,440px);display:flex;flex-direction:column;align-items:stretch;gap:16px;margin:auto 0}
+.aqg-title{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#4fd8ff;text-shadow:0 0 8px rgba(79,216,255,.6);text-align:center}
+.aqg-sub{font-size:11px;letter-spacing:.04em;color:#7fa4b0;text-align:center;line-height:1.5}
+.aqg-q{border:0.5px solid #1f5b6e;border-radius:10px;padding:14px 16px;background:rgba(79,216,255,.04)}
+.aqg-q-text{font-size:12.5px;color:#eafcff;letter-spacing:.02em;margin-bottom:10px;line-height:1.4}
+.aqg-opts{display:flex;flex-direction:column;gap:8px}
+.aqg-opt{display:flex;align-items:center;gap:9px;font-size:11.5px;color:#bcd8e0;cursor:pointer;letter-spacing:.02em}
+.aqg-opt input{accent-color:#4fd8ff;width:14px;height:14px;flex-shrink:0;cursor:pointer}
+.aqg-opt:hover{color:#eafcff}
+.aqg-submit{width:100%;background:rgba(79,216,255,.1);border:0.5px solid #2a7d96;border-radius:8px;padding:11px;color:#4fd8ff;font-family:inherit;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:background .2s,border-color .2s}
+.aqg-submit:hover{background:rgba(79,216,255,.18);border-color:#4fd8ff}
+.aqg-error{font-size:10.5px;color:#ff5a5a;min-height:13px;letter-spacing:.04em;text-align:center}
+.aqg-success-msg{font-size:13px;color:#eafcff;text-align:center;line-height:1.6;letter-spacing:.02em}
+.aqg-success-msg .aqg-emoji{font-size:20px;display:block;margin-bottom:8px}
+.aqg-contact{font-size:11.5px;color:#4fd8ff;text-align:center;letter-spacing:.02em;padding:10px 14px;border:0.5px solid #1f5b6e;border-radius:8px;background:rgba(79,216,255,.04)}
+.aqg-input{width:100%;box-sizing:border-box;background:rgba(79,216,255,.05);border:0.5px solid #1f5b6e;border-radius:8px;padding:11px 14px;color:#eafcff;font-family:inherit;font-size:13px;letter-spacing:.1em;text-align:center;outline:none;transition:border-color .2s,box-shadow .2s}
+.aqg-input::placeholder{color:#4a7c8c;letter-spacing:.1em}
+.aqg-input:focus{border-color:#4fd8ff;box-shadow:0 0 0 3px rgba(79,216,255,.12)}
+.aqg-card.aqg-shake{animation:jlShake .5s ease}
+@media(max-width:480px){
+  .aqg-title{font-size:10px}
+  .aqg-q{padding:12px 14px}
+}
 </style>
 <script>
 (function(){try{
@@ -1861,6 +2077,114 @@ html.crt-retro .cap-lb-nav{
   document.documentElement.classList.remove('dp-light','dp-grey');
 })();
 </script>
+
+<!-- ACCESS PASSWORD GATE — simple password prompt before anything else loads -->
+<div class="access-quiz-gate" id="accessQuizGate">
+  <div class="aqg-card" id="aqgCard">
+    <div class="aqg-title">Private Access</div>
+    <div class="aqg-sub" id="aqgSub">Enter the password to continue</div>
+    <input type="password" id="aqgCodeInput" class="aqg-input" placeholder="ENTER PASSWORD" autocomplete="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')aqgSubmitCode()">
+    <button class="aqg-submit" onclick="aqgSubmitCode()">Unlock</button>
+    <div class="aqg-error" id="aqgCodeError"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+/* ══════════════════════════════════════════════════════════════
+   ACCESS PASSWORD GATE — logic
+
+   A simple password prompt shown to any visitor before the site
+   loads at all. The password is never stored in plain text here —
+   only its SHA-256 hex digest (AQG_CODE_HASH) — but since this is
+   static HTML/JS with no backend, anyone reading the page source
+   can see the hash and could brute-force it offline. This is a
+   friction gate to keep the link from being casually wandered into,
+   not real access control — treat it accordingly.
+
+   localStorage key: canopus_access_granted='1' once someone unlocks
+   the site in a given browser (so they don't have to redo this every
+   visit).
+
+   To change the password later: open this page, open the browser
+   console, and run  await AccessGate.hashCode("new-password")  then
+   paste the printed hash into AQG_CODE_HASH below.
+   ══════════════════════════════════════════════════════════════ */
+const AQG_GRANTED_KEY='canopus_access_granted';
+const AQG_CODE_HASH='71570976023a3d9407f1ff2b2d97d1c003ed3950512bc30e8ba64942aef1f037'; // sha256("canopusontop")
+
+async function aqgHash(str){
+  try{
+    const enc=new TextEncoder().encode(str);
+    const buf=await crypto.subtle.digest('SHA-256',enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){
+    // Fallback for contexts without SubtleCrypto (e.g. some file:// setups) —
+    // not cryptographic, just avoids comparing the code in plain text.
+    let h=0;
+    for(let i=0;i<str.length;i++){ h=(Math.imul(31,h)+str.charCodeAt(i))|0; }
+    return 'fb'+(h>>>0).toString(16)+str.length;
+  }
+}
+
+function aqgShake(){
+  const card=document.getElementById('aqgCard');
+  if(!card) return;
+  card.classList.remove('aqg-shake'); void card.offsetWidth; card.classList.add('aqg-shake');
+}
+
+window.aqgSubmitCode=async function(){
+  const input=document.getElementById('aqgCodeInput');
+  const errEl=document.getElementById('aqgCodeError');
+  const code=(input&&input.value||'').trim();
+  if(!code){ if(errEl) errEl.textContent='Enter the password.'; aqgShake(); return; }
+  const hash=await aqgHash(code);
+  if(hash!==AQG_CODE_HASH){
+    if(errEl) errEl.textContent='That password doesn\'t look right.';
+    aqgShake();
+    return;
+  }
+  if(errEl) errEl.textContent='';
+  try{ localStorage.setItem(AQG_GRANTED_KEY,'1'); }catch(e){}
+  document.documentElement.classList.remove('access-locked');
+  const gate=document.getElementById('accessQuizGate');
+  if(gate) gate.style.display='none';
+};
+
+// Console helper if you ever want to change the password:
+//   await AccessGate.hashCode('new-password')
+window.AccessGate={ hashCode:aqgHash };
+})();
+</script>
+
+<!-- JARVIS APP LOCK — full-screen boot-style password gate -->
+<div class="jarvis-lock-overlay" id="jarvisLockOverlay">
+  <div class="jarvis-hud" id="jarvisHud">
+    <svg class="jarvis-rings" viewBox="0 0 300 300">
+      <circle class="jr-ring jr-ring-3" cx="150" cy="150" r="132"/>
+      <circle class="jr-ring jr-ring-1" cx="150" cy="150" r="108"/>
+      <circle class="jr-ring jr-ring-2" cx="150" cy="150" r="84"/>
+      <circle class="jr-core" cx="150" cy="150" r="52"/>
+    </svg>
+    <div class="jarvis-status" id="jarvisStatus">SYSTEM LOCKED</div>
+    <div class="jarvis-sub" id="jarvisSub">Passphrase authentication required</div>
+    <div class="jarvis-welcome" id="jarvisWelcome"></div>
+    <div id="jarvisFields">
+      <input type="password" id="jarvisPassInput" class="jarvis-input" placeholder="ENTER ACCESS CODE" autocomplete="off" onkeydown="if(event.key==='Enter')jarvisSubmit()">
+      <button class="jarvis-submit" id="jarvisSubmitBtn" onclick="jarvisSubmit()">Authenticate</button>
+      <div class="jarvis-error" id="jarvisError"></div>
+      <div class="jarvis-links"><span class="jarvis-link" onclick="jlOpenRecovery()">Forgot password?</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP LOCK SETTINGS (set / change / disable password) -->
+<div class="start-modal-bg" id="jlSettingsBg" onclick="if(event.target===this)closeJlSettings()">
+  <div class="start-modal jl-settings-modal" onclick="event.stopPropagation()">
+    <div class="jl-settings-head"><i class="ti ti-lock"></i><span>App Lock</span></div>
+    <div id="jlSettingsBody"></div>
+  </div>
+</div>
 
 <nav id="app-nav">
   <span class="nav-logo-wrap">
@@ -1976,6 +2300,7 @@ html.crt-retro .cap-lb-nav{
   <button class="nav-menu-item" onclick="openAnimation();closeNavMenu()"><i class="ti ti-wave-sine"></i>Animation</button>
   <button class="nav-menu-item" onclick="toggleFS();closeNavMenu()"><i class="ti ti-maximize"></i>Fullscreen</button>
   <button class="nav-menu-item" onclick="openKbd();closeNavMenu()"><i class="ti ti-keyboard"></i>Shortcuts</button>
+  <button class="nav-menu-item" onclick="openJlSettings();closeNavMenu()"><i class="ti ti-lock"></i>App Lock</button>
   <button class="nav-menu-item" onclick="openTutorial();closeNavMenu()"><i class="ti ti-help"></i>Guide</button>
   <button class="nav-menu-item" id="navChimeBtn" onclick="toggleUIChime()"><i class="ti ti-volume"></i>Click sounds: On</button>
 </div>
@@ -2458,16 +2783,21 @@ html.crt-retro .cap-lb-nav{
       <canvas class="term-globe-canvas" id="term-globe-canvas"></canvas>
     </div>
   </div>
-  <div class="term-wrap">
-    <div class="term-log" id="term-log"></div>
-    <div class="term-model-bar" id="term-model-bar"></div>
-    <div class="term-inputrow">
-      <span class="term-prompt" id="term-prompt">canopus&gt;</span>
-      <span class="term-input-wrap">
-        <span class="term-ghost" id="term-ghost" aria-hidden="true"></span>
-        <input type="text" id="term-input" class="term-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="type 'help'">
-      </span>
-      <span class="term-cursor"></span>
+  <div class="term-split" id="term-split">
+    <div class="term-wrap">
+      <div class="term-log" id="term-log"></div>
+      <div class="term-model-bar" id="term-model-bar"></div>
+      <div class="term-inputrow">
+        <span class="term-prompt" id="term-prompt">canopus&gt;</span>
+        <span class="term-input-wrap">
+          <span class="term-ghost" id="term-ghost" aria-hidden="true"></span>
+          <input type="text" id="term-input" class="term-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="type 'help'">
+        </span>
+        <span class="term-cursor"></span>
+      </div>
+    </div>
+    <div class="term-flight-dock" id="term-flight-dock">
+      <div class="term-flight-dock-inner" id="term-flight-dock-inner"></div>
     </div>
   </div>
 </div>
@@ -3777,6 +4107,9 @@ function switchTimerTab(t){
   if(t==='presets')renderPresets();
 }
 function showPage(p){
+  if(p!=='terminal'&&typeof termFlightDocked!=='undefined'&&termFlightDocked&&typeof termCloseFlightDock==='function'){
+    termCloseFlightDock();
+  }
   document.getElementById('page-focus').classList.toggle('active',p==='focus');
   document.getElementById('page-schedule').classList.toggle('active',p==='schedule');
   document.getElementById('page-progress').classList.toggle('active',p==='progress');
@@ -5339,6 +5672,22 @@ async function loadGeoData(){
   }
 }
 
+/* Sizes the globe canvas's drawing buffer to match its actual container box
+   (not the full window) — the container is only the full viewport when the
+   tracker is shown full-screen. When it's docked into a narrower pane (e.g.
+   the "zeus flight" terminal mini panel) the container is much smaller, and
+   without this the canvas kept a full-window-sized buffer while being
+   squeezed into a smaller CSS box, stretching the globe into an ellipse. */
+function sizeGlobeCanvas(){
+  if(!globeCanvas) return;
+  const container=document.getElementById('globe-canvas');
+  const w=(container&&container.clientWidth)||window.innerWidth;
+  const h=(container&&container.clientHeight)||window.innerHeight;
+  globeCanvas.width=w;
+  globeCanvas.height=h;
+  globeStars=null;
+}
+
 function initGlobe(){
   if(globeInited) return;
   globeInited=true;
@@ -5346,8 +5695,7 @@ function initGlobe(){
   container.innerHTML='';
   globeCanvas=document.createElement('canvas');
   globeCanvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;cursor:grab';
-  globeCanvas.width=window.innerWidth;
-  globeCanvas.height=window.innerHeight;
+  sizeGlobeCanvas();
   container.appendChild(globeCanvas);
   globeCtx=globeCanvas.getContext('2d');
   globeLambda=0; globePhi=0.3;
@@ -5376,10 +5724,7 @@ function initGlobe(){
   window.addEventListener('touchend',onUp);
 
   window.addEventListener('resize',()=>{
-    if(!globeCanvas) return;
-    globeCanvas.width=window.innerWidth;
-    globeCanvas.height=window.innerHeight;
-    globeStars=null;
+    sizeGlobeCanvas();
   });
 
   // Crosshair / tooltip events
@@ -5522,6 +5867,7 @@ function closeFlightTracker(){
   const badge=document.getElementById('idle-flights-badge');
   if(badge) badge.style.display='none';
   if(globeAnimFrame){cancelAnimationFrame(globeAnimFrame);globeAnimFrame=null;}
+  if(typeof termFlightDocked!=='undefined'&&termFlightDocked&&typeof termCloseFlightDock==='function')termCloseFlightDock();
 }
 
 function showFlightSetup(){
@@ -11547,26 +11893,75 @@ function termDrawGlobe(){
       ctx.strokeStyle='rgba(77,208,225,'+(0.55-pulse*0.35)+')'; ctx.lineWidth=1.4; ctx.stroke();
     }
   }
+
+  // Live flight — the timer that's actually playing (launched from Focus, a
+  // flight-linked pomodoro, or `zeus flight` right here) drawn on the route it's
+  // really flying, rather than the generic decorative orbit below.
+  const termFlightLive=(typeof flightRunning!=='undefined'&&flightRunning);
+  if(termFlightLive){
+    const fromC=getAirportCoords(flightFrom), toC=getAirportCoords(flightTo);
+    const progress=flightTotalSec>0?Math.max(0,Math.min(0.999,(flightTotalSec-flightRemSec)/flightTotalSec)):0;
+    ctx.beginPath();
+    let started=false;
+    for(let i=0;i<=60;i++){
+      const pt=slerp(fromC,toC,i/60);
+      const p=orthoProject(pt.lat,pt.lon,termGlobeLambda,termGlobePhi,R,cx,cy);
+      if(!p.visible){started=false;continue;}
+      if(!started){ctx.moveTo(p.sx,p.sy);started=true;} else ctx.lineTo(p.sx,p.sy);
+    }
+    ctx.strokeStyle='rgba(77,208,225,0.55)'; ctx.lineWidth=1.1; ctx.stroke();
+    [fromC,toC].forEach(c=>{
+      const p=orthoProject(c.lat,c.lon,termGlobeLambda,termGlobePhi,R,cx,cy);
+      if(p.visible){ ctx.beginPath(); ctx.arc(p.sx,p.sy,2,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); }
+    });
+    const cur=slerp(fromC,toC,progress);
+    const ahead=slerp(fromC,toC,Math.min(1,progress+0.01));
+    const pp=orthoProject(cur.lat,cur.lon,termGlobeLambda,termGlobePhi,R,cx,cy);
+    if(pp.visible){
+      const pa=orthoProject(ahead.lat,ahead.lon,termGlobeLambda,termGlobePhi,R,cx,cy);
+      const heading=Math.atan2(pa.sy-pp.sy,pa.sx-pp.sx)+Math.PI/2;
+      ctx.save();
+      ctx.translate(pp.sx,pp.sy);
+      ctx.rotate(heading);
+      ctx.beginPath();
+      ctx.moveTo(0,-4.5); ctx.lineTo(2.6,3.5); ctx.lineTo(0,2); ctx.lineTo(-2.6,3.5);
+      ctx.closePath();
+      ctx.fillStyle='#4dd0e1'; ctx.fill();
+      ctx.restore();
+    }
+  }
   ctx.restore();
 
   // Sphere edge
   ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.2;
   ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.stroke();
 
-  // Small orbiting plane marker signalling "in flight"
-  termPlaneAngle+=0.018;
-  const pr=R*1.14;
-  const px=cx+Math.cos(termPlaneAngle)*pr, py=cy+Math.sin(termPlaneAngle)*0.42*pr;
-  const behind=Math.sin(termPlaneAngle)>0;
-  ctx.save();
-  ctx.globalAlpha=behind?0.35:1;
-  ctx.translate(px,py);
-  ctx.rotate(termPlaneAngle+Math.PI/2);
-  ctx.beginPath();
-  ctx.moveTo(0,-4.5); ctx.lineTo(2.6,3.5); ctx.lineTo(0,2); ctx.lineTo(-2.6,3.5);
-  ctx.closePath();
-  ctx.fillStyle='#fff'; ctx.fill();
-  ctx.restore();
+  if(termFlightLive){
+    // Route + time-remaining readout under the globe while a flight is playing
+    const remMin=Math.floor(flightRemSec/3600)>0
+      ? Math.floor(flightRemSec/3600)+'h '+Math.floor((flightRemSec%3600)/60)+'m'
+      : Math.floor(flightRemSec/60)+':'+String(flightRemSec%60).padStart(2,'0');
+    ctx.font='9px "IBM Plex Mono",monospace';
+    ctx.fillStyle='rgba(77,208,225,0.85)';
+    ctx.textAlign='center';
+    ctx.fillText(flightFrom+' \u2192 '+flightTo+'   '+remMin,cx,H-8);
+  } else {
+    // Small orbiting plane marker signalling generic idle motion (decorative,
+    // shown only when nothing is actually flying)
+    termPlaneAngle+=0.018;
+    const pr=R*1.14;
+    const px=cx+Math.cos(termPlaneAngle)*pr, py=cy+Math.sin(termPlaneAngle)*0.42*pr;
+    const behind=Math.sin(termPlaneAngle)>0;
+    ctx.save();
+    ctx.globalAlpha=behind?0.35:1;
+    ctx.translate(px,py);
+    ctx.rotate(termPlaneAngle+Math.PI/2);
+    ctx.beginPath();
+    ctx.moveTo(0,-4.5); ctx.lineTo(2.6,3.5); ctx.lineTo(0,2); ctx.lineTo(-2.6,3.5);
+    ctx.closePath();
+    ctx.fillStyle='#fff'; ctx.fill();
+    ctx.restore();
+  }
 }
 
 function termGlobeLoop(){
@@ -12041,7 +12436,7 @@ const TERM_QUICK_COMMANDS=[
   'harsh','harsh on','harsh off',
   'calc','time','sysinfo','battery','uptime','search','country','country clear','note add','note list','note rm','note clear',
   'history','history clear','echo','roll','roll 2d6','flip','matrix',
-  'alias','alias list','alias rm','man','sysmon','backup','restore','zeus','zeus restore','reload'
+  'alias','alias list','alias rm','man','sysmon','backup','restore','zeus','zeus restore','zeus flight','zeus status','zeus wipe','zeus lock on','zeus lock off','reload'
 ];
 const TERM_TOP_COMMANDS=['help','clear','status','open','goto','report','accent','surface','theme','shortcut','set','fs','ls','dir','cd','cat','read','pwd','calc','time','date','sysinfo','battery','uptime','search','find','note','history','echo','roll','flip','matrix','alias','man','sysmon','backup','restore','zeus','reload','grep','harsh','country','ask','alfred','model','detail','setup'];
 let termGhostSuggestion=''; // the full suggested command string, or '' if none
@@ -12317,6 +12712,17 @@ function termRunSingle(raw,depth){
         '                 everything — as one .json file',
         'zeus restore     load a zeus backup file — replaces this device\'s data with it,',
         '                 so its stats/vault/journal become the ones from that file',
+        'zeus flight      opens a mini flight panel on the right — terminal stays',
+        '                 on the left. Pick a destination, duration & breaks,',
+        '                 or watch whatever\'s already running, over the globe',
+        'zeus flight      (again) closes the panel — anything running keeps going',
+        'zeus flight <from> <to> <mins>  quick-launch a flight and open the panel,',
+        '                 e.g. zeus flight lhr jfk 45',
+        'zeus status      read-only overview: storage used, app lock / access gate /',
+        '                 harsh mode state, and current theme/accent/surface',
+        'zeus wipe        ERASE every key on this device (schedule, progress, Vault,',
+        '                 journal, settings, lock) — asks to confirm, no undo',
+        'zeus lock on|off turn the App Lock on/off directly, no Settings modal needed',
         'reload           reload the page',
         'history clear    wipe saved command history',
         '— local files (chrome/edge) —',
@@ -12635,7 +13041,7 @@ const TERM_MAN={
   roll:['USAGE: roll  |  roll 2d6  |  roll d20','Rolls dice in the form <count>d<sides>. Defaults to 1d6.'],
   backup:['USAGE: backup','Downloads a JSON file with this page\'s saved settings, notes, aliases,','schedule, and progress data. The Vault keeps its own separate storage','and is not included — back it up from its own page, or use "zeus".'],
   restore:['USAGE: restore','Pick a previously downloaded backup .json file to write its data back','into this browser. Reload the page afterward to see the restored data.'],
-  zeus:['USAGE: zeus  |  zeus restore','FULL device backup, not just this page\'s settings. Sweeps every piece of','Canopus data on this origin into one .json file: countries visited','(passport), progress stats, time spent on each feature, every Vault','entry (including ones behind the PIN lock), and the JEE journal.','"zeus" downloads the file. "zeus restore" loads one back in — this','REPLACES all data on the current device, so afterward its stats,','Vault, and journal become the ones from that backup file.'],
+  zeus:['USAGE: zeus  |  zeus restore  |  zeus flight [from] [to] [mins]  |  zeus status  |  zeus wipe  |  zeus lock on|off','FULL device backup, not just this page\'s settings. Sweeps every piece of','Canopus data on this origin into one .json file: countries visited','(passport), progress stats, time spent on each feature, every Vault','entry (including ones behind the PIN lock), and the JEE journal.','"zeus" downloads the file. "zeus restore" loads one back in — this','REPLACES all data on the current device, so afterward its stats,','Vault, and journal become the ones from that backup file.','"zeus flight" opens a mini flight panel docked into the right half of','the terminal — a trimmed-down setup (not the full flight/pomodoro/pomomix','picker screen) where you can still set a destination, duration and','breaks, floating over a globe that fills the whole pane. Typing it','again just closes the panel; anything running keeps going and stays','visible on the terminal\'s small globe. You can also quick-launch:','"zeus flight lhr jfk 45" opens the panel already flying that route.','"zeus status" is read-only: shows how much is stored on this origin,','plus the current App Lock / Access Gate / harsh-mode / theme state.','"zeus wipe" permanently erases every key on this device — asks you to','confirm and type WIPE; there\'s no undo unless you made a "zeus" backup.','"zeus lock on" / "zeus lock off" flips the App Lock toggle directly,','same effect as the on/off switch in App Lock Settings.'],
   sysmon:['USAGE: sysmon  |  sysmon stop','Shows a single line of live-updating system stats (clock, memory, online','status, session uptime) until stopped.'],
   grep:['USAGE: <command> | grep <term>','Runs <command>, then only prints the lines from its output that contain','<term> (case-insensitive). EXAMPLE: history | grep open']
 };
@@ -12798,10 +13204,202 @@ function termZeusRestore(){
   input.click();
 }
 function termZeus(rest){
-  rest=(rest||'').trim().toLowerCase();
-  if(rest===''||rest==='backup'){termZeusBackup();return;}
-  if(rest==='restore'||rest==='load'||rest==='import'){termZeusRestore();return;}
-  termErr('TRY: zeus  (full backup)   /   zeus restore');
+  const raw=(rest||'').trim();
+  const low=raw.toLowerCase();
+  if(low===''||low==='backup'){termZeusBackup();return;}
+  if(low==='restore'||low==='load'||low==='import'){termZeusRestore();return;}
+  if(low==='flight'||low.indexOf('flight ')===0){termZeusFlight(raw.slice(6).trim());return;}
+  if(low==='status'||low==='info'){termZeusStatus();return;}
+  if(low==='wipe'||low==='wipe all'||low==='nuke'){termZeusWipe();return;}
+  if(low==='lock on'||low==='lock enable'){termZeusLock(true);return;}
+  if(low==='lock off'||low==='lock disable'){termZeusLock(false);return;}
+  termErr('TRY: zeus  /  zeus restore  /  zeus flight  /  zeus status  /  zeus wipe  /  zeus lock on|off');
+}
+
+/* ---- Terminal: ZEUS STATUS — one-shot overview of everything zeus touches:
+   how much is stored on this origin, and the current state of the device-wide
+   toggles (App Lock, Access Gate, appearance). Read-only, changes nothing. ---- */
+function termZeusStatus(){
+  const keys=termZeusKeys();
+  let bytes=0;
+  keys.forEach(k=>{ try{ bytes+=(k.length+(localStorage.getItem(k)||'').length); }catch(e){} });
+  const lockOn=localStorage.getItem('canopus_lock_enabled')==='1';
+  const gateOn=localStorage.getItem('canopus_access_granted')==='1';
+  const harshOn=localStorage.getItem('canopus_harsh_ui')==='1';
+  const theme=localStorage.getItem('dayplan_theme')||'dark';
+  const accent=localStorage.getItem('dayplan_accent')||'white';
+  const surface=localStorage.getItem('dayplan_surface')||'black';
+  termAppendLine('ZEUS STATUS','term-accent');
+  termAppendLine('  keys stored:     '+keys.length+'  ('+(bytes/1024).toFixed(1)+'KB on this origin)','term-dim');
+  termAppendLine('  app lock:        '+(lockOn?'ON':'off'),'term-dim');
+  termAppendLine('  access gate:     '+(gateOn?'unlocked on this browser':'not yet unlocked'),'term-dim');
+  termAppendLine('  harsh mode:      '+(harshOn?'ON':'off'),'term-dim');
+  termAppendLine('  theme:           '+theme+' / accent '+accent+' / surface '+surface,'term-dim');
+  termOk('USE "zeus" FOR A FULL BACKUP, OR "zeus wipe" / "zeus lock on|off" TO CHANGE THE ABOVE.');
+}
+
+/* ---- Terminal: ZEUS WIPE — erase every key this origin owns, no file involved.
+   This is the fast/destructive counterpart to "zeus restore": instead of
+   replacing data with a backup, it just clears it. Gated behind a native
+   confirm() plus typing the literal word WIPE, since there's no undo unless
+   the person made a "zeus" backup beforehand. ---- */
+function termZeusWipe(){
+  const keys=termZeusKeys();
+  if(!keys.length){termErr('NOTHING TO WIPE — THIS ORIGIN HAS NO STORED DATA.');return;}
+  if(!window.confirm('ZEUS WIPE will PERMANENTLY ERASE all '+keys.length+' key(s) of Canopus data on this device (schedule, progress, countries, Vault, JEE journal, settings, app lock). This cannot be undone unless you made a "zeus" backup. Continue?')){
+    termErr('ZEUS WIPE CANCELLED.');return;
+  }
+  const typed=window.prompt('Type WIPE in capitals to confirm — this erases everything on this device.');
+  if(typed!=='WIPE'){termErr('ZEUS WIPE CANCELLED — CONFIRMATION TEXT DID NOT MATCH.');return;}
+  try{localStorage.clear();}catch(e){}
+  termOk('ZEUS WIPE COMPLETE — '+keys.length+' KEY(S) ERASED. THIS DEVICE IS BACK TO A CLEAN SLATE.');
+  termAppendLine("TYPE 'reload' TO REFRESH THE PAGE.",'term-dim');
+}
+
+/* ---- Terminal: ZEUS LOCK — turn the Jarvis App Lock on/off directly from the
+   terminal, without opening its Settings modal. Only toggles the ON/OFF flag;
+   turning it on when no password has ever been set just arms it with no
+   password configured yet — same as toggling it on from the Settings UI. ---- */
+function termZeusLock(makeOn){
+  try{ localStorage.setItem('canopus_lock_enabled', makeOn?'1':'0'); }catch(e){}
+  if(makeOn){
+    const hasPass=!!localStorage.getItem('canopus_lock_hash');
+    termOk('APP LOCK TURNED ON.'+(hasPass?'':' NO PASSWORD SET YET — OPEN APP LOCK SETTINGS TO SET ONE.'));
+  } else {
+    termOk('APP LOCK TURNED OFF.');
+  }
+}
+
+/* ---- Terminal: ZEUS FLIGHT — dock the real Flight Tracker overlay (the same
+   one used everywhere else in Canopus: mode picker, pomodoro, pomomix, HUD, its
+   own globe) into the right half of the Terminal page, instead of it covering
+   the whole screen. The terminal stays usable on the left. Whatever's already
+   playing (or gets launched from the panel) keeps running even if the panel is
+   later closed — closing it just un-docks the view; only the panel's own [x]
+   actually stops the timer. ---- */
+let termFlightDocked=false;
+let termFlightOrigParent=null, termFlightOrigNext=null;
+
+function termFlightIsRunning(){
+  return (typeof flightRunning!=='undefined'&&flightRunning)
+      || (typeof pomoRunning!=='undefined'&&pomoRunning)
+      || (typeof pomomixRunning!=='undefined'&&pomomixRunning);
+}
+
+function termOpenFlightDock(){
+  const overlay=document.getElementById('flight-overlay');
+  const dock=document.getElementById('term-flight-dock');
+  const inner=document.getElementById('term-flight-dock-inner');
+  const page=document.getElementById('page-terminal');
+  if(!overlay||!dock||!inner||!page)return;
+  if(!termFlightDocked){
+    termFlightOrigParent=overlay.parentNode;
+    termFlightOrigNext=overlay.nextSibling;
+    inner.appendChild(overlay);
+    overlay.classList.add('term-embed');
+    termFlightDocked=true;
+  }
+  dock.classList.add('open');
+  page.classList.add('term-flight-split');
+  overlay.classList.add('open');
+  if(typeof initGlobe==='function')initGlobe();
+  // initGlobe() no-ops if the globe was already built (e.g. previously opened
+  // full-screen) — its canvas buffer would still match the OLD container size,
+  // so re-measure against the dock's actual (narrower) box here regardless.
+  if(typeof sizeGlobeCanvas==='function')sizeGlobeCanvas();
+  if(typeof globeAnimFrame!=='undefined'&&!globeAnimFrame&&typeof globeAnimLoop==='function')globeAnimLoop();
+  if(termFlightIsRunning()){
+    // Something's already playing — show the live HUD, don't reset it to setup
+    const fs=document.getElementById('flight-setup'); if(fs)fs.classList.add('hidden');
+    const hud=document.getElementById('flight-hud'); if(hud)hud.style.display='flex';
+    overlay.classList.add('tracking-flight');
+  } else if(typeof showFlightSetup==='function'){
+    showFlightSetup();
+    // The mini panel is a quick in-terminal control, not the full tracker —
+    // skip the "choose your view" cards (Track flight / World Traffic /
+    // Pomodoro / PomoMix) and land directly on duration + break controls.
+    // Only on desktop-width docking; below 860px the dock becomes a normal
+    // full-screen modal (see .term-flight-dock media query) and should keep
+    // the full picker like opening the tracker any other way.
+    if(window.innerWidth>860&&typeof selectFlightSetupMode==='function'){
+      selectFlightSetupMode('flight');
+    }
+  }
+  if(typeof renderFlightGoals==='function')renderFlightGoals();
+}
+
+function termCloseFlightDock(){
+  const overlay=document.getElementById('flight-overlay');
+  const dock=document.getElementById('term-flight-dock');
+  const page=document.getElementById('page-terminal');
+  if(!overlay||!dock||!page)return;
+  overlay.classList.remove('open');
+  dock.classList.remove('open');
+  page.classList.remove('term-flight-split');
+  if(termFlightDocked&&termFlightOrigParent){
+    if(termFlightOrigNext&&termFlightOrigNext.parentNode===termFlightOrigParent){
+      termFlightOrigParent.insertBefore(overlay,termFlightOrigNext);
+    } else {
+      termFlightOrigParent.appendChild(overlay);
+    }
+    overlay.classList.remove('term-embed');
+    termFlightDocked=false;
+  }
+  if(typeof sizeGlobeCanvas==='function')sizeGlobeCanvas();
+}
+
+function termZeusFlight(argStr){
+  const parts=(argStr||'').split(/\s+/).filter(Boolean);
+  const dock=document.getElementById('term-flight-dock');
+  const dockOpen=dock&&dock.classList.contains('open');
+  if(dockOpen&&!parts.length){
+    termCloseFlightDock();
+    termOk('MINI FLIGHT PANEL CLOSED.'+(termFlightIsRunning()?' STILL TRACKING ON THE TERMINAL GLOBE.':''));
+    return;
+  }
+  if(parts.length){
+    if(termFlightIsRunning()){
+      termErr('SOMETHING IS ALREADY IN PROGRESS. TYPE "zeus flight" ALONE TO OPEN THE PANEL AND VIEW IT.');
+      return;
+    }
+    const fromVal=getAirportIATA(parts[0])||flightFrom;
+    const toVal=parts[1]?getAirportIATA(parts[1]):flightTo;
+    let mins=parseInt(parts[2],10);
+    if(!mins||mins<1)mins=(typeof ftPickedDur!=='undefined'&&ftPickedDur)||60;
+    termLaunchFlightFromTerminal(fromVal,toVal,mins);
+  }
+  termOpenFlightDock();
+  termOk((parts.length?'FLIGHT LAUNCHED. ':'')+'MINI FLIGHT OPENED ON THE RIGHT — PICK FLIGHT/POMODORO/POMOMIX, SET A DESTINATION & TIME, OR WATCH THE ACTIVE ONE.');
+  termAppendLine("TYPE 'zeus flight' AGAIN TO CLOSE THE PANEL (WHATEVER'S RUNNING KEEPS GOING).",'term-dim');
+}
+function termLaunchFlightFromTerminal(from,to,mins){
+  flightFrom=from||'LHR';
+  flightTo=to||'JFK';
+  if(typeof ftPickedDur!=='undefined')ftPickedDur=mins;
+  flightTotalSec=mins*60;
+  flightRemSec=flightTotalSec;
+  flightEndTime=Date.now()+flightRemSec*1000;
+  flightRunning=true;
+  flightPaused=false;
+  if(typeof flightBreaksLeft!=='undefined')flightBreaksLeft=(typeof flightScheduledBreaks!=='undefined')?flightScheduledBreaks:0;
+  if(typeof flightOnBreak!=='undefined')flightOnBreak=false;
+  if(typeof flightBreakInterval!=='undefined'&&flightBreakInterval){clearInterval(flightBreakInterval);flightBreakInterval=null;}
+  // Keep the full-screen tracker's own (hidden) DOM in sync, so opening it later
+  // via "open flight" shows this same flight instead of a stale one.
+  const fromInfo=getAirportCoords(flightFrom), toInfo=getAirportCoords(flightTo);
+  const feEl=document.getElementById('ft-from-disp'); if(feEl)feEl.textContent=fromInfo.name+' ('+flightFrom+')';
+  const teEl=document.getElementById('ft-to-disp'); if(teEl)teEl.textContent=toInfo.name+' ('+flightTo+')';
+  const statusEl=document.getElementById('flight-status'); if(statusEl){statusEl.textContent='in flight';statusEl.className='flight-status';}
+  if(typeof updateFlightDisplay==='function')updateFlightDisplay();
+  if(typeof updateGlobeArcs==='function')updateGlobeArcs();
+  if(typeof generateWind==='function')generateWind(flightFrom,flightTo);
+  const mid=slerp(fromInfo,toInfo,0.5);
+  if(typeof globeLambda!=='undefined')globeLambda=mid.lon*Math.PI/180;
+  if(flightInterval)clearInterval(flightInterval);
+  flightInterval=setInterval(tickFlight,1000);
+  termAnimateGlobeTo(mid.lon,mid.lat);
+  termOk('ZEUS FLIGHT LAUNCHED — '+flightFrom+' → '+flightTo+' ('+mins+' MIN). TRACKING ON THE TERMINAL GLOBE.');
+  termAppendLine("TYPE 'report flight' FOR STATUS, 'open flight' FOR THE FULL-SCREEN TRACKER.",'term-dim');
 }
 
 /* ---- Terminal: live single-line system monitor ---- */
@@ -13634,6 +14232,464 @@ document.addEventListener('keydown',function(e){
     panel.style.left = nx + 'px';
     panel.style.top = ny + 'px';
   });
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════
+     JARVIS APP LOCK — logic
+     localStorage keys:
+       canopus_lock_enabled  '1' | '0'
+       canopus_lock_salt     random hex, generated once at setup
+       canopus_lock_hash     hex SHA-256(salt + password)
+       canopus_lock_q_salt   random hex, generated when the code
+                              word is set
+       canopus_lock_q_hash   hex SHA-256(q_salt + codeword.lower())
+     Nothing is ever written in plaintext. This is a local single-
+     user app, so the goal is "keep the screen private on a shared
+     machine", not withstand a determined attacker with the file
+     itself — but we still never store the password (or code word)
+     as typed.
+
+     Forgot-password recovery: the lock screen's "Forgot password?"
+     link asks for the code word set at setup. Get it right and you
+     can set a new password on the spot. If you don't know it either,
+     the only way back in is a full factory reset — this wipes every
+     Canopus localStorage key (all pages share one file:// origin),
+     since there's no way to prove identity otherwise. That's spelled
+     out to the user before it happens and gated behind typing RESET.
+     ══════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+const JL_ENABLED_KEY='canopus_lock_enabled';
+const JL_SALT_KEY='canopus_lock_salt';
+const JL_HASH_KEY='canopus_lock_hash';
+const JL_QSALT_KEY='canopus_lock_q_salt';
+const JL_QHASH_KEY='canopus_lock_q_hash';
+
+async function jlHash(str){
+  try{
+    const enc=new TextEncoder().encode(str);
+    const buf=await crypto.subtle.digest('SHA-256',enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){
+    // Fallback for contexts without SubtleCrypto (e.g. some file:// setups) —
+    // not cryptographic, just keeps the password out of localStorage as plaintext.
+    let h=0;
+    for(let i=0;i<str.length;i++){ h=(Math.imul(31,h)+str.charCodeAt(i))|0; }
+    return 'fb'+(h>>>0).toString(16)+str.length;
+  }
+}
+function jlRandomSalt(){
+  try{
+    const arr=new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){
+    return Math.random().toString(36).slice(2)+Date.now().toString(36);
+  }
+}
+
+/* ── Unlock screen ── */
+function jlIsLocked(){
+  return localStorage.getItem(JL_ENABLED_KEY)==='1' && !!localStorage.getItem(JL_HASH_KEY);
+}
+function jlShow(){
+  document.documentElement.classList.add('app-locked');
+  setTimeout(()=>{ const inp=document.getElementById('jarvisPassInput'); if(inp) inp.focus(); },350);
+}
+function jlResetOverlay(){
+  const welcome=document.getElementById('jarvisWelcome');
+  const fields=document.getElementById('jarvisFields');
+  const sub=document.getElementById('jarvisSub');
+  const hud=document.getElementById('jarvisHud');
+  if(welcome) welcome.textContent='';
+  if(sub) sub.style.display='';
+  if(fields) fields.style.display='';
+  if(hud) hud.classList.remove('jl-granted','jl-denied','jl-shake');
+  jlRenderFields('login');
+}
+
+/* ── Chaos: scrambles an element's text into glitch noise then
+   resolves it into the real string, character by character. ── */
+function jlScrambleText(el,final,duration){
+  if(!el) return;
+  duration=duration||550;
+  const chars='!<>-_\\/[]{}—=+*^?#01ΞΔ§±~';
+  const start=performance.now();
+  function frame(now){
+    const t=Math.min(1,(now-start)/duration);
+    if(t<1){
+      let out='';
+      for(let i=0;i<final.length;i++){
+        if(final[i]===' '){ out+=' '; continue; }
+        out += Math.random()<t ? final[i] : chars[Math.floor(Math.random()*chars.length)];
+      }
+      el.textContent=out;
+      requestAnimationFrame(frame);
+    }else{
+      el.textContent=final;
+    }
+  }
+  requestAnimationFrame(frame);
+}
+window.jlScrambleText=jlScrambleText;
+
+/* ── Chaos: on a wrong password/code, the whole screen shakes and
+   hue-flickers while scrambling text fragments burst across the
+   viewport at random — the site itself looks like it's glitching
+   out, not just the little login box. ── */
+function jlChaosBurst(){
+  document.documentElement.classList.add('jl-chaos-active');
+  let layer=document.getElementById('jlChaosLayer');
+  if(!layer){
+    layer=document.createElement('div');
+    layer.id='jlChaosLayer';
+    document.body.appendChild(layer);
+  }
+  layer.innerHTML='';
+  const words=['ACCESS DENIED','ERR_0x1A','INTRUSION','LOCKED OUT','DENIED','NO ENTRY','FAILED','0xDEAD','CORRUPT','SYSTEM HALT','REJECTED','#####','????'];
+  const glitchChars='!@#$%&*<>/\\{}[]01ΞΔ§±~';
+  const count=26;
+  for(let i=0;i<count;i++){
+    const span=document.createElement('span');
+    span.className='jl-chaos-frag';
+    span.textContent = Math.random()<0.5
+      ? words[Math.floor(Math.random()*words.length)]
+      : Array.from({length:4+Math.floor(Math.random()*6)},()=>glitchChars[Math.floor(Math.random()*glitchChars.length)]).join('');
+    span.style.left=(Math.random()*100)+'vw';
+    span.style.top=(Math.random()*100)+'vh';
+    span.style.fontSize=(10+Math.random()*26)+'px';
+    span.style.setProperty('--rot',(Math.random()*60-30)+'deg');
+    span.style.setProperty('--dx',(Math.random()*80-40)+'px');
+    span.style.setProperty('--dy',(Math.random()*80-40)+'px');
+    span.style.setProperty('--dur',(0.4+Math.random()*0.6)+'s');
+    span.style.setProperty('--delay',(Math.random()*0.3)+'s');
+    layer.appendChild(span);
+  }
+  setTimeout(()=>{
+    document.documentElement.classList.remove('jl-chaos-active');
+    if(layer) layer.innerHTML='';
+  },900);
+}
+window.jlChaosBurst=jlChaosBurst;
+
+/* Swaps the content under the HUD rings between login, recovery,
+   new-password and factory-reset states. Rebuilds #jarvisFields'
+   innerHTML each time rather than juggling several static blocks. */
+function jlRenderFields(mode){
+  const fields=document.getElementById('jarvisFields');
+  const status=document.getElementById('jarvisStatus');
+  const sub=document.getElementById('jarvisSub');
+  if(!fields) return;
+  if(mode==='recover'){
+    const hasQ=!!localStorage.getItem(JL_QHASH_KEY);
+    if(status) status.textContent='IDENTITY CHECK';
+    if(!hasQ){
+      if(sub) sub.textContent='No code word was saved for this lock.';
+      fields.innerHTML=`
+        <div class="jarvis-error" id="jarvisError"></div>
+        <button class="jarvis-submit" onclick="jlOpenResetConfirm()" style="border-color:#8a3a3a;color:#ff8a8a;background:rgba(255,90,90,.08)">Reset app instead</button>
+        <div class="jarvis-links"><span class="jarvis-link" onclick="jlBackToLogin()">Back to password</span></div>`;
+      return;
+    }
+    if(sub) sub.textContent='What is your code word?';
+    fields.innerHTML=`
+      <input type="text" id="jlRecoverInput" class="jarvis-input" placeholder="YOUR CODE WORD" autocomplete="off" onkeydown="if(event.key==='Enter')jlVerifyRecovery()">
+      <button class="jarvis-submit" onclick="jlVerifyRecovery()">Verify</button>
+      <div class="jarvis-error" id="jarvisError"></div>
+      <div class="jarvis-links"><span class="jarvis-link" onclick="jlBackToLogin()">Back to password</span><span class="jarvis-link-sep">·</span><span class="jarvis-link jarvis-link-danger" onclick="jlOpenResetConfirm()">Reset app instead</span></div>`;
+    setTimeout(()=>{ const inp=document.getElementById('jlRecoverInput'); if(inp) inp.focus(); },50);
+    return;
+  }
+  if(mode==='newpass'){
+    if(status) status.textContent='IDENTITY CONFIRMED';
+    if(sub) sub.textContent='Set a new access code';
+    fields.innerHTML=`
+      <input type="password" id="jlNewPass1" class="jarvis-input" placeholder="NEW ACCESS CODE" autocomplete="new-password">
+      <input type="password" id="jlNewPass2" class="jarvis-input" placeholder="CONFIRM ACCESS CODE" autocomplete="new-password" onkeydown="if(event.key==='Enter')jlSaveRecoveredPassword()" style="margin-top:8px">
+      <button class="jarvis-submit" onclick="jlSaveRecoveredPassword()" style="margin-top:8px">Save &amp; unlock</button>
+      <div class="jarvis-error" id="jarvisError"></div>`;
+    setTimeout(()=>{ const inp=document.getElementById('jlNewPass1'); if(inp) inp.focus(); },50);
+    return;
+  }
+  if(mode==='reset'){
+    if(status) status.textContent='FACTORY RESET';
+    if(sub) sub.textContent='This erases everything on this device';
+    fields.innerHTML=`
+      <div class="jarvis-hint">Focus history, Passport, Capsule entries, Vault, and every setting — on every Canopus page. This can't be undone.</div>
+      <input type="text" id="jlResetConfirmInput" class="jarvis-input" placeholder="TYPE RESET TO CONFIRM" autocomplete="off" onkeydown="if(event.key==='Enter')jlFactoryReset()">
+      <button class="jarvis-submit" onclick="jlFactoryReset()" style="border-color:#8a3a3a;color:#ff8a8a;background:rgba(255,90,90,.1)">Erase everything</button>
+      <div class="jarvis-error" id="jarvisError"></div>
+      <div class="jarvis-links"><span class="jarvis-link" onclick="jlBackToLogin()">Cancel</span></div>`;
+    setTimeout(()=>{ const inp=document.getElementById('jlResetConfirmInput'); if(inp) inp.focus(); },50);
+    return;
+  }
+  // default: login
+  if(status) status.textContent='SYSTEM LOCKED';
+  if(sub) sub.textContent='Passphrase authentication required';
+  fields.innerHTML=`
+    <input type="password" id="jarvisPassInput" class="jarvis-input" placeholder="ENTER ACCESS CODE" autocomplete="off" onkeydown="if(event.key==='Enter')jarvisSubmit()">
+    <button class="jarvis-submit" id="jarvisSubmitBtn" onclick="jarvisSubmit()">Authenticate</button>
+    <div class="jarvis-error" id="jarvisError"></div>
+    <div class="jarvis-links"><span class="jarvis-link" onclick="jlOpenRecovery()">Forgot password?</span></div>`;
+  setTimeout(()=>{ const inp=document.getElementById('jarvisPassInput'); if(inp) inp.focus(); },50);
+}
+window.jlOpenRecovery=function(){ jlRenderFields('recover'); };
+window.jlBackToLogin=function(){ jlRenderFields('login'); };
+window.jlOpenResetConfirm=function(){ jlRenderFields('reset'); };
+
+window.jlVerifyRecovery=async function(){
+  const input=document.getElementById('jlRecoverInput');
+  const err=document.getElementById('jarvisError');
+  const val=input?input.value.trim().toLowerCase():'';
+  if(!val) return;
+  const qsalt=localStorage.getItem(JL_QSALT_KEY)||'';
+  const hash=await jlHash(qsalt+val);
+  if(hash===localStorage.getItem(JL_QHASH_KEY)){
+    jlRenderFields('newpass');
+  }else{
+    jlChaosBurst();
+    if(err){
+      err.classList.add('jl-scramble');
+      jlScrambleText(err,'CODE WORD NOT RECOGNIZED',550);
+      setTimeout(()=>{ err.classList.remove('jl-scramble'); err.textContent='That code word is not recognized.'; },600);
+    }
+    if(input){ input.value=''; input.focus(); }
+  }
+};
+window.jlSaveRecoveredPassword=async function(){
+  const p1=document.getElementById('jlNewPass1').value;
+  const p2=document.getElementById('jlNewPass2').value;
+  const err=document.getElementById('jarvisError');
+  if(!p1||p1.length<4){ err.textContent='Use at least 4 characters.'; return; }
+  if(p1!==p2){ err.textContent="Passwords don't match."; return; }
+  const newSalt=jlRandomSalt();
+  const newHash=await jlHash(newSalt+p1);
+  localStorage.setItem(JL_SALT_KEY,newSalt);
+  localStorage.setItem(JL_HASH_KEY,newHash);
+  localStorage.setItem(JL_ENABLED_KEY,'1');
+  jlGrantAccess();
+};
+window.jlFactoryReset=function(){
+  const input=document.getElementById('jlResetConfirmInput');
+  const err=document.getElementById('jarvisError');
+  const val=input?input.value.trim().toUpperCase():'';
+  if(val!=='RESET'){ if(err) err.textContent='Type RESET (all caps) to confirm.'; return; }
+  try{ localStorage.clear(); }catch(e){}
+  location.reload();
+};
+
+window.jarvisSubmit=async function(){
+  const input=document.getElementById('jarvisPassInput');
+  const val=input?input.value:'';
+  if(!val) return;
+  const btn=document.getElementById('jarvisSubmitBtn');
+  if(btn) btn.disabled=true;
+  const salt=localStorage.getItem(JL_SALT_KEY)||'';
+  const hash=await jlHash(salt+val);
+  const stored=localStorage.getItem(JL_HASH_KEY);
+  if(btn) btn.disabled=false;
+  if(hash===stored){ jlGrantAccess(); } else { jlDenyAccess(); }
+};
+function jlGrantAccess(){
+  let name='';
+  try{ name=(localStorage.getItem('canopus_user_name')||'').trim(); }catch(e){}
+  const first=name?name.split(' ')[0]:'';
+  const greet=first?('Welcome, '+first+'.'):'Welcome, Sir.';
+  const hud=document.getElementById('jarvisHud');
+  const status=document.getElementById('jarvisStatus');
+  const sub=document.getElementById('jarvisSub');
+  const fields=document.getElementById('jarvisFields');
+  if(hud) hud.classList.add('jl-granted');
+  if(status) status.textContent='ACCESS GRANTED';
+  if(sub) sub.style.display='none';
+  if(fields) fields.style.display='none';
+  jlTypeWelcome(greet);
+  setTimeout(()=>{
+    const overlay=document.getElementById('jarvisLockOverlay');
+    if(overlay) overlay.classList.add('jl-closing');
+    setTimeout(()=>{
+      document.documentElement.classList.remove('app-locked');
+      if(overlay) overlay.classList.remove('jl-closing');
+      jlResetOverlay();
+    },560);
+  },2100);
+}
+function jlDenyAccess(){
+  const hud=document.getElementById('jarvisHud');
+  const status=document.getElementById('jarvisStatus');
+  const err=document.getElementById('jarvisError');
+  const input=document.getElementById('jarvisPassInput');
+  if(hud) hud.classList.add('jl-denied');
+  if(status){ status.classList.add('jl-scramble'); jlScrambleText(status,'ACCESS DENIED',550); }
+  if(err){ err.classList.add('jl-scramble'); jlScrambleText(err,'PASSPHRASE NOT RECOGNIZED',550); }
+  if(input) input.value='';
+  jlChaosBurst();
+  setTimeout(()=>{
+    if(hud) hud.classList.remove('jl-denied');
+    if(status){ status.classList.remove('jl-scramble'); status.textContent='SYSTEM LOCKED'; }
+    if(err){ err.classList.remove('jl-scramble'); err.textContent=''; }
+    if(input) input.focus();
+  },950);
+}
+function jlTypeWelcome(text){
+  const el=document.getElementById('jarvisWelcome');
+  if(!el) return;
+  el.textContent='';
+  let i=0;
+  (function step(){
+    if(i<=text.length){ el.textContent=text.slice(0,i); i++; setTimeout(step,42); }
+  })();
+}
+
+/* ── Settings modal: set / change / disable password ── */
+window.openJlSettings=function(){
+  renderJlSettings();
+  document.getElementById('jlSettingsBg').classList.add('open');
+};
+window.closeJlSettings=function(){
+  document.getElementById('jlSettingsBg').classList.remove('open');
+};
+function jlHasPassword(){
+  return !!localStorage.getItem(JL_HASH_KEY);
+}
+function renderJlSettings(mode){
+  const body=document.getElementById('jlSettingsBody');
+  if(!body) return;
+  if(!jlHasPassword()){
+    body.innerHTML=`
+      <div class="jl-hint">Set a password to lock Canopus. You'll be asked for it every time the app opens.</div>
+      <label class="jl-field-label">New password</label>
+      <input type="password" id="jlNew1" class="jl-input" placeholder="New password" autocomplete="new-password">
+      <label class="jl-field-label">Confirm password</label>
+      <input type="password" id="jlNew2" class="jl-input" placeholder="Confirm password" autocomplete="new-password">
+      <label class="jl-field-label">Code word</label>
+      <input type="text" id="jlCode1" class="jl-input" placeholder="A word only you'd know" autocomplete="off">
+      <div class="jl-hint" style="margin-top:-6px">If you forget your password, this is how you get back in — so pick something you won't forget. Without it, the only recovery option is a full reset that erases all Canopus data.</div>
+      <div class="jl-error" id="jlErr"></div>
+      <button class="jl-btn" onclick="jlSetupPassword()">Set password &amp; enable lock</button>
+      <button class="jl-btn-ghost" onclick="closeJlSettings()">Cancel</button>`;
+    return;
+  }
+  const enabled=localStorage.getItem(JL_ENABLED_KEY)==='1';
+  if(mode==='codeword'){
+    body.innerHTML=`
+      <div class="jl-hint">Verify your password, then set a new code word.</div>
+      <label class="jl-field-label">Current password</label>
+      <input type="password" id="jlCur" class="jl-input" placeholder="Current password" autocomplete="current-password">
+      <label class="jl-field-label">New code word</label>
+      <input type="text" id="jlCode1" class="jl-input" placeholder="A word only you'd know" autocomplete="off">
+      <div class="jl-error" id="jlErr"></div>
+      <button class="jl-btn" onclick="jlUpdateCodeword()">Save code word</button>
+      <button class="jl-btn-ghost" onclick="renderJlSettings()">Back</button>`;
+    return;
+  }
+  if(mode==='change'){
+    body.innerHTML=`
+      <label class="jl-field-label">Current password</label>
+      <input type="password" id="jlCur" class="jl-input" placeholder="Current password" autocomplete="current-password">
+      <label class="jl-field-label">New password</label>
+      <input type="password" id="jlNew1" class="jl-input" placeholder="New password" autocomplete="new-password">
+      <label class="jl-field-label">Confirm new password</label>
+      <input type="password" id="jlNew2" class="jl-input" placeholder="Confirm new password" autocomplete="new-password">
+      <div class="jl-error" id="jlErr"></div>
+      <button class="jl-btn" onclick="jlChangePassword()">Save new password</button>
+      <button class="jl-btn-ghost" onclick="renderJlSettings()">Back</button>`;
+    return;
+  }
+  if(mode==='remove'){
+    body.innerHTML=`
+      <div class="jl-hint">Enter your current password to remove App Lock entirely.</div>
+      <label class="jl-field-label">Current password</label>
+      <input type="password" id="jlCur" class="jl-input" placeholder="Current password" autocomplete="current-password">
+      <div class="jl-error" id="jlErr"></div>
+      <button class="jl-btn" style="background:#c94a4a;color:#fff" onclick="jlRemovePassword()">Remove password</button>
+      <button class="jl-btn-ghost" onclick="renderJlSettings()">Back</button>`;
+    return;
+  }
+  body.innerHTML=`
+    <div class="jl-row">
+      <div>
+        <div class="jl-row-label">Lock enabled</div>
+        <div class="jl-row-sub">Ask for the password on launch</div>
+      </div>
+      <button class="jl-btn-ghost" style="width:auto;padding:7px 14px;margin:0" id="jlToggleBtn" onclick="jlToggleEnabled()">${enabled?'On':'Off'}</button>
+    </div>
+    <button class="jl-btn-ghost" onclick="renderJlSettings('change')">Change password</button>
+    <button class="jl-btn-ghost" onclick="renderJlSettings('codeword')">Update code word</button>
+    <button class="jl-btn" onclick="closeJlSettings()">Done</button>
+    <button class="jl-btn-danger" onclick="renderJlSettings('remove')">Remove password</button>`;
+}
+window.renderJlSettings=renderJlSettings;
+window.jlToggleEnabled=function(){
+  const enabled=localStorage.getItem(JL_ENABLED_KEY)==='1';
+  localStorage.setItem(JL_ENABLED_KEY, enabled?'0':'1');
+  renderJlSettings();
+};
+window.jlSetupPassword=async function(){
+  const p1=document.getElementById('jlNew1').value;
+  const p2=document.getElementById('jlNew2').value;
+  const cw=document.getElementById('jlCode1').value.trim();
+  const err=document.getElementById('jlErr');
+  if(!p1||p1.length<4){ err.textContent='Use at least 4 characters.'; return; }
+  if(p1!==p2){ err.textContent="Passwords don't match."; return; }
+  if(!cw||cw.length<2){ err.textContent="Add a code word — it's how you recover access if you forget your password."; return; }
+  const salt=jlRandomSalt();
+  const hash=await jlHash(salt+p1);
+  const qsalt=jlRandomSalt();
+  const qhash=await jlHash(qsalt+cw.toLowerCase());
+  localStorage.setItem(JL_SALT_KEY,salt);
+  localStorage.setItem(JL_HASH_KEY,hash);
+  localStorage.setItem(JL_QSALT_KEY,qsalt);
+  localStorage.setItem(JL_QHASH_KEY,qhash);
+  localStorage.setItem(JL_ENABLED_KEY,'1');
+  closeJlSettings();
+};
+window.jlUpdateCodeword=async function(){
+  const cur=document.getElementById('jlCur').value;
+  const cw=document.getElementById('jlCode1').value.trim();
+  const err=document.getElementById('jlErr');
+  const salt=localStorage.getItem(JL_SALT_KEY)||'';
+  const curHash=await jlHash(salt+cur);
+  if(curHash!==localStorage.getItem(JL_HASH_KEY)){ err.textContent='Current password is incorrect.'; return; }
+  if(!cw||cw.length<2){ err.textContent='Code word is too short.'; return; }
+  const qsalt=jlRandomSalt();
+  const qhash=await jlHash(qsalt+cw.toLowerCase());
+  localStorage.setItem(JL_QSALT_KEY,qsalt);
+  localStorage.setItem(JL_QHASH_KEY,qhash);
+  renderJlSettings();
+};
+window.jlChangePassword=async function(){
+  const cur=document.getElementById('jlCur').value;
+  const p1=document.getElementById('jlNew1').value;
+  const p2=document.getElementById('jlNew2').value;
+  const err=document.getElementById('jlErr');
+  const salt=localStorage.getItem(JL_SALT_KEY)||'';
+  const curHash=await jlHash(salt+cur);
+  if(curHash!==localStorage.getItem(JL_HASH_KEY)){ err.textContent='Current password is incorrect.'; return; }
+  if(!p1||p1.length<4){ err.textContent='Use at least 4 characters.'; return; }
+  if(p1!==p2){ err.textContent="Passwords don't match."; return; }
+  const newSalt=jlRandomSalt();
+  const newHash=await jlHash(newSalt+p1);
+  localStorage.setItem(JL_SALT_KEY,newSalt);
+  localStorage.setItem(JL_HASH_KEY,newHash);
+  renderJlSettings();
+};
+window.jlRemovePassword=async function(){
+  const cur=document.getElementById('jlCur').value;
+  const err=document.getElementById('jlErr');
+  const salt=localStorage.getItem(JL_SALT_KEY)||'';
+  const curHash=await jlHash(salt+cur);
+  if(curHash!==localStorage.getItem(JL_HASH_KEY)){ err.textContent='Current password is incorrect.'; return; }
+  localStorage.removeItem(JL_HASH_KEY);
+  localStorage.removeItem(JL_SALT_KEY);
+  localStorage.removeItem(JL_QHASH_KEY);
+  localStorage.removeItem(JL_QSALT_KEY);
+  localStorage.setItem(JL_ENABLED_KEY,'0');
+  renderJlSettings();
+};
+
+if(jlIsLocked()) jlShow();
 })();
 </script>
 
