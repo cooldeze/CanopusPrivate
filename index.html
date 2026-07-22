@@ -638,6 +638,17 @@ html.crt-retro .flight-hud.hud-idle .flight-hud-grip span{
    generated airport leg for each focus session) */
 .flight-hud.pomo-mode .alt-curve-wrap,
 .flight-hud.pomo-mode .flight-wind-row{display:none}
+/* ── Pause badge: shown when the active timer (flight / pomodoro / pomomix) is paused ── */
+.flight-pause-badge{
+  display:none;position:absolute;left:50%;top:-34px;transform:translateX(-50%);
+  background:rgba(0,0,0,0.65);border:0.5px solid rgba(255,255,255,0.25);border-radius:8px;
+  padding:6px 12px;font-size:10px;letter-spacing:.08em;color:rgba(255,255,255,0.85);
+  white-space:nowrap;text-transform:uppercase;font-family:'Inter',sans-serif;z-index:5;
+}
+.flight-pause-badge.show{display:block;animation:pauseBadgeFade .2s ease}
+@keyframes pauseBadgeFade{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.flight-hud.is-paused .flight-timer{opacity:.45}
+.flight-hud.is-paused .flight-progress-fill{filter:grayscale(1)}
 .pomo-dots{display:flex;gap:5px;align-items:center;justify-content:center}
 .pomo-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.15);transition:background .3s}
 .pomo-dot.done{background:rgba(120,200,255,0.9)}
@@ -726,7 +737,7 @@ html.crt-retro .flight-hud.hud-idle .flight-hud-grip span{
 .flight-setup.hidden{opacity:0;pointer-events:none}
 .flight-setup>div{margin:auto 0;flex-shrink:0}
 /* ── Mode picker cards ── */
-.flight-mode-cards{display:flex;gap:16px;margin-top:4px;margin-bottom:8px}
+.flight-mode-cards{display:flex;gap:16px;margin-top:4px;margin-bottom:8px;flex-wrap:wrap;justify-content:center}
 .fmc{display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 24px;width:200px;
   background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.12);
   border-radius:16px;cursor:pointer;transition:all .22s;font-family:'Inter',sans-serif;text-align:center;
@@ -2768,6 +2779,11 @@ html.crt-retro .cap-lb-nav{
           <div class="fmc-name">Pomodoro</div>
           <div class="fmc-desc">Timed focus sprints with automatic short & long breaks</div>
         </button>
+        <button class="fmc" id="fmc-pomomix" onclick="selectFlightSetupMode('pomomix')">
+          <div class="fmc-icon"><i class="ti ti-hourglass-high"></i></div>
+          <div class="fmc-name">PomoMix</div>
+          <div class="fmc-desc">One long focus block (e.g. 6h) with break reminders at an interval you set</div>
+        </button>
       </div>
     </div>
 
@@ -2946,6 +2962,83 @@ html.crt-retro .cap-lb-nav{
       </button>
     </div>
 
+    <!-- ── PomoMix form (shown after choosing PomoMix) ── -->
+    <div id="pomomix-form" style="display:none;width:100%;flex-direction:column;align-items:center">
+      <div class="flight-setup-title" style="display:flex;align-items:center;gap:10px">
+        <button onclick="backToModePicker()" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:16px;padding:0;line-height:1;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'"><i class="ti ti-arrow-left"></i></button>
+        set up your pomomix
+      </div>
+      <div class="airport-row">
+        <div class="airport-input-wrap" style="position:relative">
+          <div class="airport-lbl">From</div>
+          <input class="airport-inp" id="pmx-from" maxlength="40" value="LKO" placeholder="City or IATA" oninput="pmxAirportInputChanged('from',this.value)" onfocus="pmxShowAirportSuggest('from')" onblur="pmxHideAirportSuggest('from')">
+          <div class="airport-name" id="pmx-from-name">Lucknow (LKO)</div>
+          <div class="airport-suggest" id="suggest-pmx-from"></div>
+        </div>
+        <button class="airport-swap" onclick="pmxSwapAirports()" title="Swap airports"><i class="ti ti-arrows-exchange"></i></button>
+        <div class="airport-input-wrap" style="position:relative">
+          <div class="airport-lbl">To</div>
+          <input class="airport-inp" id="pmx-to" maxlength="40" value="JFK" placeholder="City or IATA" oninput="pmxAirportInputChanged('to',this.value)" onfocus="pmxShowAirportSuggest('to')" onblur="pmxHideAirportSuggest('to')">
+          <div class="airport-name" id="pmx-to-name">New York (JFK)</div>
+          <div class="airport-suggest" id="suggest-pmx-to"></div>
+        </div>
+      </div>
+      <div class="flight-sched-load-wrap" style="margin-top:2px">
+        <button type="button" class="flight-sched-load-btn" onclick="pmxRandomizeRoute()">
+          <i class="ti ti-arrows-shuffle" style="font-size:12px"></i> randomize route
+        </button>
+      </div>
+      <div class="flight-dur-wrap">
+        <div class="flight-dur-label">total block length</div>
+        <div class="flight-dur-chips" id="pmx-dur-chips">
+          <button class="fdc" onclick="pmxPickDuration(120,this)">2h</button>
+          <button class="fdc" onclick="pmxPickDuration(240,this)">4h</button>
+          <button class="fdc sel" onclick="pmxPickDuration(360,this)">6h</button>
+          <button class="fdc" onclick="pmxPickDuration(480,this)">8h</button>
+        </div>
+        <div class="flight-custom-row">
+          <div class="fdc-custom-label">or custom</div>
+          <div class="fdc-inputs">
+            <div class="fdc-inp-wrap">
+              <input class="fdc-inp" id="pmx-dur-custom" type="number" min="5" max="1440" step="5" placeholder="360" oninput="pmxDurationCustomChanged(this.value)">
+              <span class="fdc-inp-unit">m</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flight-dur-wrap">
+        <div class="flight-dur-label">remind me every</div>
+        <div class="flight-dur-chips" id="pmx-rem-chips">
+          <button class="fdc" onclick="pmxPickReminder(60,this)">1h</button>
+          <button class="fdc" onclick="pmxPickReminder(90,this)">1.5h</button>
+          <button class="fdc sel" onclick="pmxPickReminder(120,this)">2h</button>
+          <button class="fdc" onclick="pmxPickReminder(180,this)">3h</button>
+        </div>
+        <div class="flight-custom-row">
+          <div class="fdc-custom-label">or custom</div>
+          <div class="fdc-inputs">
+            <div class="fdc-inp-wrap">
+              <input class="fdc-inp" id="pmx-rem-custom" type="number" min="1" step="5" placeholder="120" oninput="pmxReminderCustomChanged(this.value)">
+              <span class="fdc-inp-unit">m</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flight-break-setup">
+        <div class="flight-break-label">number of breaks</div>
+        <div class="flight-break-stepper" id="pmx-breaks-stepper">
+          <button class="fbs-btn" onclick="pmxAdjustBreaks(-1)" id="pmxb-minus">−</button>
+          <div class="fbs-val" id="pmx-breaks-val">2</div>
+          <button class="fbs-btn" onclick="pmxAdjustBreaks(1)" id="pmxb-plus">+</button>
+        </div>
+        <div class="fbs-none" id="pmx-breaks-hint">reminder every 2h · 2 breaks total</div>
+      </div>
+      <div class="pomo-time-preview" id="pmx-time-preview"></div>
+      <button class="flight-launch-btn" onclick="launchPomomix()" title="Start pomomix">
+        <i class="ti ti-player-play"></i>
+      </button>
+    </div>
+
   </div>
 
   <!-- Live HUD (shown during flight) -->
@@ -2954,6 +3047,7 @@ html.crt-retro .cap-lb-nav{
       <div class="flight-hud-grip"><span></span><span></span><span></span></div>
     </div>
     <button class="flight-hud-reset" id="flight-hud-reset" title="Reset position &amp; size" aria-label="Reset panel"><i class="ti ti-refresh"></i></button>
+    <div class="flight-pause-badge" id="flight-pause-badge"><i class="ti ti-player-pause" style="margin-right:4px"></i>paused — press space to resume</div>
     <div class="flight-route">
       <span id="ft-from-disp">LHR</span>
       <span class="sep">→</span>
@@ -4152,6 +4246,18 @@ let pomoRemSec=pomoWorkMin*60;
 let pomoEndTime=null;
 let pomoInterval=null;
 
+// PomoMix state — one long focus block with periodic break-reminder notifications
+let pomomixRunning=false;
+let pomomixPaused=false;
+let pomomixDurationMin=360;    // total block length in minutes (default 6h)
+let pomomixReminderMin=120;    // remind every N minutes (default 2h)
+let pomomixBreaksTotal=2;      // how many break reminders to send over the block
+let pomomixBreaksTaken=0;      // how many reminders have fired so far
+let pomomixTotalSec=pomomixDurationMin*60;
+let pomomixRemSec=pomomixDurationMin*60;
+let pomomixEndTime=null;
+let pomomixInterval=null;
+
 // Spherical linear interpolation for great-circle path
 function slerp(a,b,t){
   const lat1=a.lat*Math.PI/180,lon1=a.lon*Math.PI/180;
@@ -4632,6 +4738,12 @@ function selectFlightSetupMode(mode){
     const titleEl=document.getElementById('flight-header-title');
     if(titleEl) titleEl.textContent='🍅 Pomodoro';
     updatePomoTimePreview();
+  } else if(mode==='pomomix'){
+    document.getElementById('flight-mode-picker').style.display='none';
+    document.getElementById('pomomix-form').style.display='flex';
+    const titleEl=document.getElementById('flight-header-title');
+    if(titleEl) titleEl.textContent='⏳ PomoMix';
+    pmxSyncBreaksHint();
   } else {
     // World traffic mode — hide setup, start idle flights
     document.getElementById('flight-setup').classList.add('hidden');
@@ -4651,6 +4763,8 @@ function backToModePicker(){
   document.getElementById('flight-form').style.display='none';
   const pf=document.getElementById('pomo-form');
   if(pf) pf.style.display='none';
+  const pmxf=document.getElementById('pomomix-form');
+  if(pmxf) pmxf.style.display='none';
   document.getElementById('flight-mode-picker').style.display='';
   const titleEl=document.getElementById('flight-header-title');
   if(titleEl) titleEl.textContent='✈ Flight Mode';
@@ -5398,7 +5512,11 @@ function closeFlightTracker(){
   flightOnBreak=false;
   pomoRunning=false; pomoPaused=false;
   if(pomoInterval){clearInterval(pomoInterval);pomoInterval=null;}
-  document.getElementById('flight-hud').classList.remove('pomo-mode');
+  pomomixRunning=false; pomomixPaused=false;
+  pomomixEndTime=null;
+  if(pomomixInterval){clearInterval(pomomixInterval);pomomixInterval=null;}
+  document.getElementById('flight-hud').classList.remove('pomo-mode','pomomix-mode');
+  syncPauseBadge();
   const bov=document.getElementById('flight-break-overlay');
   if(bov) bov.classList.remove('active');
   const badge=document.getElementById('idle-flights-badge');
@@ -5409,13 +5527,15 @@ function closeFlightTracker(){
 function showFlightSetup(){
   document.getElementById('flight-setup').classList.remove('hidden');
   document.getElementById('flight-hud').style.display='none';
-  document.getElementById('flight-hud').classList.remove('pomo-mode');
+  document.getElementById('flight-hud').classList.remove('pomo-mode','pomomix-mode');
   document.getElementById('flight-overlay').classList.remove('tracking-flight');
   // Always return to mode picker
   document.getElementById('flight-mode-picker').style.display='';
   document.getElementById('flight-form').style.display='none';
   const pf=document.getElementById('pomo-form');
   if(pf) pf.style.display='none';
+  const pmxf=document.getElementById('pomomix-form');
+  if(pmxf) pmxf.style.display='none';
   // Stop idle flights when going back to picker
   if(idleFlightsEnabled){ idleFlightsEnabled=false; }
   const titleEl=document.getElementById('flight-header-title');
@@ -5430,6 +5550,10 @@ function showFlightSetup(){
   flightOnBreak=false;
   pomoRunning=false; pomoPaused=false;
   if(pomoInterval){clearInterval(pomoInterval);pomoInterval=null;}
+  pomomixRunning=false; pomomixPaused=false;
+  pomomixEndTime=null;
+  if(pomomixInterval){clearInterval(pomomixInterval);pomomixInterval=null;}
+  syncPauseBadge();
   const bov=document.getElementById('flight-break-overlay');
   if(bov) bov.classList.remove('active');
   const val=document.getElementById('fbs-val');
@@ -5521,13 +5645,19 @@ function renderBreakDots(){
 
 // ── Take / resume break ──
 function takeBreak(){
-  if(!flightRunning||flightBreaksLeft<=0||flightOnBreak) return;
+  if(!(flightRunning||pomomixRunning)||flightBreaksLeft<=0||flightOnBreak) return;
   flightOnBreak=true;
   flightBreaksLeft--;
   flightBreakElapsed=0;
   renderBreakDots();
-  // Pause flight countdown
-  if(flightInterval){clearInterval(flightInterval);flightInterval=null;}
+  // Pause whichever countdown is actually driving this session
+  if(pomomixRunning){
+    pomomixRemSec=Math.max(0,Math.round((pomomixEndTime-Date.now())/1000));
+    pomomixPaused=true;
+    if(pomomixInterval){clearInterval(pomomixInterval);pomomixInterval=null;}
+  } else if(flightInterval){
+    clearInterval(flightInterval);flightInterval=null;
+  }
   // Show break overlay
   const ov=document.getElementById('flight-break-overlay');
   if(ov) ov.classList.add('active');
@@ -5565,8 +5695,13 @@ function resumeFromBreak(){
     btn.textContent='take break';
     btn.disabled=(flightBreaksLeft<=0);
   }
-  // Resume flight interval — reset the end time since flightRemSec was frozen during the break
-  if(flightRunning&&!flightInterval){
+  // Resume whichever countdown was frozen for the break
+  if(pomomixRunning){
+    pomomixPaused=false;
+    pomomixEndTime=Date.now()+pomomixRemSec*1000;
+    if(!pomomixInterval) pomomixInterval=setInterval(tickPomomix,1000);
+  } else if(flightRunning&&!flightInterval){
+    // Resume flight interval — reset the end time since flightRemSec was frozen during the break
     flightEndTime=Date.now()+flightRemSec*1000;
     flightInterval=setInterval(tickFlight,1000);
   }
@@ -5644,6 +5779,7 @@ function toggleFlightPause(){
     // Resume counting down from the frozen remaining time
     flightEndTime=Date.now()+flightRemSec*1000;
   }
+  syncPauseBadge();
 }
 
 function tickFlight(){
@@ -6000,6 +6136,16 @@ function togglePomoPause(){
   } else {
     pomoEndTime=Date.now()+pomoRemSec*1000;
   }
+  syncPauseBadge();
+}
+
+// Shared visual indicator for whichever timer (flight / pomodoro / pomomix) is paused
+function syncPauseBadge(){
+  const paused=flightPaused||pomoPaused||pomomixPaused;
+  const hud=document.getElementById('flight-hud');
+  const badge=document.getElementById('flight-pause-badge');
+  if(hud) hud.classList.toggle('is-paused',paused);
+  if(badge) badge.classList.toggle('show',paused);
 }
 
 function tickPomodoro(){
@@ -6113,6 +6259,279 @@ function updatePomoDisplay(){
       }
       dots+='</div>';
       phaseEl.innerHTML=dots;
+    }
+  }
+}
+
+// =================== POMOMIX ===================
+// One continuous focus block (default 6h) with browser-notification break reminders
+// fired at a fixed interval, up to a fixed number of breaks set during setup.
+function pmxFmtDur(mins){
+  const h=Math.floor(mins/60),m=Math.round(mins%60);
+  return h>0?(h+'h'+(m?' '+m+'m':'')):m+'m';
+}
+// ── PomoMix's own From/To airport picker, mirroring "Track My Flight" but with its
+//    own field ids (pmx-from / pmx-to) so the two setups don't fight over one route ──
+function pmxUpdateAirportName(which,val){
+  const code=getAirportIATA(val);
+  const ap=AIRPORTS[code]||null;
+  const el=document.getElementById('pmx-'+which+'-name');
+  if(el) el.textContent = ap ? ap.name+' ('+code+')' : (val.length>=3?val:'');
+}
+function pmxAirportInputChanged(which,val){
+  pmxUpdateAirportName(which,val);
+  pmxRenderAirportSuggest(which,val);
+}
+function pmxRenderAirportSuggest(which,val){
+  const box=document.getElementById('suggest-pmx-'+which);
+  if(!box) return;
+  const q=val.trim().toUpperCase();
+  const ql=val.trim().toLowerCase();
+  if(!q){box.classList.remove('open');return;}
+  let matches=[];
+  for(const [code,info] of Object.entries(AIRPORTS)){
+    const score=code.startsWith(q)?2:(info.name.toLowerCase().includes(ql)?1:0);
+    if(score>0) matches.push({code,name:info.name,score});
+  }
+  matches.sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));
+  matches=matches.slice(0,6);
+  if(!matches.length){box.classList.remove('open');return;}
+  box.innerHTML=matches.map(m=>`
+    <div class="airport-sug-item" onmousedown="pmxSelectAirport('${which}','${m.code}')">
+      <span class="asg-iata">${m.code}</span>
+      <span class="asg-city">${m.name}</span>
+    </div>`).join('');
+  box.classList.add('open');
+}
+function pmxSelectAirport(which,code){
+  const inp=document.getElementById('pmx-'+which);
+  if(inp) inp.value=code;
+  pmxUpdateAirportName(which,code);
+  const box=document.getElementById('suggest-pmx-'+which);
+  if(box) box.classList.remove('open');
+}
+function pmxShowAirportSuggest(which){
+  clearTimeout(suggestHideTimeout['pmx-'+which]);
+  const val=document.getElementById('pmx-'+which).value;
+  pmxRenderAirportSuggest(which,val);
+}
+function pmxHideAirportSuggest(which){
+  suggestHideTimeout['pmx-'+which]=setTimeout(()=>{
+    const box=document.getElementById('suggest-pmx-'+which);
+    if(box) box.classList.remove('open');
+  },200);
+}
+function pmxSwapAirports(){
+  const a=document.getElementById('pmx-from').value;
+  const b=document.getElementById('pmx-to').value;
+  document.getElementById('pmx-from').value=b;
+  document.getElementById('pmx-to').value=a;
+  pmxUpdateAirportName('from',b);
+  pmxUpdateAirportName('to',a);
+}
+function pmxRandomizeRoute(){
+  const from=pickRandomAirport([]);
+  const to=pickRandomAirport([from]);
+  const fromInp=document.getElementById('pmx-from');
+  const toInp=document.getElementById('pmx-to');
+  if(fromInp) fromInp.value=from;
+  if(toInp) toInp.value=to;
+  pmxUpdateAirportName('from',from);
+  pmxUpdateAirportName('to',to);
+}
+function pmxPickDuration(mins,btn){
+  pomomixDurationMin=mins;
+  btn.parentElement.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const custom=document.getElementById('pmx-dur-custom');
+  if(custom) custom.value='';
+  pmxSyncBreaksHint();
+}
+function pmxDurationCustomChanged(val){
+  const mins=Math.max(5,Math.min(1440,parseInt(val)||0));
+  if(!mins) return;
+  pomomixDurationMin=mins;
+  const chipWrap=document.getElementById('pmx-dur-chips');
+  if(chipWrap) chipWrap.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
+  pmxSyncBreaksHint();
+}
+function pmxPickReminder(mins,btn){
+  pomomixReminderMin=mins;
+  btn.parentElement.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const custom=document.getElementById('pmx-rem-custom');
+  if(custom) custom.value='';
+  pmxSyncBreaksHint();
+}
+function pmxReminderCustomChanged(val){
+  const mins=Math.max(1,parseInt(val)||0);
+  if(!mins) return;
+  pomomixReminderMin=mins;
+  const chipWrap=document.getElementById('pmx-rem-chips');
+  if(chipWrap) chipWrap.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
+  pmxSyncBreaksHint();
+}
+function pmxAdjustBreaks(delta){
+  pomomixBreaksTotal=Math.max(0,Math.min(10,pomomixBreaksTotal+delta));
+  const val=document.getElementById('pmx-breaks-val');
+  if(val) val.textContent=pomomixBreaksTotal;
+  pmxSyncBreaksHint();
+}
+// Setup-screen preview: hint line + a list of the clock times each break reminder will fire at
+function pmxSyncBreaksHint(){
+  const hint=document.getElementById('pmx-breaks-hint');
+  if(hint) hint.textContent=pomomixBreaksTotal===0?'no reminders — silent focus block':
+    'reminder every '+pmxFmtDur(pomomixReminderMin)+' · '+pomomixBreaksTotal+' break'+(pomomixBreaksTotal===1?'':'s')+' total';
+  const preview=document.getElementById('pmx-time-preview');
+  if(!preview) return;
+  const end=new Date(Date.now()+pomomixDurationMin*60000);
+  let rows='';
+  for(let i=1;i<=pomomixBreaksTotal;i++){
+    const t=new Date(Date.now()+i*pomomixReminderMin*60000);
+    if(t.getTime()>=end.getTime()) break;
+    rows+='<div class="ptp-row ptp-short"><span class="ptp-label"><span class="ptp-dot"></span>break reminder '+i+'</span><span class="ptp-time">'+fmtClock(t)+'</span></div>';
+  }
+  preview.innerHTML='<div class="ptp-title">'+pmxFmtDur(pomomixDurationMin)+' block</div>'+rows+
+    '<div class="ptp-finish"><span class="ptp-label">ends</span><span class="ptp-time">'+fmtClock(end)+'</span></div>';
+}
+
+function launchPomomix(){
+  pomomixTotalSec=pomomixDurationMin*60;
+  pomomixRemSec=pomomixTotalSec;
+  pomomixEndTime=Date.now()+pomomixRemSec*1000;
+  pomomixBreaksTaken=0;
+  pomomixRunning=true;
+  pomomixPaused=false;
+
+  // Route: same From/To picker as "Track My Flight", but the plane's progress across it
+  // is driven by the pomomix countdown below — tickFlight/flightInterval are never started.
+  flightFrom=getAirportIATA(document.getElementById('pmx-from').value)||'LKO';
+  flightTo=getAirportIATA(document.getElementById('pmx-to').value)||'JFK';
+  flightTotalSec=pomomixTotalSec;
+  flightRemSec=pomomixRemSec;
+  flightRunning=true;
+  flightPaused=false;
+  flightEndTime=null;
+
+  const fromInfo=getAirportCoords(flightFrom);
+  const toInfo=getAirportCoords(flightTo);
+  const fEl=document.getElementById('ft-from-disp'); if(fEl) fEl.textContent=fromInfo.name+' ('+flightFrom+')';
+  const tEl=document.getElementById('ft-to-disp'); if(tEl) tEl.textContent=toInfo.name+' ('+flightTo+')';
+  const nEl=document.getElementById('ft-from-name-disp'); if(nEl) nEl.textContent='';
+  const mid=slerp(fromInfo,toInfo,0.5);
+  globeLambda=mid.lon*Math.PI/180;
+  updateGlobeArcs();
+
+  document.getElementById('flight-setup').classList.add('hidden');
+  document.getElementById('flight-hud').style.display='flex';
+  document.getElementById('flight-hud').classList.add('pomo-mode','pomomix-mode');
+  document.getElementById('flight-overlay').classList.add('tracking-flight');
+
+  // PomoMix reuses the shared break panel/overlay so reminders are actionable —
+  // but breaks start locked and unlock one at a time as reminders fire (see tickPomomix).
+  flightScheduledBreaks=pomomixBreaksTotal;
+  flightBreaksLeft=0;
+  flightOnBreak=false;
+  if(flightBreakInterval){clearInterval(flightBreakInterval);flightBreakInterval=null;}
+  const breakRow=document.getElementById('flight-break-row');
+  if(breakRow) breakRow.style.display=pomomixBreaksTotal>0?'flex':'none';
+  const breakBtn=document.getElementById('flight-break-btn');
+  if(breakBtn){breakBtn.disabled=true;breakBtn.textContent='take break';}
+  renderBreakDots();
+  // PomoMix has no goals furniture
+  const goalsPanel=document.getElementById('flight-goals-panel');
+  if(goalsPanel) goalsPanel.style.display='none';
+  const bov=document.getElementById('flight-break-overlay');
+  if(bov) bov.classList.remove('active');
+
+  const titleEl=document.getElementById('flight-header-title');
+  if(titleEl) titleEl.textContent='⏳ PomoMix';
+  document.getElementById('flight-status').className='flight-status';
+
+  updatePomomixDisplay();
+  syncPauseBadge();
+
+  if(pomomixInterval) clearInterval(pomomixInterval);
+  pomomixInterval=setInterval(tickPomomix,1000);
+}
+
+function togglePomomixPause(){
+  if(!pomomixRunning) return;
+  pomomixPaused=!pomomixPaused;
+  if(pomomixPaused){
+    pomomixRemSec=Math.max(0,Math.round((pomomixEndTime-Date.now())/1000));
+  } else {
+    pomomixEndTime=Date.now()+pomomixRemSec*1000;
+  }
+  syncPauseBadge();
+}
+
+function tickPomomix(){
+  if(!pomomixRunning||pomomixPaused) return;
+  pomomixRemSec=Math.max(0,Math.round((pomomixEndTime-Date.now())/1000));
+  flightRemSec=pomomixRemSec; // keep the globe's plane in sync with this block
+
+  // Fire a break reminder each time elapsed time crosses another reminder-interval boundary —
+  // each reminder unlocks exactly one break; taking it (takeBreak()) spends it, and the next
+  // reminder unlocks the next one.
+  if(pomomixBreaksTotal>0&&pomomixBreaksTaken<pomomixBreaksTotal&&pomomixRemSec>0){
+    const elapsedMin=(pomomixTotalSec-pomomixRemSec)/60;
+    const nextThreshold=(pomomixBreaksTaken+1)*pomomixReminderMin;
+    if(elapsedMin>=nextThreshold){
+      pomomixBreaksTaken++;
+      flightBreaksLeft++;
+      renderBreakDots();
+      const btn=document.getElementById('flight-break-btn');
+      if(btn&&!flightOnBreak) btn.disabled=false;
+      playFlightChime();
+      if('Notification' in window && Notification.permission==='granted'){
+        new Notification('Canopus ⏳','Break unlocked — '+pmxFmtDur(Math.round(elapsedMin))+' in. ('+pomomixBreaksTaken+' of '+pomomixBreaksTotal+')');
+      }
+    }
+  }
+
+  if(pomomixRemSec>0){
+    updatePomomixDisplay();
+  } else {
+    pomomixRunning=false;
+    flightRunning=false;
+    if(pomomixInterval){clearInterval(pomomixInterval);pomomixInterval=null;}
+    updatePomomixDisplay();
+    document.getElementById('flight-status').textContent='all done ✓';
+    document.getElementById('flight-status').className='flight-status landed';
+    document.getElementById('flight-eta').textContent='pomomix block complete';
+    document.getElementById('flight-prog').style.width='100%';
+    if('Notification' in window && Notification.permission==='granted'){
+      new Notification('Canopus ⏳','PomoMix block complete — nice focus streak!');
+    }
+  }
+}
+
+function updatePomomixDisplay(){
+  const h=Math.floor(pomomixRemSec/3600),m=Math.floor((pomomixRemSec%3600)/60),s=pomomixRemSec%60;
+  document.getElementById('flight-countdown').textContent=
+    h>0?h+':'+pad(m)+':'+pad(s):pad(m)+':'+pad(s);
+  const pct=pomomixTotalSec>0?((pomomixTotalSec-pomomixRemSec)/pomomixTotalSec*100).toFixed(2):0;
+  document.getElementById('flight-prog').style.width=pct+'%';
+
+  document.getElementById('flight-status').textContent='focusing';
+  const remMin=Math.round(pomomixRemSec/60);
+  document.getElementById('flight-eta').textContent=pmxFmtDur(remMin)+' remaining';
+  const destEl=document.getElementById('flight-dest-time');
+  if(destEl) destEl.textContent=pomomixBreaksTotal>0?(pomomixBreaksTaken+' of '+pomomixBreaksTotal+' breaks unlocked'):'no break reminders set';
+
+  // Reuse the phase row to show a dot per break reminder, taken vs upcoming
+  const phaseEl=document.getElementById('flight-phase-row');
+  if(phaseEl){
+    if(pomomixBreaksTotal>0){
+      let dots='<div class="pomo-dots">';
+      for(let i=0;i<pomomixBreaksTotal;i++){
+        dots+='<div class="pomo-dot '+(i<pomomixBreaksTaken?'done':'')+'"></div>';
+      }
+      dots+='</div>';
+      phaseEl.innerHTML=dots;
+    } else {
+      phaseEl.innerHTML='';
     }
   }
 }
@@ -7005,6 +7424,7 @@ document.addEventListener('visibilitychange',()=>{
   if(activePreset&&activePreset.running&&activePreset.endTime!=null)tickPreset(activePreset.idx);
   if(pomoRunning&&!pomoPaused&&pomoEndTime!=null)tickPomodoro();
   if(pomoQuitLocked()) pomoStrictNudge();
+  if(pomomixRunning&&!pomomixPaused&&!flightOnBreak&&pomomixEndTime!=null)tickPomomix();
   if(flightRunning&&!flightPaused&&!flightOnBreak&&!pomoRunning&&flightEndTime!=null)tickFlight();
   if(flightOnBreak&&flightBreakStartTime!=null){
     flightBreakElapsed=Math.round((Date.now()-flightBreakStartTime)/1000);
@@ -13068,6 +13488,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function activeRemSec(){
     if(pomoRunning&&!pomoPaused) return pomoRemSec;
+    if(pomomixRunning&&!pomomixPaused) return pomomixRemSec;
     if(flightRunning&&!flightPaused&&!flightOnBreak) return flightRemSec;
     return null;
   }
@@ -13084,6 +13505,24 @@ document.addEventListener('DOMContentLoaded',function(){
   timerEl.addEventListener('mousemove',showTip);
   timerEl.addEventListener('mouseleave',()=>tip.classList.remove('show'));
 })();
+
+/* ---- Flight tracker: spacebar pauses/resumes whichever timer is currently running
+   (Track My Flight, Pomodoro, or PomoMix) — only while the tracker is open and actively
+   running a session, and never while the person is typing in a field. ---- */
+document.addEventListener('keydown',function(e){
+  if(e.code!=='Space'&&e.key!==' ') return;
+  const el=document.activeElement;
+  const typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+  if(typing) return;
+  const overlay=document.getElementById('flight-overlay');
+  if(!overlay||!overlay.classList.contains('open')) return;
+  if(!overlay.classList.contains('tracking-flight')) return; // only during an active run, not the setup screens
+  if(flightOnBreak) return; // the break overlay has its own "resume flight" control
+  e.preventDefault();
+  if(pomoRunning) togglePomoPause();
+  else if(pomomixRunning) togglePomomixPause();
+  else if(flightRunning) toggleFlightPause();
+},true);
 
 /* ---- Flight HUD: draggable + resizable floating panel ---- */
 (function(){
