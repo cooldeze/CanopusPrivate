@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
 <script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
@@ -1442,6 +1442,27 @@ body.light .prog-goal-sub{color:#ccc}
 #capComposerOverlay{z-index:320}
 #capConfirmOverlay{z-index:330}
 #capLightboxOverlay{z-index:340}
+
+/* ── Reels: full-screen vertical swipe-through viewer for capsule videos ── */
+#capReelsOverlay{position:fixed;inset:0;background:#000;z-index:345;display:none;flex-direction:column}
+#capReelsOverlay.open{display:flex}
+.cap-reels-scroll{flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.cap-reels-scroll::-webkit-scrollbar{display:none}
+.cap-reel-slide{position:relative;width:100%;height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden}
+.cap-reel-slide video{width:100%;height:100%;object-fit:contain;background:#000}
+.cap-reel-loading{color:rgba(255,255,255,.45);font-size:26px}
+.cap-reel-loading i{animation:capspin 1s linear infinite}
+.cap-reel-info{position:absolute;left:16px;right:78px;bottom:calc(22px + env(safe-area-inset-bottom));color:#fff;pointer-events:none}
+.cap-reel-tag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#F4C430;background:rgba(200,155,92,.16);border:0.5px solid rgba(200,155,92,.4);border-radius:20px;padding:2px 8px;margin-bottom:6px}
+.cap-reel-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,.6);margin-bottom:4px}
+.cap-reel-text{font-size:13px;line-height:1.4;color:rgba(255,255,255,.92);max-height:4.2em;overflow:hidden}
+.cap-reel-side{position:absolute;right:14px;bottom:calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px;align-items:center;z-index:2}
+.cap-reel-side button{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:0.5px solid rgba(255,255,255,.18);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cap-reel-side button:hover{background:rgba(255,255,255,.2)}
+.cap-reel-top{position:absolute;top:calc(14px + env(safe-area-inset-top));left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:3}
+.cap-reel-close{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);border:0.5px solid rgba(255,255,255,.16);color:#fff;font-size:17px;cursor:pointer}
+.cap-reel-counter{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.08);border-radius:20px;padding:5px 12px}
+.cap-reel-empty{color:rgba(255,255,255,.6);font-size:13px;text-align:center;padding:0 30px}
 #capWebViewOverlay{z-index:345}
 .cap-webview{width:min(1100px,94vw);height:min(820px,88vh);background:var(--cap-paper);border:0.5px solid var(--cap-line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transform:translateY(10px);transition:transform .2s}
 .cap-overlay.open .cap-webview{transform:translateY(0)}
@@ -2563,6 +2584,7 @@ window.AccessGate={ hashCode:aqgHash };
         <span class="cap-sub">a private archive, just for you</span>
       </div>
       <div class="cap-header-actions">
+        <button class="cap-lock-btn" id="capReelsBtn" title="Watch your videos as Reels"><i class="ti ti-movie"></i></button>
         <button class="cap-lock-btn" id="capLockOpenBtn" title="Locked capsule"><i class="ti ti-lock"></i></button>
         <button class="cap-new" id="capComposeBtn"><i class="ti ti-plus"></i>New entry</button>
       </div>
@@ -2862,6 +2884,14 @@ window.AccessGate={ hashCode:aqgHash };
   <div class="cap-lb-inner" id="capLightboxInner"></div>
 </div>
 
+<div id="capReelsOverlay">
+  <div class="cap-reel-top">
+    <button class="cap-reel-close" id="capReelsClose" title="Close"><i class="ti ti-x"></i></button>
+    <span class="cap-reel-counter" id="capReelsCounter"></span>
+  </div>
+  <div class="cap-reels-scroll" id="capReelsScroll"></div>
+</div>
+
 <div class="cap-overlay" id="capWebViewOverlay">
   <div class="cap-webview">
     <div class="cap-webview-head">
@@ -2923,6 +2953,7 @@ window.AccessGate={ hashCode:aqgHash };
     <div class="cap-locked-head">
       <div class="cap-locked-head-title"><i class="ti ti-lock"></i><span>Locked capsule</span></div>
       <div style="display:flex;gap:8px">
+        <button class="cap-lock-btn" id="capLockedReelsBtn" title="Watch these videos as Reels"><i class="ti ti-movie"></i></button>
         <button class="cap-new" id="capLockedNewBtn"><i class="ti ti-plus"></i>New</button>
         <button class="cap-comp-close" id="capLockedRelock" title="Lock &amp; close"><i class="ti ti-x"></i></button>
       </div>
@@ -9378,6 +9409,13 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   let capLbPost = null;
   let capLbIndex = 0;
   let capLbObjUrl = null;
+
+  /* ── Reels state ── */
+  let capReelItems = [];        // flattened list of {post, media, mi} across all video attachments
+  let capReelObjUrls = {};      // media.id -> blob object URL, kept only for nearby slides
+  let capReelObserver = null;
+  let capReelCurrentIndex = 0;
+  let capReelMuted = true;      // start muted so autoplay-on-scroll is never blocked by the browser
   let capDbPromise = null;
   let capCapsules = [];
   let capActiveCapsuleTab = '';
@@ -9930,6 +9968,195 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     }
   }
 
+  /* ── Reels: vertical swipe-through viewer for every video in a feed ──
+     Gathers every video attachment (across all entries in the relevant
+     feed) into one flat list, then renders them as full-screen snap-scroll
+     slides. Only the current slide (plus one neighbour each side) has its
+     blob loaded/decoded at a time, so scrolling through a long history of
+     videos doesn't balloon memory. ── */
+  function capGatherReelVideos(context){
+    let posts;
+    if(context==='locked'){
+      posts = capPosts.filter(p=>p.locked && (p.capsuleId||'')===capActiveCapsuleTab);
+    } else {
+      posts = capPosts.filter(p=>!p.locked);
+    }
+    const items = [];
+    posts.forEach(p=>{
+      (p.media||[]).forEach((m,mi)=>{
+        if(m.type==='video') items.push({post:p, media:m, mi});
+      });
+    });
+    return items;
+  }
+
+  function capOpenReels(context){
+    const items = capGatherReelVideos(context);
+    if(!items.length){ capToast('No videos here yet.'); return; }
+    capReelItems = items;
+    capReelCurrentIndex = 0;
+    capBuildReelsDom();
+    $('capReelsOverlay').classList.add('open');
+  }
+  window.capOpenReels = capOpenReels;
+
+  function capBuildReelsDom(){
+    const scroll = $('capReelsScroll');
+    scroll.innerHTML = capReelItems.map((it,i)=>{
+      const p = it.post;
+      const d = new Date(p.ts);
+      const dateStr = d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+      const tag = p.tag ? `<span class="cap-reel-tag">${capEsc(p.tag)}</span><br>` : '';
+      const text = p.text ? `<div class="cap-reel-text">${capEsc(p.text)}</div>` : '';
+      return `<div class="cap-reel-slide" data-i="${i}">
+        <div class="cap-reel-loading"><i class="ti ti-loader-2"></i></div>
+        <div class="cap-reel-info">${tag}<div class="cap-reel-date">${dateStr}</div>${text}</div>
+        <div class="cap-reel-side">
+          <button class="cap-reel-mute-btn" data-i="${i}" title="Mute/unmute"><i class="ti ti-volume-3"></i></button>
+          <button class="cap-reel-dl-btn" data-i="${i}" title="Download"><i class="ti ti-download"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+    $('capReelsCounter').textContent = `1 / ${capReelItems.length}`;
+    scroll.scrollTop = 0;
+
+    scroll.querySelectorAll('.cap-reel-mute-btn').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        e.stopPropagation();
+        capReelMuted = !capReelMuted;
+        capReelsApplyMute();
+      });
+    });
+    scroll.querySelectorAll('.cap-reel-dl-btn').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        e.stopPropagation();
+        capDownloadReelMedia(parseInt(btn.getAttribute('data-i'),10));
+      });
+    });
+
+    capReelsSetupObserver();
+    capReelsLoadNeighborhood(0);
+  }
+
+  function capReelsApplyMute(){
+    document.querySelectorAll('#capReelsScroll video').forEach(v=>{ v.muted = capReelMuted; });
+    document.querySelectorAll('.cap-reel-mute-btn i').forEach(i=>{
+      i.className = capReelMuted ? 'ti ti-volume-3' : 'ti ti-volume';
+    });
+  }
+
+  function capReelsSetupObserver(){
+    if(capReelObserver){ capReelObserver.disconnect(); capReelObserver = null; }
+    const scroll = $('capReelsScroll');
+    capReelObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        const slide = entry.target;
+        const i = parseInt(slide.getAttribute('data-i'),10);
+        const video = slide.querySelector('video');
+        if(entry.isIntersecting && entry.intersectionRatio>=0.6){
+          capReelCurrentIndex = i;
+          $('capReelsCounter').textContent = `${i+1} / ${capReelItems.length}`;
+          capReelsLoadNeighborhood(i);
+          if(video){ video.play().catch(()=>{}); }
+        } else if(video){
+          video.pause();
+        }
+      });
+    }, {root: scroll, threshold: [0, 0.6, 1]});
+    scroll.querySelectorAll('.cap-reel-slide').forEach(el=>capReelObserver.observe(el));
+  }
+
+  /* Load the current slide plus one neighbour on each side; unload anything further away. */
+  async function capReelsLoadNeighborhood(i){
+    const keep = new Set([i-1, i, i+1]);
+    for(let idx=0; idx<capReelItems.length; idx++){
+      if(!keep.has(idx)) capReelsUnloadSlide(idx);
+    }
+    await capReelsLoadSlide(i);
+    capReelsLoadSlide(i-1);
+    capReelsLoadSlide(i+1);
+  }
+
+  async function capReelsLoadSlide(i){
+    if(i<0 || i>=capReelItems.length) return;
+    const scroll = $('capReelsScroll');
+    if(!scroll) return;
+    const slide = scroll.querySelector(`.cap-reel-slide[data-i="${i}"]`);
+    if(!slide || slide.querySelector('video')) return; // not present, or already loaded
+    const m = capReelItems[i].media;
+    let blob = null;
+    try{ blob = await capIdbGet(m.id); }catch(e){}
+    // bail if the reels view was closed or rebuilt while the blob was loading
+    if(!$('capReelsOverlay').classList.contains('open')) return;
+    const stillThere = $('capReelsScroll').querySelector(`.cap-reel-slide[data-i="${i}"]`);
+    if(!stillThere || stillThere.querySelector('video')) return;
+    if(!blob){
+      const loading = stillThere.querySelector('.cap-reel-loading');
+      if(loading) loading.innerHTML = '<i class="ti ti-alert-circle"></i>';
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    capReelObjUrls[m.id] = url;
+    const loading = stillThere.querySelector('.cap-reel-loading');
+    if(loading) loading.remove();
+    const video = document.createElement('video');
+    video.src = url;
+    video.loop = true;
+    video.playsInline = true;
+    video.setAttribute('webkit-playsinline','');
+    video.muted = capReelMuted;
+    video.preload = 'auto';
+    video.addEventListener('click', ()=>{ if(video.paused) video.play().catch(()=>{}); else video.pause(); });
+    stillThere.prepend(video);
+    if(i===capReelCurrentIndex) video.play().catch(()=>{});
+  }
+
+  function capReelsUnloadSlide(i){
+    const scroll = $('capReelsScroll');
+    if(!scroll) return;
+    const slide = scroll.querySelector(`.cap-reel-slide[data-i="${i}"]`);
+    if(!slide) return;
+    const video = slide.querySelector('video');
+    if(!video) return;
+    const m = capReelItems[i] && capReelItems[i].media;
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    video.remove();
+    if(m && capReelObjUrls[m.id]){ URL.revokeObjectURL(capReelObjUrls[m.id]); delete capReelObjUrls[m.id]; }
+    if(!slide.querySelector('.cap-reel-loading')){
+      const l = document.createElement('div');
+      l.className = 'cap-reel-loading';
+      l.innerHTML = '<i class="ti ti-loader-2"></i>';
+      slide.prepend(l);
+    }
+  }
+
+  async function capDownloadReelMedia(i){
+    const it = capReelItems[i];
+    if(!it) return;
+    // Reuse the existing single-item download flow (native share sheet, iOS
+    // fallback, etc.) by momentarily pointing the lightbox state at this item.
+    const savedPost = capLbPost, savedIdx = capLbIndex, savedUrl = capLbObjUrl;
+    capLbPost = it.post; capLbIndex = it.mi; capLbObjUrl = capReelObjUrls[it.media.id] || null;
+    try{ await capDownloadCurrentMedia(); }
+    finally{ capLbPost = savedPost; capLbIndex = savedIdx; capLbObjUrl = savedUrl; }
+  }
+
+  function capCloseReels(){
+    $('capReelsOverlay').classList.remove('open');
+    const scroll = $('capReelsScroll');
+    if(scroll){
+      scroll.querySelectorAll('video').forEach(v=>{ v.pause(); });
+      scroll.innerHTML = '';
+    }
+    Object.values(capReelObjUrls).forEach(u=>{ try{ URL.revokeObjectURL(u); }catch(e){} });
+    capReelObjUrls = {};
+    if(capReelObserver){ capReelObserver.disconnect(); capReelObserver = null; }
+    capReelItems = [];
+    capReelCurrentIndex = 0;
+  }
+
   function capResetComposer(){
     capEditingId = null; capMediaList = []; capOrigMediaIds = []; capPinned = false; capLocked = false; capLinkOpen = false;
     capLinksList = []; capPostCapsuleId = ''; capGoalOpen = false; capGoalsList = [];
@@ -10317,6 +10544,13 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   $('capWebViewClose').addEventListener('click', capCloseWebView);
   $('capWebViewOverlay').addEventListener('click', e=>{ if(e.target.id==='capWebViewOverlay') capCloseWebView(); });
   $('capLightboxOverlay').addEventListener('click', e=>{ if(e.target.id==='capLightboxOverlay') capCloseLightbox(); });
+
+  $('capReelsBtn').addEventListener('click', ()=>capOpenReels('unlocked'));
+  $('capLockedReelsBtn').addEventListener('click', ()=>capOpenReels('locked'));
+  $('capReelsClose').addEventListener('click', capCloseReels);
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape' && $('capReelsOverlay').classList.contains('open')) capCloseReels();
+  });
 
   /* ── PIN gate ── */
   function capLockErr(msg){
