@@ -519,6 +519,16 @@ body.light .nm-modal-signoff{color:#8a8578}
   transition:all .25s;backdrop-filter:blur(8px);
 }
 .flight-close:hover{border-color:rgba(255,255,255,1);color:#fff}
+.flight-close.shake{animation:pomoShake .4s ease}
+@keyframes pomoShake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-4px)}
+  40%{transform:translateX(4px)}
+  60%{transform:translateX(-3px)}
+  80%{transform:translateX(3px)}
+}
+.pomo-nudge{margin-top:8px;text-align:center;font-size:10.5px;letter-spacing:.04em;color:rgba(230,150,150,0.9);opacity:0;transition:opacity .3s;min-height:14px}
+.pomo-nudge.show{opacity:1}
 .flight-back{
   width:34px;height:34px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.35);
   background:rgba(0,0,0,0.4);color:rgba(255,255,255,0.85);cursor:pointer;
@@ -632,10 +642,31 @@ html.crt-retro .flight-hud.hud-idle .flight-hud-grip span{
 .pomo-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.15);transition:background .3s}
 .pomo-dot.done{background:rgba(120,200,255,0.9)}
 .pomo-dot.cur{background:rgba(255,255,255,0.85)}
+.pomo-inf-badge{display:flex;align-items:center;justify-content:center;gap:6px;font-size:10.5px;color:rgba(255,255,255,0.4);letter-spacing:.04em}
+.pomo-inf-badge i{font-size:13px;color:rgba(255,255,255,0.5)}
+.pomo-inf-toggle{margin-top:10px;display:flex;align-items:center;gap:7px;background:transparent;border:0.5px solid rgba(255,255,255,0.14);border-radius:20px;padding:7px 14px;font-size:10.5px;letter-spacing:.04em;color:rgba(255,255,255,0.5);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+.pomo-inf-toggle i{font-size:13px}
+.pomo-inf-toggle:hover{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.75)}
+.pomo-inf-toggle.on{background:rgba(255,255,255,0.08);border-color:var(--accent,#fff);color:var(--accent,#fff)}
+.pomo-inf-toggle.disabled,.pomo-inf-toggle:disabled{opacity:.3;cursor:not-allowed}
+.pomo-inf-toggle.disabled:hover,.pomo-inf-toggle:disabled:hover{border-color:rgba(255,255,255,0.14);color:rgba(255,255,255,0.5)}
+.pomo-strict-toggle{margin-top:8px}
+.pomo-strict-toggle.on{background:rgba(220,90,90,0.1);border-color:rgba(220,120,120,0.7);color:rgba(230,150,150,0.95)}
+.pomo-strict-note{color:rgba(220,120,120,0.75);margin-top:6px}
 .flight-timer{
   font-size:clamp(52px,10vw,84px);font-weight:300;letter-spacing:-.04em;
   color:#fff;font-variant-numeric:tabular-nums;line-height:1;margin-bottom:6px;
+  cursor:default;
 }
+.flight-finish-tip{
+  position:fixed;z-index:200;pointer-events:none;
+  background:rgba(10,10,10,0.92);border:0.5px solid rgba(255,255,255,0.18);
+  border-radius:7px;padding:5px 10px;font-size:11px;letter-spacing:.03em;
+  color:rgba(255,255,255,0.9);font-variant-numeric:tabular-nums;
+  opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;
+  white-space:nowrap;
+}
+.flight-finish-tip.show{opacity:1;transform:translateY(0)}
 /* ── FLIGHT STATUS CARD ── */
 .flight-status-card{
   display:flex;flex-direction:column;align-items:center;
@@ -943,6 +974,20 @@ body.light kbd{background:#f0f0eb;border-color:#ddd;color:#666}
 .fbs-btn:hover{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.8)}
 .fbs-val{font-size:22px;font-weight:300;color:rgba(255,255,255,0.7);min-width:32px;text-align:center;font-variant-numeric:tabular-nums}
 .fbs-none{font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:.08em}
+
+/* ── POMODORO TIME PREVIEW (setup screen: shows clock time each session will end) ── */
+.pomo-time-preview{width:100%;max-width:280px;margin-top:20px;padding:14px 16px;border:0.5px solid rgba(255,255,255,0.1);border-radius:10px;background:rgba(255,255,255,0.03)}
+.ptp-title{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:.22em;text-transform:uppercase;margin-bottom:10px;text-align:center}
+.ptp-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:11.5px;letter-spacing:.03em}
+.ptp-row .ptp-label{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,0.55)}
+.ptp-row .ptp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ptp-row.ptp-work .ptp-dot{background:#c0392b}
+.ptp-row.ptp-short .ptp-dot{background:#5a9fd4}
+.ptp-row.ptp-long .ptp-dot{background:#4a9a6a}
+.ptp-row .ptp-time{color:rgba(255,255,255,0.85);font-variant-numeric:tabular-nums;font-weight:500}
+.ptp-finish{margin-top:10px;padding-top:10px;border-top:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;font-size:11.5px}
+.ptp-finish .ptp-label{color:rgba(255,255,255,0.55);letter-spacing:.03em;display:flex;align-items:center;gap:6px}
+.ptp-finish .ptp-time{color:var(--accent,#fff);font-weight:600;font-variant-numeric:tabular-nums}
 
 /* ── BREAK PANEL (bottom-left corner, isolated from HUD) ── */
 .flight-break-panel{position:absolute;top:80px;left:32px;z-index:15;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
@@ -2881,13 +2926,21 @@ html.crt-retro .cap-lb-nav{
       </div>
       <div class="flight-break-setup">
         <div class="flight-break-label">focus sessions</div>
-        <div class="flight-break-stepper">
+        <div class="flight-break-stepper" id="pms-stepper">
           <button class="fbs-btn" onclick="ppAdjustCycles(-1)" id="pms-minus">−</button>
           <div class="fbs-val" id="pms-val">4</div>
           <button class="fbs-btn" onclick="ppAdjustCycles(1)" id="pms-plus">+</button>
         </div>
         <div class="fbs-none" id="pms-hint">4 sessions, then done</div>
+        <button type="button" class="pomo-inf-toggle" id="pomo-inf-toggle" onclick="togglePomoInfinite()">
+          <i class="ti ti-infinity"></i> infinite mode — repeat until I quit
+        </button>
+        <button type="button" class="pomo-inf-toggle pomo-strict-toggle" id="pomo-strict-toggle" onclick="togglePomoStrict()">
+          <i class="ti ti-lock"></i> strict mode — no quitting mid-focus
+        </button>
+        <div class="fbs-none pomo-strict-note" id="pomo-strict-note" style="display:none">quit &amp; close only unlock during breaks</div>
       </div>
+      <div class="pomo-time-preview" id="pomo-time-preview"></div>
       <button class="flight-launch-btn" onclick="launchPomodoro()" title="Start pomodoro">
         <i class="ti ti-player-play"></i>
       </button>
@@ -2908,6 +2961,7 @@ html.crt-retro .cap-lb-nav{
     </div>
     <div style="font-size:11px;color:rgba(255,255,255,0.22);letter-spacing:.08em;margin-bottom:8px" id="ft-from-name-disp"></div>
     <div class="flight-timer" id="flight-countdown">1:00:00</div>
+    <div class="flight-finish-tip" id="flight-finish-tip"></div>
     <div class="flight-dest-time" id="flight-dest-time"></div>
     <div class="flight-status-card">
       <div class="flight-status-row">
@@ -2923,6 +2977,7 @@ html.crt-retro .cap-lb-nav{
     <div class="flight-progress-track">
       <div class="flight-progress-fill" id="flight-prog" style="width:0%"></div>
     </div>
+    <div class="pomo-nudge" id="pomo-nudge"></div>
 
     <div class="flight-hud-resize" id="flight-hud-resize" title="Drag to resize"><i class="ti ti-arrows-maximize"></i></div>
   </div>
@@ -2952,7 +3007,7 @@ html.crt-retro .cap-lb-nav{
   <div class="globe-tooltip" id="globe-tooltip" style="position:fixed"></div>
   <!-- Globe controls: theme toggle + spin speed -->
   <div class="globe-spin-ctrl" id="globe-spin-ctrl">
-    <button id="globe-theme-btn" onclick="toggleGlobeTheme()" style="background:none;border:none;padding:0;cursor:pointer;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:.14em;text-transform:uppercase;font-family:'Inter',sans-serif;transition:color .2s;white-space:nowrap">b&amp;w</button>
+    <button id="globe-theme-btn" onclick="toggleGlobeTheme()" style="background:none;border:none;padding:0;cursor:pointer;font-size:10px;color:rgba(255,255,255,0.55);letter-spacing:.14em;text-transform:uppercase;font-family:'Inter',sans-serif;transition:color .2s;white-space:nowrap">colour</button>
     <span class="gsc-label" style="margin-left:10px">spin</span>
     <input class="gsc-slider" id="gsc-slider" type="range" min="0" max="100" value="50" step="1" oninput="setGlobeSpinSpeed(this.value)">
     <span class="gsc-val" id="gsc-val">1×</span>
@@ -4048,6 +4103,16 @@ function genPomoRoute(numLegs){
   return route;
 }
 
+// Infinite mode has no fixed number of legs up front, so grow pomoRoute on demand,
+// picking a random airport different from wherever the previous leg landed.
+function extendPomoRouteIfNeeded(neededLen){
+  while(pomoRoute.length<neededLen){
+    const last=pomoRoute.length?pomoRoute[pomoRoute.length-1].to:(getAirportIATA(document.getElementById('ft-from')?.value)||'LKO');
+    const next=pickRandomAirport([last]);
+    pomoRoute.push({from:last,to:next});
+  }
+}
+
 // Apply the leg at pomoRoute[idx] to the HUD + globe (called when a work/focus session starts)
 function applyPomoLeg(idx){
   const leg=pomoRoute[idx];
@@ -4076,7 +4141,9 @@ let flightBreakStartTime=null; // wall-clock timestamp (ms) when current break b
 let pomoRunning=false;
 let pomoPaused=false;
 let pomoWorkMin=25, pomoBreakMin=5, pomoLongBreakMin=15;
-let pomoCyclesTarget=4;        // number of focus sessions before pomodoro ends (min 1, max 12)
+let pomoCyclesTarget=4;        // number of focus sessions before pomodoro ends (min 1, max 12); ignored when pomoInfinite is true
+let pomoInfinite=false;        // when true, sessions repeat forever until the user quits mid-session
+let pomoStrict=false;          // when true, quitting is locked during focus phases — only allowed on breaks
 let pomoLongBreakEvery=4;      // take a long break every Nth completed focus session (min 2, max 12)
 let pomoCycleCount=0;          // completed focus sessions so far
 let pomoPhase='work';          // 'work' | 'short' | 'long' | 'done'
@@ -4276,7 +4343,7 @@ let globeGeoData=null; // cached GeoJSON features
 let globeStars=null;
 let globeLoadError=false;
 let globeSpinSpeed=0.006; // radians per frame during flight
-let globeTheme='color'; // 'color' | 'bw'
+let globeTheme='bw'; // 'color' | 'bw' — b&amp;w is the default look
 let globeZoom=0.5; // zoom multiplier (0.4 – 3.0)
 
 // ── IDLE WORLD FLIGHTS ──────────────────────────────────────────────────────
@@ -4564,6 +4631,7 @@ function selectFlightSetupMode(mode){
     document.getElementById('pomo-form').style.display='flex';
     const titleEl=document.getElementById('flight-header-title');
     if(titleEl) titleEl.textContent='🍅 Pomodoro';
+    updatePomoTimePreview();
   } else {
     // World traffic mode — hide setup, start idle flights
     document.getElementById('flight-setup').classList.add('hidden');
@@ -5288,7 +5356,38 @@ function openFlightTracker(){
   updateAirportName('to',document.getElementById('ft-to').value);
 }
 
+// Quit an in-progress pomodoro (any phase — focus, short break, or long break) and
+// return to the setup screen so a new one can be configured. Unlike closeFlightTracker(),
+// this keeps the globe overlay open and just resets straight back to the pomodoro form.
+// True while strict mode is on, a pomodoro is running, and it's currently a focus phase —
+// quitting is locked until the next break starts.
+function pomoQuitLocked(){
+  return pomoRunning && pomoStrict && pomoPhase==='work';
+}
+// Briefly flash the quit button / close button to signal a blocked quit attempt.
+function pomoFlashLocked(btn){
+  if(!btn) return;
+  btn.classList.add('shake');
+  setTimeout(()=>btn.classList.remove('shake'),420);
+}
+let _pomoNudgeTimer=null;
+// Shown when the tab regains focus mid-session in strict mode — a reminder, not a real
+// site block (a webpage can't control other tabs/apps), but the closest honest nudge.
+function pomoStrictNudge(){
+  const el=document.getElementById('pomo-nudge');
+  if(!el) return;
+  const m=Math.floor(pomoRemSec/60), s=pomoRemSec%60;
+  el.textContent='welcome back — '+m+':'+pad(s)+' left in this focus session';
+  el.classList.add('show');
+  clearTimeout(_pomoNudgeTimer);
+  _pomoNudgeTimer=setTimeout(()=>el.classList.remove('show'),4000);
+}
+
 function closeFlightTracker(){
+  if(pomoQuitLocked()){
+    pomoFlashLocked(document.querySelector('.flight-close'));
+    return;
+  }
   document.getElementById('flight-overlay').classList.remove('open');
   document.getElementById('flight-overlay').classList.remove('tracking-flight');
   flightRunning=false; flightPaused=false;
@@ -5648,6 +5747,7 @@ function ppPickWork(mins,btn){
   btn.classList.add('sel');
   const custom=document.getElementById('pp-work-custom');
   if(custom) custom.value='';
+  updatePomoTimePreview();
 }
 function ppWorkCustomChanged(val){
   const mins=Math.max(1,Math.min(180,parseInt(val)||0));
@@ -5656,6 +5756,7 @@ function ppWorkCustomChanged(val){
   clearPomoSchedule();
   const chipWrap=document.getElementById('pomo-work-chips');
   if(chipWrap) chipWrap.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
+  updatePomoTimePreview();
 }
 // ── Load pomodoro focus length from a scheduled study session ──
 function togglePomoSchedPicker(e){
@@ -5702,11 +5803,13 @@ function pickPomoSchedule(idx){
   }
   const p=document.getElementById('pomo-sched-picker');
   if(p)p.classList.remove('open');
+  updatePomoTimePreview();
 }
 function clearPomoSchedule(){
   pomoLoadedType='work';pomoLoadedLabel='';
   const hint=document.getElementById('pomo-sched-loaded');
   if(hint){hint.style.display='none';hint.innerHTML='';}
+  updatePomoTimePreview();
 }
 function ppPickBreak(mins,btn){
   pomoBreakMin=mins;
@@ -5714,6 +5817,7 @@ function ppPickBreak(mins,btn){
   btn.classList.add('sel');
   const custom=document.getElementById('pp-break-custom');
   if(custom) custom.value='';
+  updatePomoTimePreview();
 }
 function ppBreakCustomChanged(val){
   const mins=Math.max(1,Math.min(120,parseInt(val)||0));
@@ -5721,6 +5825,7 @@ function ppBreakCustomChanged(val){
   pomoBreakMin=mins;
   const chipWrap=document.getElementById('pomo-break-chips');
   if(chipWrap) chipWrap.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
+  updatePomoTimePreview();
 }
 function ppPickLongBreak(mins,btn){
   pomoLongBreakMin=mins;
@@ -5728,6 +5833,7 @@ function ppPickLongBreak(mins,btn){
   btn.classList.add('sel');
   const custom=document.getElementById('pp-longbreak-custom');
   if(custom) custom.value='';
+  updatePomoTimePreview();
 }
 function ppLongBreakCustomChanged(val){
   const mins=Math.max(1,Math.min(120,parseInt(val)||0));
@@ -5735,6 +5841,7 @@ function ppLongBreakCustomChanged(val){
   pomoLongBreakMin=mins;
   const chipWrap=document.getElementById('pomo-longbreak-chips');
   if(chipWrap) chipWrap.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
+  updatePomoTimePreview();
 }
 function ppAdjustCycles(delta){
   pomoCyclesTarget=Math.max(1,Math.min(12,pomoCyclesTarget+delta));
@@ -5742,6 +5849,43 @@ function ppAdjustCycles(delta){
   const hint=document.getElementById('pms-hint');
   if(val) val.textContent=pomoCyclesTarget;
   if(hint) hint.textContent=pomoCyclesTarget+' session'+(pomoCyclesTarget===1?'':'s')+', then done';
+  updatePomoTimePreview();
+}
+// Infinite mode + strict mode together would trap the user in a focus session that
+// never ends and can't be quit — so only one of the two can be on at a time.
+function syncPomoModeToggles(){
+  const infBtn=document.getElementById('pomo-inf-toggle');
+  const strictBtn=document.getElementById('pomo-strict-toggle');
+  const stepper=document.getElementById('pms-stepper');
+  const hint=document.getElementById('pms-hint');
+  const note=document.getElementById('pomo-strict-note');
+
+  if(infBtn){
+    infBtn.classList.toggle('on',pomoInfinite);
+    infBtn.classList.toggle('disabled',pomoStrict&&!pomoInfinite);
+    infBtn.disabled=pomoStrict&&!pomoInfinite;
+    infBtn.title=pomoStrict?"can't combine with strict mode — no way to exit a session that never ends and can't be quit":'';
+  }
+  if(strictBtn){
+    strictBtn.classList.toggle('on',pomoStrict);
+    strictBtn.classList.toggle('disabled',pomoInfinite&&!pomoStrict);
+    strictBtn.disabled=pomoInfinite&&!pomoStrict;
+    strictBtn.title=pomoInfinite?"can't combine with infinite mode — no way to exit a session that never ends and can't be quit":'';
+  }
+  if(stepper){ stepper.style.opacity=pomoInfinite?'0.3':'1'; stepper.style.pointerEvents=pomoInfinite?'none':'auto'; }
+  if(hint) hint.textContent=pomoInfinite?'runs forever — quit anytime from the session':(pomoCyclesTarget+' session'+(pomoCyclesTarget===1?'':'s')+', then done');
+  if(note) note.style.display=pomoStrict?'block':'none';
+}
+function togglePomoInfinite(){
+  if(pomoStrict) return; // guarded server-side of the click too — disabled buttons don't fire onclick, this is belt-and-braces
+  pomoInfinite=!pomoInfinite;
+  syncPomoModeToggles();
+  updatePomoTimePreview();
+}
+function togglePomoStrict(){
+  if(pomoInfinite) return;
+  pomoStrict=!pomoStrict;
+  syncPomoModeToggles();
 }
 
 // 1st, 2nd, 3rd, 4th... used for the long-break-frequency hint
@@ -5756,6 +5900,7 @@ function ppAdjustLongBreakEvery(delta){
   const hint=document.getElementById('plbe-hint');
   if(val) val.textContent=pomoLongBreakEvery;
   if(hint) hint.textContent='every '+ordinalSuffix(pomoLongBreakEvery)+' session';
+  updatePomoTimePreview();
 }
 
 function pomoPhaseLabel(phase){
@@ -5771,6 +5916,41 @@ function pomoPhaseSec(phase){
   return 0;
 }
 
+// ── Setup-screen preview: shows the clock time each focus/break session will end,
+//    computed from "now" using whatever work/break/cycle settings are currently picked ──
+function fmtClock(d){
+  return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+function updatePomoTimePreview(){
+  const el=document.getElementById('pomo-time-preview');
+  if(!el) return;
+  const workMin=pomoWorkMin, shortMin=pomoBreakMin, longMin=pomoLongBreakMin;
+  const every=Math.max(2,Math.min(12,pomoLongBreakEvery));
+  if(!workMin){ el.innerHTML=''; return; }
+
+  // Infinite mode has no fixed end, so just preview the first few repeats and note that it loops.
+  const cycles=pomoInfinite?6:Math.max(1,Math.min(12,pomoCyclesTarget));
+
+  let cursor=new Date();
+  let rows='';
+  for(let i=1;i<=cycles;i++){
+    const workStart=cursor;
+    cursor=new Date(cursor.getTime()+workMin*60000);
+    rows+=`<div class="ptp-row ptp-work"><span class="ptp-label"><span class="ptp-dot"></span>focus ${i}</span><span class="ptp-time">${fmtClock(workStart)} – ${fmtClock(cursor)}</span></div>`;
+    if(i<cycles||pomoInfinite){
+      const isLong=(i%every===0);
+      const breakMin=isLong?longMin:shortMin;
+      const breakStart=cursor;
+      cursor=new Date(cursor.getTime()+breakMin*60000);
+      rows+=`<div class="ptp-row ${isLong?'ptp-long':'ptp-short'}"><span class="ptp-label"><span class="ptp-dot"></span>${isLong?'long break':'short break'}</span><span class="ptp-time">${fmtClock(breakStart)} – ${fmtClock(cursor)}</span></div>`;
+    }
+  }
+  const footer=pomoInfinite
+    ? `<div class="ptp-finish"><span class="ptp-label"><i class="ti ti-infinity"></i> repeats until you quit</span></div>`
+    : `<div class="ptp-finish"><span class="ptp-label">all done</span><span class="ptp-time">${fmtClock(cursor)}</span></div>`;
+  el.innerHTML=`<div class="ptp-title">${pomoInfinite?'next few sessions':'session times'}</div>${rows}${footer}`;
+}
+
 function launchPomodoro(){
   pomoCycleCount=0;
   pomoPhase='work';
@@ -5782,7 +5962,7 @@ function launchPomodoro(){
 
   // Generate a randomly chained airport route: one leg per focus session,
   // e.g. session 1 LKO→PER, session 2 PER→<random>, session 3 <random>→<random>...
-  pomoRoute=genPomoRoute(pomoCyclesTarget);
+  pomoRoute=genPomoRoute(pomoInfinite?1:pomoCyclesTarget);
   applyPomoLeg(0);
   flightTotalSec=pomoTotalSec;
   flightRemSec=pomoRemSec;
@@ -5838,6 +6018,7 @@ function pomoAdvancePhase(){
 
   if(pomoPhase==='work'){
     pomoCycleCount++;
+    if(pomoInfinite) extendPomoRouteIfNeeded(pomoCycleCount);
     // The leg just flown: pomoRoute[pomoCycleCount-1] (0-indexed, chained from→to→from...)
     const leg=pomoRoute[pomoCycleCount-1]||{from:flightFrom,to:flightTo};
     const fromInfo=getAirportCoords(leg.from), toInfo=getAirportCoords(leg.to);
@@ -5857,7 +6038,7 @@ function pomoAdvancePhase(){
     const nEl=document.getElementById('ft-from-name-disp');
     if(nEl) nEl.textContent='on the ground · '+(toInfo.name||leg.to);
 
-    if(pomoCycleCount>=pomoCyclesTarget){
+    if(!pomoInfinite&&pomoCycleCount>=pomoCyclesTarget){
       pomoPhase='done';
     } else if(pomoCycleCount%pomoLongBreakEvery===0){
       pomoPhase='long';
@@ -5865,8 +6046,14 @@ function pomoAdvancePhase(){
       pomoPhase='short';
     }
   } else if(pomoPhase==='short'||pomoPhase==='long'){
-    pomoPhase = pomoCycleCount>=pomoCyclesTarget ? 'done' : 'work';
-    if(pomoPhase==='work') applyPomoLeg(pomoCycleCount); // display the upcoming randomly generated leg
+    if(pomoInfinite){
+      pomoPhase='work';
+      extendPomoRouteIfNeeded(pomoCycleCount+1);
+      applyPomoLeg(pomoCycleCount);
+    } else {
+      pomoPhase = pomoCycleCount>=pomoCyclesTarget ? 'done' : 'work';
+      if(pomoPhase==='work') applyPomoLeg(pomoCycleCount); // display the upcoming randomly generated leg
+    }
   }
 
   if(pomoPhase==='done'){
@@ -5909,20 +6096,24 @@ function updatePomoDisplay(){
 
   document.getElementById('flight-status').textContent=pomoPhaseLabel(pomoPhase);
   document.getElementById('flight-eta').textContent=
-    pomoPhase==='done'?'':(pomoPhase==='work'?'session '+(pomoCycleCount+1)+' of '+pomoCyclesTarget:'up next: focus');
+    pomoPhase==='done'?'':(pomoPhase==='work'?('session '+(pomoCycleCount+1)+(pomoInfinite?' · infinite':' of '+pomoCyclesTarget)):'up next: focus');
   const destEl=document.getElementById('flight-dest-time');
-  if(destEl) destEl.textContent='session '+Math.min(pomoCycleCount+1,pomoCyclesTarget)+' of '+pomoCyclesTarget;
+  if(destEl) destEl.textContent=pomoInfinite?('session '+(pomoCycleCount+1)+' · ∞'):('session '+Math.min(pomoCycleCount+1,pomoCyclesTarget)+' of '+pomoCyclesTarget);
 
   // Reuse the phase row to show a dot per completed/remaining focus session
   const phaseEl=document.getElementById('flight-phase-row');
   if(phaseEl){
-    let dots='<div class="pomo-dots">';
-    for(let i=0;i<pomoCyclesTarget;i++){
-      const cls=i<pomoCycleCount?'done':(i===pomoCycleCount&&pomoPhase!=='done'?'cur':'');
-      dots+='<div class="pomo-dot '+cls+'"></div>';
+    if(pomoInfinite){
+      phaseEl.innerHTML='<div class="pomo-inf-badge"><i class="ti ti-infinity"></i> session '+(pomoCycleCount+1)+' — repeats until you quit</div>';
+    } else {
+      let dots='<div class="pomo-dots">';
+      for(let i=0;i<pomoCyclesTarget;i++){
+        const cls=i<pomoCycleCount?'done':(i===pomoCycleCount&&pomoPhase!=='done'?'cur':'');
+        dots+='<div class="pomo-dot '+cls+'"></div>';
+      }
+      dots+='</div>';
+      phaseEl.innerHTML=dots;
     }
-    dots+='</div>';
-    phaseEl.innerHTML=dots;
   }
 }
 
@@ -6813,6 +7004,7 @@ document.addEventListener('visibilitychange',()=>{
   if(fsRunning&&fsEndTime!=null)fsTick();
   if(activePreset&&activePreset.running&&activePreset.endTime!=null)tickPreset(activePreset.idx);
   if(pomoRunning&&!pomoPaused&&pomoEndTime!=null)tickPomodoro();
+  if(pomoQuitLocked()) pomoStrictNudge();
   if(flightRunning&&!flightPaused&&!flightOnBreak&&!pomoRunning&&flightEndTime!=null)tickFlight();
   if(flightOnBreak&&flightBreakStartTime!=null){
     flightBreakElapsed=Math.round((Date.now()-flightBreakStartTime)/1000);
@@ -12866,6 +13058,32 @@ document.addEventListener('DOMContentLoaded',function(){
   }
   if(h) history.replaceState(null,'',location.pathname+location.search);
 });
+
+/* ---- Countdown hover: show the actual clock time the current flight/pomodoro session
+   will finish at, following the cursor while it's over the big timer digits ---- */
+(function(){
+  const timerEl=document.getElementById('flight-countdown');
+  const tip=document.getElementById('flight-finish-tip');
+  if(!timerEl||!tip) return;
+
+  function activeRemSec(){
+    if(pomoRunning&&!pomoPaused) return pomoRemSec;
+    if(flightRunning&&!flightPaused&&!flightOnBreak) return flightRemSec;
+    return null;
+  }
+
+  function showTip(e){
+    const remSec=activeRemSec();
+    if(remSec==null||remSec<=0){ tip.classList.remove('show'); return; }
+    const finish=new Date(Date.now()+remSec*1000);
+    tip.textContent='finishes at '+fmtClock(finish);
+    tip.style.left=(e.clientX+16)+'px';
+    tip.style.top=(e.clientY+16)+'px';
+    tip.classList.add('show');
+  }
+  timerEl.addEventListener('mousemove',showTip);
+  timerEl.addEventListener('mouseleave',()=>tip.classList.remove('show'));
+})();
 
 /* ---- Flight HUD: draggable + resizable floating panel ---- */
 (function(){
