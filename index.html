@@ -1428,6 +1428,36 @@ body.light .prog-goal-sub{color:#ccc}
 .cap-confirm p{font-size:12.5px;color:var(--cap-text-lo);line-height:1.55;margin-bottom:18px}
 .cap-confirm-actions{display:flex;justify-content:flex-end;gap:8px}
 .cap-btn-danger{padding:9px 15px;border-radius:9px;background:var(--cap-danger);border:none;color:#1a0a06;font-size:13px;font-weight:600;cursor:pointer;font-family:'Work Sans',sans-serif}
+.cap-dedupe-panel{width:100%;max-width:440px;max-height:82vh;overflow-y:auto;background:var(--cap-paper);border:0.5px solid var(--cap-line);border-radius:16px;padding:22px}
+.cap-dedupe-panel h3{font-family:'Fraunces',serif;font-size:16px;font-weight:500;color:var(--cap-text-hi);margin-bottom:6px}
+.cap-dedupe-panel>p{font-size:12.5px;color:var(--cap-text-lo);line-height:1.5;margin-bottom:16px}
+.cap-dedupe-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.cap-dedupe-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;border:0.5px solid var(--cap-line);background:var(--cap-ink-2)}
+.cap-dedupe-item img{width:52px;height:52px;border-radius:7px;object-fit:cover;flex-shrink:0;background:#000}
+.cap-dedupe-item-blank{width:52px;height:52px;border-radius:7px;flex-shrink:0;background:#000;display:flex;align-items:center;justify-content:center;color:var(--cap-text-faint)}
+.cap-dedupe-item-info{flex:1;min-width:0}
+.cap-dedupe-item-label{font-size:12.5px;color:var(--cap-text-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cap-dedupe-item-meta{font-size:11px;color:var(--cap-text-faint);margin-top:2px}
+.cap-dedupe-item label.cap-dedupe-check{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--cap-text-lo);cursor:pointer;flex-shrink:0;white-space:nowrap}
+.cap-dedupe-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--cap-danger);cursor:pointer}
+.cap-reelpick-panel{width:100%;max-width:380px;max-height:82vh;overflow-y:auto;background:var(--cap-paper);border:0.5px solid var(--cap-line);border-radius:16px;padding:22px}
+.cap-reelpick-panel h3{font-family:'Fraunces',serif;font-size:16px;font-weight:500;color:var(--cap-text-hi);margin-bottom:6px}
+.cap-reelpick-panel>p{font-size:12.5px;color:var(--cap-text-lo);line-height:1.5;margin-bottom:16px}
+.cap-reelpick-list{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.cap-reelpick-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;border-radius:11px;border:0.5px solid var(--cap-line);background:var(--cap-ink-2);color:var(--cap-text-hi);font-size:13.5px;cursor:pointer;font-family:'Work Sans',sans-serif;text-align:left;transition:all .14s}
+.cap-reelpick-item:hover{border-color:var(--cap-brass-dim);color:var(--cap-brass)}
+.cap-reelpick-item:disabled{opacity:.4;cursor:default}
+.cap-reelpick-item:disabled:hover{border-color:var(--cap-line);color:var(--cap-text-hi)}
+.cap-reelpick-item .cap-capsule-count{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--cap-text-faint);background:rgba(255,255,255,.05);padding:2px 7px;border-radius:10px}
+.cap-reelpick-tabs{display:flex;gap:4px;padding:3px;margin-bottom:14px;background:var(--cap-ink-2);border-radius:11px}
+.cap-reelpick-tab{flex:1;padding:7px 8px;border-radius:8px;border:none;background:none;color:var(--cap-text-lo);font-size:11.5px;font-weight:500;cursor:pointer;font-family:'Work Sans',sans-serif;letter-spacing:.02em;transition:background .14s,color .14s}
+.cap-reelpick-tab:hover{color:var(--cap-text-hi)}
+.cap-reelpick-tab.active{background:var(--cap-paper-hi);color:var(--cap-brass)}
+.cap-reelpick-post{align-items:center}
+.cap-reelpick-post-main{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;overflow:hidden}
+.cap-reelpick-post-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--cap-text-hi)}
+.cap-reelpick-post-date{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cap-text-faint)}
+.cap-reelpick-empty{font-size:12.5px;color:var(--cap-text-lo);text-align:center;padding:18px 6px}
 .cap-toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--cap-paper-hi);border:0.5px solid var(--cap-line);color:var(--cap-text-hi);padding:11px 18px;border-radius:10px;font-size:12.5px;opacity:0;pointer-events:none;transition:all .25s;z-index:400;box-shadow:0 10px 24px rgba(0,0,0,.4)}
 .cap-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -1441,6 +1471,8 @@ body.light .prog-goal-sub{color:#ccc}
 #capCapsuleModal{z-index:315}
 #capComposerOverlay{z-index:320}
 #capConfirmOverlay{z-index:330}
+#capDedupeModal{z-index:335}
+#capReelPickerModal{z-index:335}
 #capLightboxOverlay{z-index:340}
 
 /* ── Reels: full-screen vertical swipe-through viewer for capsule videos ── */
@@ -2856,6 +2888,7 @@ window.AccessGate={ hashCode:aqgHash };
     <div class="cap-tools">
       <button class="cap-tool" id="capBtnPhoto"><i class="ti ti-photo"></i>Photo</button>
       <button class="cap-tool" id="capBtnVideo"><i class="ti ti-video"></i>Video</button>
+      <button class="cap-tool" id="capBtnDedupe" title="Scan attached videos and remove any that are the same content"><i class="ti ti-copy-off"></i>Dedupe videos</button>
       <button class="cap-tool" id="capBtnLink"><i class="ti ti-link"></i>Link</button>
       <button class="cap-tool" id="capBtnGoal"><i class="ti ti-flag"></i>Goals</button>
       <button class="cap-tool" id="capBtnPin"><i class="ti ti-star"></i>Pin</button>
@@ -2919,6 +2952,33 @@ window.AccessGate={ hashCode:aqgHash };
     <div class="cap-confirm-actions">
       <button class="cap-btn-ghost" id="capConfirmCancel">Cancel</button>
       <button class="cap-btn-danger" id="capConfirmOk">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="cap-overlay" id="capDedupeModal">
+  <div class="cap-dedupe-panel">
+    <h3 id="capDedupeTitle">Duplicate videos found</h3>
+    <p id="capDedupeBody">These look identical to a video already added. Untick any you'd like to keep anyway.</p>
+    <div class="cap-dedupe-list" id="capDedupeList"></div>
+    <div class="cap-confirm-actions">
+      <button class="cap-btn-ghost" id="capDedupeCancel">Keep all</button>
+      <button class="cap-btn-danger" id="capDedupeConfirm">Remove checked</button>
+    </div>
+  </div>
+</div>
+
+<div class="cap-overlay" id="capReelPickerModal">
+  <div class="cap-reelpick-panel">
+    <h3 id="capReelPickerTitle">Watch which capsule?</h3>
+    <p id="capReelPickerSub">Pick a capsule and Reels will only show videos from that one.</p>
+    <div class="cap-reelpick-tabs" id="capReelPickerTabs">
+      <button type="button" class="cap-reelpick-tab active" id="capReelPickerTabGroup">By capsule</button>
+      <button type="button" class="cap-reelpick-tab" id="capReelPickerTabPost">By post</button>
+    </div>
+    <div class="cap-reelpick-list" id="capReelPickerList"></div>
+    <div class="cap-confirm-actions">
+      <button class="cap-btn-ghost" id="capReelPickerCancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -9410,6 +9470,11 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   const CAP_CAPSULES_KEY = 'dayplan_capsule_groups';
   const CAP_DB_NAME = 'dayplan_capsule_media';
   const CAP_STORE = 'blobs';
+  // Ask the browser to treat this origin's storage as persistent (best-effort;
+  // ignored on browsers that don't support it). This mainly stops the browser
+  // from silently evicting stored videos under disk pressure — it doesn't
+  // raise the hard quota ceiling on devices that are genuinely low on space.
+  if(navigator.storage && navigator.storage.persist){ navigator.storage.persist().catch(()=>{}); }
   let capPosts = [];
   let capEditingId = null;
   let capMediaList = [];
@@ -9462,6 +9527,25 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     if(!bytes) return '';
     if(bytes<1024*1024) return Math.round(bytes/1024)+' KB';
     return (bytes/(1024*1024)).toFixed(1)+' MB';
+  }
+
+  /* ── Content hashing for duplicate-video detection: two videos with different filenames
+     but identical bytes (e.g. the same clip saved/shared twice) hash to the same value,
+     so this is what "same video" actually means here — not matching titles or thumbnails. ── */
+  async function capSha256(blob){
+    const buf = await blob.arrayBuffer();
+    const digest = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+  // Resolves (and caches on the media object) the content hash for a capMediaList entry,
+  // fetching its blob from IndexedDB first if it's a pre-existing item that wasn't re-uploaded.
+  async function capGetMediaHash(m){
+    if(m.hash) return m.hash;
+    let blob = m.fullBlob;
+    if(!blob){ try{ blob = await capIdbGet(m.id); }catch(e){ blob = null; } }
+    if(!blob) return null;
+    try{ m.hash = await capSha256(blob); return m.hash; }
+    catch(e){ return null; }
   }
 
   function capToLocal(ts){
@@ -9993,12 +10077,27 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
      slides. Only the current slide (plus one neighbour each side) has its
      blob loaded/decoded at a time, so scrolling through a long history of
      videos doesn't balloon memory. ── */
-  function capGatherReelVideos(context){
+  function capGatherReelVideos(context, filterId){
+    // A filterId of "post:<id>" restricts Reels to the videos in that single
+    // entry only, so scrolling never leaves that post.
+    if(typeof filterId==='string' && filterId.indexOf('post:')===0){
+      const postId = filterId.slice(5);
+      const p = capPosts.find(x=>x.id===postId);
+      const items = [];
+      if(p){
+        (p.media||[]).forEach((m,mi)=>{
+          if(m.type==='video') items.push({post:p, media:m, mi});
+        });
+      }
+      return items;
+    }
     let posts;
     if(context==='locked'){
-      posts = capPosts.filter(p=>p.locked && (p.capsuleId||'')===capActiveCapsuleTab);
+      const id = filterId!==undefined ? filterId : capActiveCapsuleTab;
+      posts = capPosts.filter(p=>p.locked && (p.capsuleId||'')===id);
     } else {
       posts = capPosts.filter(p=>!p.locked);
+      if(filterId!==undefined && filterId!=='__all__') posts = posts.filter(p=>(p.tag||'')===filterId);
     }
     const items = [];
     posts.forEach(p=>{
@@ -10009,8 +10108,8 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     return items;
   }
 
-  function capOpenReels(context){
-    const items = capGatherReelVideos(context);
+  function capOpenReels(context, filterId){
+    const items = capGatherReelVideos(context, filterId);
     if(!items.length){ capToast('No videos here yet.'); return; }
     capReelItems = items;
     capReelCurrentIndex = 0;
@@ -10018,6 +10117,111 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     $('capReelsOverlay').classList.add('open');
   }
   window.capOpenReels = capOpenReels;
+
+  /* ── Capsule/tag picker: shown when opening Reels so the person can jump straight to a
+     subset of videos without switching tabs or filters first. ── */
+  function capOpenReelPicker(context){
+    const list = $('capReelPickerList');
+    const title = $('capReelPickerTitle');
+    const sub = $('capReelPickerSub');
+    const tabGroup = $('capReelPickerTabGroup');
+    const tabPost = $('capReelPickerTabPost');
+    let groupEntries; // [{id, name, count}]
+    let groupTabLabel, groupTitle, groupSub;
+
+    if(context==='locked'){
+      groupTabLabel = 'By capsule';
+      groupTitle = 'Watch which capsule?';
+      groupSub = "Pick a capsule and Reels will only show videos from that one.";
+      const counts = {};
+      capPosts.filter(p=>p.locked).forEach(p=>{
+        const id = p.capsuleId||'';
+        const vids = (p.media||[]).filter(m=>m.type==='video').length;
+        if(vids) counts[id] = (counts[id]||0)+vids;
+      });
+      const groups = [{id:'', name:'General'}].concat(capCapsules.map(c=>({id:c.id, name:c.name})));
+      groupEntries = groups.map(g=>({id:g.id, name:g.name, count:counts[g.id]||0}));
+    } else {
+      groupTabLabel = 'By tag';
+      groupTitle = 'Watch which videos?';
+      groupSub = "Pick a tag and Reels will only show videos from entries with that tag.";
+      const counts = {};
+      let total = 0, untagged = 0;
+      capPosts.filter(p=>!p.locked).forEach(p=>{
+        const vids = (p.media||[]).filter(m=>m.type==='video').length;
+        if(!vids) return;
+        total += vids;
+        const tag = (p.tag||'').trim();
+        if(tag) counts[tag] = (counts[tag]||0)+vids;
+        else untagged += vids;
+      });
+      groupEntries = [{id:'__all__', name:'All videos', count:total}];
+      Object.keys(counts).sort((a,b)=>a.localeCompare(b)).forEach(tag=>{
+        groupEntries.push({id:tag, name:tag, count:counts[tag]});
+      });
+      if(untagged) groupEntries.push({id:'', name:'Untagged', count:untagged});
+    }
+
+    // Individual posts (entries) that have at least one video, newest first —
+    // lets someone jump straight into the videos of just one post.
+    const postsSrc = context==='locked' ? capPosts.filter(p=>p.locked) : capPosts.filter(p=>!p.locked);
+    const postEntries = postsSrc
+      .map(p=>({p, count:(p.media||[]).filter(m=>m.type==='video').length}))
+      .filter(e=>e.count>0)
+      .sort((a,b)=>(b.p.ts||0)-(a.p.ts||0));
+
+    function renderGroups(){
+      title.textContent = groupTitle;
+      sub.textContent = groupSub;
+      list.innerHTML = groupEntries.map(g=>{
+        return `<button class="cap-reelpick-item" data-id="${capEsc(g.id)}" ${g.count?'':'disabled'}>${capEsc(g.name)}<span class="cap-capsule-count">${g.count}</span></button>`;
+      }).join('');
+      list.querySelectorAll('.cap-reelpick-item:not(:disabled)').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          $('capReelPickerModal').classList.remove('open');
+          capOpenReels(context, btn.getAttribute('data-id'));
+        });
+      });
+    }
+
+    function renderPosts(){
+      title.textContent = 'Watch which post?';
+      sub.textContent = "Pick one entry and Reels will only scroll through its videos.";
+      if(!postEntries.length){
+        list.innerHTML = `<p class="cap-reelpick-empty">No entries with videos yet.</p>`;
+        return;
+      }
+      list.innerHTML = postEntries.map(({p, count})=>{
+        const d = new Date(p.ts);
+        const dateStr = d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+        const label = (p.text||'').trim() || (p.tag||'').trim() || dateStr;
+        return `<button class="cap-reelpick-item cap-reelpick-post" data-id="post:${capEsc(p.id)}">
+          <span class="cap-reelpick-post-main">
+            <span class="cap-reelpick-post-title">${capEsc(label)}</span>
+            <span class="cap-reelpick-post-date">${dateStr}</span>
+          </span>
+          <span class="cap-capsule-count">${count}</span>
+        </button>`;
+      }).join('');
+      list.querySelectorAll('.cap-reelpick-post').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          $('capReelPickerModal').classList.remove('open');
+          capOpenReels(context, btn.getAttribute('data-id'));
+        });
+      });
+    }
+
+    tabGroup.textContent = groupTabLabel;
+    tabGroup.classList.add('active');
+    tabPost.classList.remove('active');
+    tabGroup.onclick = ()=>{ tabGroup.classList.add('active'); tabPost.classList.remove('active'); renderGroups(); };
+    tabPost.onclick = ()=>{ tabPost.classList.add('active'); tabGroup.classList.remove('active'); renderPosts(); };
+
+    renderGroups();
+    $('capReelPickerModal').classList.add('open');
+  }
+  $('capReelPickerCancel').addEventListener('click', ()=>$('capReelPickerModal').classList.remove('open'));
+  $('capReelPickerModal').addEventListener('click', e=>{ if(e.target.id==='capReelPickerModal') $('capReelPickerModal').classList.remove('open'); });
 
   function capBuildReelsDom(){
     const scroll = $('capReelsScroll');
@@ -10223,7 +10427,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
       }
       capPostCapsuleId = post.capsuleId || '';
       if(post.media && post.media.length){
-        capMediaList = post.media.map(m=>({id:m.id, type:m.type, mime:m.mime, thumb:m.thumb, fullBlob:null, isNew:false, size:m.size||0}));
+        capMediaList = post.media.map(m=>({id:m.id, type:m.type, mime:m.mime, thumb:m.thumb, fullBlob:null, isNew:false, size:m.size||0, hash:m.hash||null}));
         capOrigMediaIds = post.media.map(m=>m.id);
         capRenderPreview();
       }
@@ -10394,10 +10598,14 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
       if(navigator.storage && navigator.storage.estimate){
         const est = await navigator.storage.estimate();
         const free = (est.quota||0) - (est.usage||0);
-        if(est.quota && fileSize > free * 0.85) return false;
+        // Keep a 15% safety margin under whatever the browser reports as free,
+        // since the estimate can drift during a large write.
+        if(est.quota && fileSize > free * 0.85){
+          return {ok:false, free};
+        }
       }
     }catch(e){}
-    return true;
+    return {ok:true};
   }
 
   $('capComposeBtn').addEventListener('click', ()=>capOpenComposer(null));
@@ -10406,6 +10614,33 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   $('capComposerOverlay').addEventListener('click', e=>{ if(e.target.id==='capComposerOverlay') capCloseComposer(); });
   $('capBtnPhoto').addEventListener('click', ()=>$('capFileImage').click());
   $('capBtnVideo').addEventListener('click', ()=>$('capFileVideo').click());
+  $('capBtnDedupe').addEventListener('click', async ()=>{
+    const videos = capMediaList.filter(m=>m.type==='video');
+    if(videos.length<2){ capToast('Add at least two videos to check for duplicates.'); return; }
+    const btn = $('capBtnDedupe');
+    btn.disabled = true;
+    const origLabel = btn.innerHTML;
+    btn.innerHTML = `<i class="ti ti-loader-2"></i>Scanning…`;
+    try{
+      const seenHashes = new Map(); // hash -> id of the kept (first-seen) video
+      const dupes = [];
+      for(const m of videos){
+        const hash = await capGetMediaHash(m);
+        if(!hash) continue; // couldn't read this one — leave it alone rather than risk dropping it
+        if(seenHashes.has(hash)) dupes.push(m);
+        else seenHashes.set(hash, m.id);
+      }
+      if(!dupes.length){
+        capToast('No duplicate videos found — every video here is unique.');
+      } else {
+        capOpenDedupeReview('manual', dupes.map((m,i)=>({key:m.id, thumb:m.thumb, label:`Video ${videos.indexOf(m)+1}`, size:m.size})));
+      }
+    }catch(e){
+      capToast("Couldn't finish scanning — try again.");
+    }
+    btn.disabled = false;
+    btn.innerHTML = origLabel;
+  });
   $('capBtnLink').addEventListener('click', ()=>{
     capLinkOpen=!capLinkOpen;
     $('capLinkRow').classList.toggle('show', capLinkOpen);
@@ -10469,15 +10704,113 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     const files = Array.from(e.target.files).filter(f=>f.type.startsWith('video/'));
     e.target.value='';
     if(!files.length) return;
+    let addedCount = 0;
+    const dupeCandidates = []; // held back pending user confirmation
     for(const file of files){
-      const ok = await capCheckSpace(file.size);
-      if(!ok){ capToast(`Not enough storage space for "${file.name}".`); continue; }
+      const space = await capCheckSpace(file.size);
+      if(!space.ok){
+        const freeStr = space.free!==undefined ? ` — need ${capFmtSize(file.size)}, only ${capFmtSize(Math.max(space.free,0))} free` : '';
+        capToast(`Not enough storage space for "${file.name}"${freeStr}.`);
+        continue;
+      }
       capSetUploadStatus(`Reading "${file.name}" (${capFmtSize(file.size)})…`);
+      const hash = await capSha256(file).catch(()=>null);
       const thumb = await capVideoPoster(file);
-      capMediaList.push({id:capGenId(), type:'video', mime:file.type||'video/mp4', thumb, fullBlob:file, isNew:true, size:file.size});
-      capRenderPreview();
+      let isDupe = false;
+      if(hash){
+        // Compare against videos already attached to this entry (existing ones are hashed
+        // lazily here too) so a re-added or renamed copy of the same clip is caught, as
+        // well as duplicates within this same batch of selected files.
+        for(const m of capMediaList){
+          if(m.type!=='video') continue;
+          const mHash = await capGetMediaHash(m);
+          if(mHash && mHash===hash){ isDupe = true; break; }
+        }
+        if(!isDupe){
+          for(const d of dupeCandidates){ if(d.hash===hash){ isDupe = true; break; } }
+        }
+      }
+      if(isDupe){
+        dupeCandidates.push({key:capGenId(), file, hash, thumb, label:file.name, size:file.size});
+      } else {
+        capMediaList.push({id:capGenId(), type:'video', mime:file.type||'video/mp4', thumb, fullBlob:file, isNew:true, size:file.size, hash});
+        addedCount++;
+        capRenderPreview();
+      }
     }
     capSetUploadStatus(null);
+    if(addedCount>0 && dupeCandidates.length>0){
+      capToast(`${addedCount} video${addedCount>1?'s':''} added.`);
+    }
+    if(dupeCandidates.length>0) capOpenDedupeReview('upload', dupeCandidates);
+  });
+
+  /* ── Duplicate-video review modal: shared by the upload flow above and the manual
+     "Dedupe videos" scan below. Never removes anything without the user confirming. ── */
+  let capDedupePending = null;
+  function capOpenDedupeReview(context, items){
+    capDedupePending = { context, items };
+    $('capDedupeTitle').textContent = `${items.length} duplicate video${items.length>1?'s':''} found`;
+    $('capDedupeBody').textContent = context==='upload'
+      ? "These already match a video added to this entry. Checked ones won't be added — untick any you'd like to add anyway."
+      : "These videos in this entry have identical content. Checked ones will be removed — untick any you'd like to keep.";
+    $('capDedupeConfirm').textContent = context==='upload' ? 'Continue' : 'Remove checked';
+    const list = $('capDedupeList');
+    list.innerHTML = items.map(it=>{
+      const img = it.thumb ? `<img src="${it.thumb}" alt="">` : `<div class="cap-dedupe-item-blank"><i class="ti ti-video"></i></div>`;
+      return `<div class="cap-dedupe-item" data-key="${it.key}">${img}<div class="cap-dedupe-item-info"><div class="cap-dedupe-item-label">${capEsc(it.label)}</div><div class="cap-dedupe-item-meta">${capFmtSize(it.size)}</div></div><label class="cap-dedupe-check"><input type="checkbox" checked data-key="${it.key}">Remove</label></div>`;
+    }).join('');
+    $('capDedupeModal').classList.add('open');
+  }
+  function capCloseDedupeReview(){ $('capDedupeModal').classList.remove('open'); capDedupePending = null; }
+  $('capDedupeModal').addEventListener('click', e=>{ if(e.target.id==='capDedupeModal') $('capDedupeCancel').click(); });
+
+  $('capDedupeCancel').addEventListener('click', ()=>{
+    if(!capDedupePending) return;
+    const { context, items } = capDedupePending;
+    if(context==='upload'){
+      // "Keep all" — add every held-back candidate after all, none get skipped.
+      items.forEach(it=>{
+        capMediaList.push({id:capGenId(), type:'video', mime:it.file.type||'video/mp4', thumb:it.thumb, fullBlob:it.file, isNew:true, size:it.size, hash:it.hash});
+      });
+      capRenderPreview();
+      capToast(`${items.length} video${items.length>1?'s':''} added.`);
+    }
+    capCloseDedupeReview();
+  });
+
+  $('capDedupeConfirm').addEventListener('click', ()=>{
+    if(!capDedupePending) return;
+    const { context, items } = capDedupePending;
+    const checkedKeys = new Set(
+      Array.from($('capDedupeList').querySelectorAll('input[type=checkbox]:checked')).map(cb=>cb.getAttribute('data-key'))
+    );
+    if(context==='upload'){
+      // Checked = leave out (it's a duplicate); unchecked = user wants it added anyway.
+      let added = 0;
+      items.forEach(it=>{
+        if(!checkedKeys.has(it.key)){
+          capMediaList.push({id:capGenId(), type:'video', mime:it.file.type||'video/mp4', thumb:it.thumb, fullBlob:it.file, isNew:true, size:it.size, hash:it.hash});
+          added++;
+        }
+      });
+      if(added) capRenderPreview();
+      const removed = items.length - added;
+      const parts = [];
+      if(added) parts.push(`${added} added anyway`);
+      if(removed) parts.push(`${removed} duplicate video${removed>1?'s':''} left out`);
+      capToast(parts.join(', ') + '.');
+    } else {
+      // Manual scan: checked = remove from the entry now.
+      if(checkedKeys.size){
+        capMediaList = capMediaList.filter(m=>!checkedKeys.has(m.id));
+        capRenderPreview();
+        capToast(`${checkedKeys.size} duplicate video${checkedKeys.size>1?'s':''} removed. Save the entry to update your capsule.`);
+      } else {
+        capToast('No videos removed.');
+      }
+    }
+    capCloseDedupeReview();
   });
 
   $('capCompSave').addEventListener('click', async ()=>{
@@ -10499,7 +10832,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
       for(const oldId of capOrigMediaIds){
         if(!keptIds.has(oldId)) await capIdbDelete(oldId);
       }
-      const media = capMediaList.map(m=>({id:m.id, type:m.type, mime:m.mime, thumb:m.thumb||null, size:m.size||0}));
+      const media = capMediaList.map(m=>({id:m.id, type:m.type, mime:m.mime, thumb:m.thumb||null, size:m.size||0, hash:m.hash||null}));
       const ts = $('capDateInput').value ? new Date($('capDateInput').value).getTime() : Date.now();
       const post = {
         id: capEditingId||capGenId(),
@@ -10564,8 +10897,8 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   $('capWebViewOverlay').addEventListener('click', e=>{ if(e.target.id==='capWebViewOverlay') capCloseWebView(); });
   $('capLightboxOverlay').addEventListener('click', e=>{ if(e.target.id==='capLightboxOverlay') capCloseLightbox(); });
 
-  $('capReelsBtn').addEventListener('click', ()=>capOpenReels('unlocked'));
-  $('capLockedReelsBtn').addEventListener('click', ()=>capOpenReels('locked'));
+  $('capReelsBtn').addEventListener('click', ()=>capOpenReelPicker('unlocked'));
+  $('capLockedReelsBtn').addEventListener('click', ()=>capOpenReelPicker('locked'));
   $('capReelsClose').addEventListener('click', capCloseReels);
   document.addEventListener('keydown', e=>{
     if(e.key==='Escape' && $('capReelsOverlay').classList.contains('open')) capCloseReels();
