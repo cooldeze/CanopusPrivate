@@ -14193,14 +14193,21 @@ async function zeusReadAllMedia(){
     });
   }catch(e){ return []; }
 }
-async function zeusWriteAllMedia(items){
+async function zeusWriteAllMedia(items,onProgress){
   if(!items||!items.length) return 0;
+  const decoded=[];
+  for(let i=0;i<items.length;i++){
+    const it=items[i];
+    try{ decoded.push({key:it.key, blob:zeusBase64ToBlob(it.data,it.mime)}); }catch(e){}
+    if(onProgress) onProgress(i+1,items.length);
+    if(i%20===0) await new Promise(r=>setTimeout(r,0)); // yield periodically so the tab stays responsive on big libraries
+  }
   const db=await zeusOpenMediaDb();
   return await new Promise((resolve,reject)=>{
     const tx=db.transaction(ZEUS_MEDIA_STORE,'readwrite');
     const store=tx.objectStore(ZEUS_MEDIA_STORE);
-    items.forEach(it=>{ try{ store.put(zeusBase64ToBlob(it.data,it.mime),it.key); }catch(e){} });
-    tx.oncomplete=()=>resolve(items.length);
+    decoded.forEach(d=>{ try{ store.put(d.blob,d.key); }catch(e){} });
+    tx.oncomplete=()=>resolve(decoded.length);
     tx.onerror=()=>reject(tx.error);
   });
 }
@@ -14220,15 +14227,20 @@ async function termZeusBackup(){
   if(!keys.length){termErr('NOTHING TO BACK UP.');return;}
   const data={};
   keys.forEach(k=>{ try{ data[k]=localStorage.getItem(k); }catch(e){} });
-  termAppendLine('READING VIDEO/PHOTO LIBRARY FROM THIS DEVICE — THIS CAN TAKE A MOMENT FOR LARGE CAPSULES…','term-dim');
   const rawMedia=await zeusReadAllMedia();
   const media=[];
-  for(const it of rawMedia){
+  const progressLine=termAppendLine(rawMedia.length?('ENCODING PHOTO/VIDEO 0 OF '+rawMedia.length+'…'):'NO CAPSULE MEDIA TO ENCODE.','term-dim');
+  for(let i=0;i<rawMedia.length;i++){
+    const it=rawMedia[i];
     try{
       const buf=await it.blob.arrayBuffer();
       media.push({key:it.key, mime:it.blob.type||'application/octet-stream', data:zeusBufferToBase64(buf)});
     }catch(e){}
+    if(progressLine) progressLine.textContent='ENCODING PHOTO/VIDEO '+(i+1)+' OF '+rawMedia.length+'…';
+    termScrollToBottom();
   }
+  if(progressLine&&rawMedia.length) progressLine.textContent='ENCODED '+rawMedia.length+' PHOTO/VIDEO FILE(S).';
+  termAppendLine('BUILDING THE BACKUP FILE…','term-dim');
   const payload={_zeusBackup:true,ts:new Date().toISOString(),data,media};
   const json=JSON.stringify(payload,null,2);
   const blob=new Blob([json],{type:'application/json'});
@@ -14299,8 +14311,14 @@ function termZeusRestore(){
           }catch(e){}
         });
         if(mediaCount){
-          termAppendLine('WRITING '+mediaCount+' PHOTO/VIDEO FILE(S) BACK INTO STORAGE — THIS CAN TAKE A MOMENT…','term-dim');
-          try{ await zeusWriteAllMedia(payload.media); }catch(e){}
+          const progressLine=termAppendLine('WRITING PHOTO/VIDEO 0 OF '+mediaCount+'…','term-dim');
+          try{
+            await zeusWriteAllMedia(payload.media,(done,total)=>{
+              if(progressLine) progressLine.textContent='WRITING PHOTO/VIDEO '+done+' OF '+total+'…';
+              termScrollToBottom();
+            });
+            if(progressLine) progressLine.textContent='WROTE '+mediaCount+' PHOTO/VIDEO FILE(S).';
+          }catch(e){ if(progressLine) progressLine.textContent='SOME PHOTO/VIDEO FILE(S) FAILED TO WRITE.'; }
         }
         termOk('ZEUS RESTORE COMPLETE — '+keys.length+' KEY(S) + '+mediaCount+' MEDIA FILE(S) MERGED IN. EXISTING DATA WAS KEPT; DUPLICATE ENTRIES WERE COLLAPSED TO ONE.');
         termAppendLine("TYPE 'reload' TO REFRESH THE PAGE AND SEE THE MERGED DATA.",'term-dim');
