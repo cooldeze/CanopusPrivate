@@ -13695,9 +13695,9 @@ function termRunSingle(raw,depth){
         'restore          load a previously downloaded backup file back in',
         'zeus             FULL device backup — countries/passport, progress stats,',
         '                 time per feature, Vault (incl. locked entries), JEE journal,',
-        '                 everything — as one .json file',
+        '                 capsule photos/videos, everything — as one .json file',
         'zeus restore     load a zeus backup file — merges it into this device\'s data,',
-        '                 so its stats/vault/journal become the ones from that file',
+        '                 keeping what\'s already here and adding what\'s new from the file',
         'zeus flight      opens a mini flight panel on the right — terminal stays',
         '                 on the left. Pick a destination, duration & breaks,',
         '                 or watch whatever\'s already running, over the globe',
@@ -14027,7 +14027,7 @@ const TERM_MAN={
   roll:['USAGE: roll  |  roll 2d6  |  roll d20','Rolls dice in the form <count>d<sides>. Defaults to 1d6.'],
   backup:['USAGE: backup','Downloads a JSON file with this page\'s saved settings, notes, aliases,','schedule, and progress data. The Vault keeps its own separate storage','and is not included — back it up from its own page, or use "zeus".'],
   restore:['USAGE: restore','Pick a previously downloaded backup .json file to write its data back','into this browser. Reload the page afterward to see the restored data.'],
-  zeus:['USAGE: zeus  |  zeus restore  |  zeus flight [from] [to] [mins]  |  zeus status  |  zeus wipe  |  zeus lock on|off','FULL device backup, not just this page\'s settings. Sweeps every piece of','Canopus data on this origin into one .json file: countries visited','(passport), progress stats, time spent on each feature, every Vault','entry (including ones behind the PIN lock), and the JEE journal.','"zeus" downloads the file. "zeus restore" loads one back in — this','MERGES the backup into whatever is already on this device: entries','already here are kept, entries only in the file are added, and any','entry present in both (same id) is kept just once — nothing is wiped.','"zeus flight" opens a mini flight panel docked into the right half of','the terminal — a trimmed-down setup (not the full flight/pomodoro/pomomix','picker screen) where you can still set a destination, duration and','breaks, floating over a globe that fills the whole pane. Typing it','again just closes the panel; anything running keeps going and stays','visible on the terminal\'s small globe. You can also quick-launch:','"zeus flight lhr jfk 45" opens the panel already flying that route.','"zeus status" is read-only: shows how much is stored on this origin,','plus the current App Lock / Access Gate / harsh-mode / theme state.','"zeus wipe" permanently erases every key on this device — asks you to','confirm and type WIPE; there\'s no undo unless you made a "zeus" backup.','"zeus lock on" / "zeus lock off" flips the App Lock toggle directly,','same effect as the on/off switch in App Lock Settings.'],
+  zeus:['USAGE: zeus  |  zeus restore  |  zeus flight [from] [to] [mins]  |  zeus status  |  zeus wipe  |  zeus lock on|off','FULL device backup, not just this page\'s settings. Sweeps every piece of','Canopus data on this origin into one .json file: countries visited','(passport), progress stats, time spent on each feature, every Vault','entry (including ones behind the PIN lock), and the JEE journal — including every Capsule photo/video, base64-encoded','straight into the same .json file, not just a reference to it.','"zeus" downloads the file. "zeus restore" loads one back in — this','MERGES the backup into whatever is already on this device: entries','already here are kept, entries only in the file are added, and any','entry present in both (same id) is kept just once — nothing is wiped.','"zeus flight" opens a mini flight panel docked into the right half of','the terminal — a trimmed-down setup (not the full flight/pomodoro/pomomix','picker screen) where you can still set a destination, duration and','breaks, floating over a globe that fills the whole pane. Typing it','again just closes the panel; anything running keeps going and stays','visible on the terminal\'s small globe. You can also quick-launch:','"zeus flight lhr jfk 45" opens the panel already flying that route.','"zeus status" is read-only: shows how much is stored on this origin,','plus the current App Lock / Access Gate / harsh-mode / theme state.','"zeus wipe" permanently erases every key on this device — asks you to','confirm and type WIPE; there\'s no undo unless you made a "zeus" backup.','"zeus lock on" / "zeus lock off" flips the App Lock toggle directly,','same effect as the on/off switch in App Lock Settings.'],
   sysmon:['USAGE: sysmon  |  sysmon stop','Shows a single line of live-updating system stats (clock, memory, online','status, session uptime) until stopped.'],
   grep:['USAGE: <command> | grep <term>','Runs <command>, then only prints the lines from its output that contain','<term> (case-insensitive). EXAMPLE: history | grep open']
 };
@@ -14146,12 +14146,90 @@ function termZeusKeys(){
   }
   return keys.sort();
 }
-function termZeusBackup(){
+/* ---- Zeus media blobs — Capsule's full-res photos/videos live in IndexedDB
+   (dayplan_capsule_media / store "blobs"), not localStorage, because that's
+   the only place in the browser built to hold large binary files. Zeus backup
+   used to only sweep localStorage, so a restored backup would show the post
+   and its thumbnail but the video/photo itself would be missing. These
+   helpers read every blob out of that store, base64-encode it into the same
+   JSON file, and write it back on restore — no separate export step needed. ---- */
+const ZEUS_MEDIA_DB='dayplan_capsule_media';
+const ZEUS_MEDIA_STORE='blobs';
+function zeusBufferToBase64(buffer){
+  const bytes=new Uint8Array(buffer);
+  let binary='';
+  const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){ binary+=String.fromCharCode.apply(null,bytes.subarray(i,i+chunk)); }
+  return btoa(binary);
+}
+function zeusBase64ToBlob(base64,mime){
+  const binary=atob(base64);
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+  return new Blob([bytes],{type:mime||'application/octet-stream'});
+}
+function zeusOpenMediaDb(){
+  return new Promise((resolve,reject)=>{
+    if(!('indexedDB' in window)){ reject(new Error('no indexeddb')); return; }
+    const req=indexedDB.open(ZEUS_MEDIA_DB,1);
+    req.onupgradeneeded=()=>{ if(!req.result.objectStoreNames.contains(ZEUS_MEDIA_STORE)) req.result.createObjectStore(ZEUS_MEDIA_STORE); };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+    req.onblocked=()=>reject(new Error('indexeddb blocked'));
+  });
+}
+async function zeusReadAllMedia(){
+  try{
+    const db=await zeusOpenMediaDb();
+    if(!db.objectStoreNames.contains(ZEUS_MEDIA_STORE)) return [];
+    return await new Promise((resolve,reject)=>{
+      const tx=db.transaction(ZEUS_MEDIA_STORE,'readonly');
+      const store=tx.objectStore(ZEUS_MEDIA_STORE);
+      let keys=null, values=null;
+      store.getAllKeys().onsuccess=(e)=>{ keys=e.target.result; };
+      store.getAll().onsuccess=(e)=>{ values=e.target.result; };
+      tx.oncomplete=()=>resolve((keys||[]).map((k,i)=>({key:k, blob:values[i]})));
+      tx.onerror=()=>reject(tx.error);
+    });
+  }catch(e){ return []; }
+}
+async function zeusWriteAllMedia(items){
+  if(!items||!items.length) return 0;
+  const db=await zeusOpenMediaDb();
+  return await new Promise((resolve,reject)=>{
+    const tx=db.transaction(ZEUS_MEDIA_STORE,'readwrite');
+    const store=tx.objectStore(ZEUS_MEDIA_STORE);
+    items.forEach(it=>{ try{ store.put(zeusBase64ToBlob(it.data,it.mime),it.key); }catch(e){} });
+    tx.oncomplete=()=>resolve(items.length);
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+async function zeusClearAllMedia(){
+  try{
+    const db=await zeusOpenMediaDb();
+    return await new Promise((resolve)=>{
+      const tx=db.transaction(ZEUS_MEDIA_STORE,'readwrite');
+      tx.objectStore(ZEUS_MEDIA_STORE).clear();
+      tx.oncomplete=()=>resolve(true);
+      tx.onerror=()=>resolve(false);
+    });
+  }catch(e){ return false; }
+}
+async function termZeusBackup(){
   const keys=termZeusKeys();
   if(!keys.length){termErr('NOTHING TO BACK UP.');return;}
   const data={};
   keys.forEach(k=>{ try{ data[k]=localStorage.getItem(k); }catch(e){} });
-  const payload={_zeusBackup:true,ts:new Date().toISOString(),data};
+  termAppendLine('READING VIDEO/PHOTO LIBRARY FROM THIS DEVICE — THIS CAN TAKE A MOMENT FOR LARGE CAPSULES…','term-dim');
+  const rawMedia=await zeusReadAllMedia();
+  const media=[];
+  for(const it of rawMedia){
+    try{
+      const buf=await it.blob.arrayBuffer();
+      media.push({key:it.key, mime:it.blob.type||'application/octet-stream', data:zeusBufferToBase64(buf)});
+    }catch(e){}
+  }
+  const payload={_zeusBackup:true,ts:new Date().toISOString(),data,media};
   const json=JSON.stringify(payload,null,2);
   const blob=new Blob([json],{type:'application/json'});
   const url=URL.createObjectURL(blob);
@@ -14160,8 +14238,8 @@ function termZeusBackup(){
   a.href=url;a.download='zeus-backup-'+stamp+'.json';
   document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),2000);
-  termOk('ZEUS BACKUP DOWNLOADED — '+keys.length+' KEY(S), '+(json.length/1024).toFixed(1)+'KB.');
-  termAppendLine('INCLUDES EVERYTHING ON THIS ORIGIN: COUNTRIES/PASSPORT, PROGRESS STATS, TIME PER FEATURE, VAULT (INCLUDING LOCKED ENTRIES), JEE JOURNAL, NOTES, SETTINGS.','term-dim');
+  termOk('ZEUS BACKUP DOWNLOADED — '+keys.length+' KEY(S) + '+media.length+' MEDIA FILE(S), '+(json.length/1024/1024).toFixed(2)+'MB.');
+  termAppendLine('INCLUDES EVERYTHING ON THIS ORIGIN: COUNTRIES/PASSPORT, PROGRESS STATS, TIME PER FEATURE, VAULT (INCLUDING LOCKED ENTRIES), JEE JOURNAL, NOTES, SETTINGS, AND CAPSULE PHOTOS/VIDEOS.','term-dim');
 }
 /* Merge one localStorage value with an incoming backup value for the same key.
    If both sides parse as JSON arrays of objects, merge them entry-by-entry
@@ -14203,13 +14281,14 @@ function termZeusRestore(){
     const file=input.files&&input.files[0];
     if(!file)return;
     const reader=new FileReader();
-    reader.onload=()=>{
+    reader.onload=async()=>{
       try{
         const payload=JSON.parse(reader.result);
         if(!payload||typeof payload.data!=='object'){termErr('NOT A VALID ZEUS BACKUP FILE.');return;}
         const keys=Object.keys(payload.data);
-        if(!keys.length){termErr('BACKUP FILE HAS NO DATA.');return;}
-        if(!window.confirm('ZEUS RESTORE will MERGE this backup file into the data already on this device (schedule, progress, countries, Vault, JEE journal, settings). Existing entries are kept, new ones from the file are added, and any entry present in both is kept once. Continue?')){
+        const mediaCount=Array.isArray(payload.media)?payload.media.length:0;
+        if(!keys.length&&!mediaCount){termErr('BACKUP FILE HAS NO DATA.');return;}
+        if(!window.confirm('ZEUS RESTORE will MERGE this backup file into the data already on this device (schedule, progress, countries, Vault, JEE journal, settings, capsule photos/videos). Existing entries are kept, new ones from the file are added, and any entry present in both is kept once. Continue?')){
           termErr('ZEUS RESTORE CANCELLED.');return;
         }
         keys.forEach(k=>{
@@ -14219,7 +14298,11 @@ function termZeusRestore(){
             localStorage.setItem(k,merged);
           }catch(e){}
         });
-        termOk('ZEUS RESTORE COMPLETE — '+keys.length+' KEY(S) MERGED IN. EXISTING DATA WAS KEPT; DUPLICATE ENTRIES WERE COLLAPSED TO ONE.');
+        if(mediaCount){
+          termAppendLine('WRITING '+mediaCount+' PHOTO/VIDEO FILE(S) BACK INTO STORAGE — THIS CAN TAKE A MOMENT…','term-dim');
+          try{ await zeusWriteAllMedia(payload.media); }catch(e){}
+        }
+        termOk('ZEUS RESTORE COMPLETE — '+keys.length+' KEY(S) + '+mediaCount+' MEDIA FILE(S) MERGED IN. EXISTING DATA WAS KEPT; DUPLICATE ENTRIES WERE COLLAPSED TO ONE.');
         termAppendLine("TYPE 'reload' TO REFRESH THE PAGE AND SEE THE MERGED DATA.",'term-dim');
       }catch(e){termErr('COULD NOT PARSE THAT FILE AS A ZEUS BACKUP.');}
     };
@@ -14267,16 +14350,17 @@ function termZeusStatus(){
    replacing data with a backup, it just clears it. Gated behind a native
    confirm() plus typing the literal word WIPE, since there's no undo unless
    the person made a "zeus" backup beforehand. ---- */
-function termZeusWipe(){
+async function termZeusWipe(){
   const keys=termZeusKeys();
   if(!keys.length){termErr('NOTHING TO WIPE — THIS ORIGIN HAS NO STORED DATA.');return;}
-  if(!window.confirm('ZEUS WIPE will PERMANENTLY ERASE all '+keys.length+' key(s) of Canopus data on this device (schedule, progress, countries, Vault, JEE journal, settings, app lock). This cannot be undone unless you made a "zeus" backup. Continue?')){
+  if(!window.confirm('ZEUS WIPE will PERMANENTLY ERASE all '+keys.length+' key(s) of Canopus data on this device (schedule, progress, countries, Vault, JEE journal, settings, app lock, capsule photos/videos). This cannot be undone unless you made a "zeus" backup. Continue?')){
     termErr('ZEUS WIPE CANCELLED.');return;
   }
   const typed=window.prompt('Type WIPE in capitals to confirm — this erases everything on this device.');
   if(typed!=='WIPE'){termErr('ZEUS WIPE CANCELLED — CONFIRMATION TEXT DID NOT MATCH.');return;}
   try{localStorage.clear();}catch(e){}
-  termOk('ZEUS WIPE COMPLETE — '+keys.length+' KEY(S) ERASED. THIS DEVICE IS BACK TO A CLEAN SLATE.');
+  try{await zeusClearAllMedia();}catch(e){}
+  termOk('ZEUS WIPE COMPLETE — '+keys.length+' KEY(S) + ALL CAPSULE MEDIA ERASED. THIS DEVICE IS BACK TO A CLEAN SLATE.');
   termAppendLine("TYPE 'reload' TO REFRESH THE PAGE.",'term-dim');
 }
 
