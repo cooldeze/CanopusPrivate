@@ -13696,7 +13696,7 @@ function termRunSingle(raw,depth){
         'zeus             FULL device backup — countries/passport, progress stats,',
         '                 time per feature, Vault (incl. locked entries), JEE journal,',
         '                 everything — as one .json file',
-        'zeus restore     load a zeus backup file — replaces this device\'s data with it,',
+        'zeus restore     load a zeus backup file — merges it into this device\'s data,',
         '                 so its stats/vault/journal become the ones from that file',
         'zeus flight      opens a mini flight panel on the right — terminal stays',
         '                 on the left. Pick a destination, duration & breaks,',
@@ -14027,7 +14027,7 @@ const TERM_MAN={
   roll:['USAGE: roll  |  roll 2d6  |  roll d20','Rolls dice in the form <count>d<sides>. Defaults to 1d6.'],
   backup:['USAGE: backup','Downloads a JSON file with this page\'s saved settings, notes, aliases,','schedule, and progress data. The Vault keeps its own separate storage','and is not included — back it up from its own page, or use "zeus".'],
   restore:['USAGE: restore','Pick a previously downloaded backup .json file to write its data back','into this browser. Reload the page afterward to see the restored data.'],
-  zeus:['USAGE: zeus  |  zeus restore  |  zeus flight [from] [to] [mins]  |  zeus status  |  zeus wipe  |  zeus lock on|off','FULL device backup, not just this page\'s settings. Sweeps every piece of','Canopus data on this origin into one .json file: countries visited','(passport), progress stats, time spent on each feature, every Vault','entry (including ones behind the PIN lock), and the JEE journal.','"zeus" downloads the file. "zeus restore" loads one back in — this','REPLACES all data on the current device, so afterward its stats,','Vault, and journal become the ones from that backup file.','"zeus flight" opens a mini flight panel docked into the right half of','the terminal — a trimmed-down setup (not the full flight/pomodoro/pomomix','picker screen) where you can still set a destination, duration and','breaks, floating over a globe that fills the whole pane. Typing it','again just closes the panel; anything running keeps going and stays','visible on the terminal\'s small globe. You can also quick-launch:','"zeus flight lhr jfk 45" opens the panel already flying that route.','"zeus status" is read-only: shows how much is stored on this origin,','plus the current App Lock / Access Gate / harsh-mode / theme state.','"zeus wipe" permanently erases every key on this device — asks you to','confirm and type WIPE; there\'s no undo unless you made a "zeus" backup.','"zeus lock on" / "zeus lock off" flips the App Lock toggle directly,','same effect as the on/off switch in App Lock Settings.'],
+  zeus:['USAGE: zeus  |  zeus restore  |  zeus flight [from] [to] [mins]  |  zeus status  |  zeus wipe  |  zeus lock on|off','FULL device backup, not just this page\'s settings. Sweeps every piece of','Canopus data on this origin into one .json file: countries visited','(passport), progress stats, time spent on each feature, every Vault','entry (including ones behind the PIN lock), and the JEE journal.','"zeus" downloads the file. "zeus restore" loads one back in — this','MERGES the backup into whatever is already on this device: entries','already here are kept, entries only in the file are added, and any','entry present in both (same id) is kept just once — nothing is wiped.','"zeus flight" opens a mini flight panel docked into the right half of','the terminal — a trimmed-down setup (not the full flight/pomodoro/pomomix','picker screen) where you can still set a destination, duration and','breaks, floating over a globe that fills the whole pane. Typing it','again just closes the panel; anything running keeps going and stays','visible on the terminal\'s small globe. You can also quick-launch:','"zeus flight lhr jfk 45" opens the panel already flying that route.','"zeus status" is read-only: shows how much is stored on this origin,','plus the current App Lock / Access Gate / harsh-mode / theme state.','"zeus wipe" permanently erases every key on this device — asks you to','confirm and type WIPE; there\'s no undo unless you made a "zeus" backup.','"zeus lock on" / "zeus lock off" flips the App Lock toggle directly,','same effect as the on/off switch in App Lock Settings.'],
   sysmon:['USAGE: sysmon  |  sysmon stop','Shows a single line of live-updating system stats (clock, memory, online','status, session uptime) until stopped.'],
   grep:['USAGE: <command> | grep <term>','Runs <command>, then only prints the lines from its output that contain','<term> (case-insensitive). EXAMPLE: history | grep open']
 };
@@ -14163,6 +14163,39 @@ function termZeusBackup(){
   termOk('ZEUS BACKUP DOWNLOADED — '+keys.length+' KEY(S), '+(json.length/1024).toFixed(1)+'KB.');
   termAppendLine('INCLUDES EVERYTHING ON THIS ORIGIN: COUNTRIES/PASSPORT, PROGRESS STATS, TIME PER FEATURE, VAULT (INCLUDING LOCKED ENTRIES), JEE JOURNAL, NOTES, SETTINGS.','term-dim');
 }
+/* Merge one localStorage value with an incoming backup value for the same key.
+   If both sides parse as JSON arrays of objects, merge them entry-by-entry
+   instead of one replacing the other wholesale:
+     - items are matched by their `id` field (every capsule post, capsule group,
+       goal, media item, etc. already carries one via capGenId()/Date.now());
+     - a duplicate id (the same entry present in both) collapses to a single
+       entry, so restoring a backup twice — or restoring on top of data that
+       already contains those entries — never produces copies;
+     - ids only on the device are kept, ids only in the backup are added, so
+       nothing that was already there gets lost.
+   Anything that isn't a same-shaped array (settings blobs, counters, plain
+   strings, or a key that's brand-new on this device) just takes the
+   backup's value directly, same as before. */
+function zeusMergeValue(existingRaw,incomingRaw){
+  let incoming;
+  try{ incoming=JSON.parse(incomingRaw); }catch(e){ return incomingRaw; }
+  if(!Array.isArray(incoming)) return incomingRaw;
+  let existing=[];
+  if(existingRaw!=null){
+    try{ const parsed=JSON.parse(existingRaw); if(Array.isArray(parsed)) existing=parsed; }catch(e){}
+  }
+  const byId=new Map();
+  const noId=[];
+  existing.forEach(item=>{
+    if(item&&typeof item==='object'&&'id' in item) byId.set(String(item.id),item);
+    else noId.push(item);
+  });
+  incoming.forEach(item=>{
+    if(item&&typeof item==='object'&&'id' in item) byId.set(String(item.id),item); // backup wins on an id clash
+    else if(!noId.some(x=>JSON.stringify(x)===JSON.stringify(item))) noId.push(item); // dedupe id-less items by value
+  });
+  return JSON.stringify(Array.from(byId.values()).concat(noId));
+}
 function termZeusRestore(){
   const input=document.createElement('input');
   input.type='file';input.accept='application/json';
@@ -14176,13 +14209,18 @@ function termZeusRestore(){
         if(!payload||typeof payload.data!=='object'){termErr('NOT A VALID ZEUS BACKUP FILE.');return;}
         const keys=Object.keys(payload.data);
         if(!keys.length){termErr('BACKUP FILE HAS NO DATA.');return;}
-        if(!window.confirm('ZEUS RESTORE will REPLACE ALL data on this device (schedule, progress, countries, Vault, JEE journal, settings) with the contents of this backup file. Continue?')){
+        if(!window.confirm('ZEUS RESTORE will MERGE this backup file into the data already on this device (schedule, progress, countries, Vault, JEE journal, settings). Existing entries are kept, new ones from the file are added, and any entry present in both is kept once. Continue?')){
           termErr('ZEUS RESTORE CANCELLED.');return;
         }
-        try{localStorage.clear();}catch(e){}
-        keys.forEach(k=>{try{localStorage.setItem(k,payload.data[k]);}catch(e){}});
-        termOk('ZEUS RESTORE COMPLETE — '+keys.length+' KEY(S) WRITTEN. THIS DEVICE NOW CARRIES THAT BACKUP\'S STATS.');
-        termAppendLine("TYPE 'reload' TO REFRESH THE PAGE AND SEE THE RESTORED DATA.",'term-dim');
+        keys.forEach(k=>{
+          try{
+            const existingRaw=localStorage.getItem(k);
+            const merged=existingRaw==null?payload.data[k]:zeusMergeValue(existingRaw,payload.data[k]);
+            localStorage.setItem(k,merged);
+          }catch(e){}
+        });
+        termOk('ZEUS RESTORE COMPLETE — '+keys.length+' KEY(S) MERGED IN. EXISTING DATA WAS KEPT; DUPLICATE ENTRIES WERE COLLAPSED TO ONE.');
+        termAppendLine("TYPE 'reload' TO REFRESH THE PAGE AND SEE THE MERGED DATA.",'term-dim');
       }catch(e){termErr('COULD NOT PARSE THAT FILE AS A ZEUS BACKUP.');}
     };
     reader.readAsText(file);
