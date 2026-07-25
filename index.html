@@ -14241,16 +14241,27 @@ async function termZeusBackup(){
   }
   if(progressLine&&rawMedia.length) progressLine.textContent='ENCODED '+rawMedia.length+' PHOTO/VIDEO FILE(S).';
   termAppendLine('BUILDING THE BACKUP FILE…','term-dim');
-  const payload={_zeusBackup:true,ts:new Date().toISOString(),data,media};
-  const json=JSON.stringify(payload,null,2);
-  const blob=new Blob([json],{type:'application/json'});
+  // Deliberately NOT JSON.stringify(payload) here — with hundreds of files that
+  // builds one single string that can run into hundreds of MB to a few GB,
+  // which either grinds the tab to a halt or hits the browser's max string
+  // length. Instead we assemble the same JSON as an array of small pieces and
+  // hand that straight to Blob, which concatenates them without ever needing
+  // one giant string in memory.
+  const parts=['{"_zeusBackup":true,"ts":'+JSON.stringify(new Date().toISOString())+',"data":'+JSON.stringify(data)+',"media":['];
+  for(let i=0;i<media.length;i++){
+    const m=media[i];
+    parts.push((i>0?',':'')+'{"key":'+JSON.stringify(m.key)+',"mime":'+JSON.stringify(m.mime)+',"data":"'+m.data+'"}');
+  }
+  parts.push(']}');
+  const blob=new Blob(parts,{type:'application/json'});
+  const approxBytes=parts.reduce((n,p)=>n+p.length,0);
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   const stamp=new Date().toISOString().slice(0,10);
   a.href=url;a.download='zeus-backup-'+stamp+'.json';
   document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),2000);
-  termOk('ZEUS BACKUP DOWNLOADED — '+keys.length+' KEY(S) + '+media.length+' MEDIA FILE(S), '+(json.length/1024/1024).toFixed(2)+'MB.');
+  termOk('ZEUS BACKUP DOWNLOADED — '+keys.length+' KEY(S) + '+media.length+' MEDIA FILE(S), '+(approxBytes/1024/1024).toFixed(2)+'MB.');
   termAppendLine('INCLUDES EVERYTHING ON THIS ORIGIN: COUNTRIES/PASSPORT, PROGRESS STATS, TIME PER FEATURE, VAULT (INCLUDING LOCKED ENTRIES), JEE JOURNAL, NOTES, SETTINGS, AND CAPSULE PHOTOS/VIDEOS.','term-dim');
 }
 /* Merge one localStorage value with an incoming backup value for the same key.
