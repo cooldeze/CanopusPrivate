@@ -642,13 +642,14 @@ html.crt-retro .flight-hud.hud-idle .flight-hud-grip span{
 .flight-hud.pomo-mode .flight-wind-row{display:none}
 /* ── Pause badge: shown when the active timer (flight / pomodoro / pomomix) is paused ── */
 .flight-pause-badge{
-  display:none;position:absolute;left:50%;top:-34px;transform:translateX(-50%);
+  display:none;
   background:rgba(0,0,0,0.65);border:0.5px solid rgba(255,255,255,0.25);border-radius:8px;
   padding:6px 12px;font-size:10px;letter-spacing:.08em;color:rgba(255,255,255,0.85);
   white-space:nowrap;text-transform:uppercase;font-family:'Inter',sans-serif;z-index:5;
+  margin-bottom:10px;
 }
 .flight-pause-badge.show{display:block;animation:pauseBadgeFade .2s ease}
-@keyframes pauseBadgeFade{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes pauseBadgeFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .flight-hud.is-paused .flight-timer{opacity:.45}
 .flight-hud.is-paused .flight-progress-fill{filter:grayscale(1)}
 .pomo-dots{display:flex;gap:5px;align-items:center;justify-content:center}
@@ -669,7 +670,7 @@ html.crt-retro .flight-hud.hud-idle .flight-hud-grip span{
 .flight-timer{
   font-size:clamp(52px,10vw,84px);font-weight:300;letter-spacing:-.04em;
   color:#fff;font-variant-numeric:tabular-nums;line-height:1;margin-bottom:6px;
-  cursor:default;
+  cursor:pointer;
 }
 .flight-finish-tip{
   position:fixed;z-index:200;pointer-events:none;
@@ -1021,6 +1022,26 @@ body.light kbd{background:#f0f0eb;border-color:#ddd;color:#666}
 .flight-goals-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15)}
 .flight-goal-item{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.8);letter-spacing:.02em;text-align:right;line-height:1.4}
 .flight-goal-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);flex-shrink:0}
+
+/* ── SCHEDULE PANEL (top-left corner, isolated from HUD; lists the pomodoro's
+   focus/break session clock-times so they're visible mid-flight — same layout
+   as the setup-screen "session times" preview, revealed on cursor move ── */
+.flight-schedule-panel{position:absolute;top:80px;left:32px;z-index:15;display:flex;flex-direction:column;gap:8px;width:min(230px,60vw);padding:12px 14px;border-radius:10px;border:0.5px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.4);backdrop-filter:blur(6px)}
+.flight-schedule-title{font-size:10px;color:rgba(255,255,255,0.55);letter-spacing:.22em;text-transform:uppercase}
+.flight-schedule-list{display:flex;flex-direction:column;gap:4px;max-height:34vh;overflow-y:auto;padding:2px}
+.flight-schedule-list::-webkit-scrollbar{width:3px}
+.flight-schedule-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15)}
+.fsp-row{display:flex;align-items:center;justify-content:space-between;padding:2px 0;font-size:11px;letter-spacing:.02em;color:rgba(255,255,255,0.45)}
+.fsp-label{display:flex;align-items:center;gap:6px}
+.fsp-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,0.3)}
+.fsp-row.fsp-work .fsp-dot{background:#c0392b}
+.fsp-row.fsp-short .fsp-dot{background:#5a9fd4}
+.fsp-row.fsp-long .fsp-dot{background:#4a9a6a}
+.fsp-time{font-variant-numeric:tabular-nums}
+.fsp-row.fsp-current{color:rgba(255,255,255,0.92);font-weight:500}
+.fsp-row.fsp-current .fsp-time{color:var(--accent,#fff)}
+.fsp-finish{margin-top:4px;padding-top:8px;border-top:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.55)}
+.fsp-finish .fsp-time{color:var(--accent,#fff);font-weight:600;font-variant-numeric:tabular-nums}
 
 /* ── BREAK OVERLAY ── */
 .flight-break-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.78);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;pointer-events:none;opacity:0;transition:opacity .35s}
@@ -3468,7 +3489,7 @@ window.AccessGate={ hashCode:aqgHash };
       <div class="flight-hud-grip"><span></span><span></span><span></span></div>
     </div>
     <button class="flight-hud-reset" id="flight-hud-reset" title="Reset position &amp; size" aria-label="Reset panel"><i class="ti ti-refresh"></i></button>
-    <div class="flight-pause-badge" id="flight-pause-badge"><i class="ti ti-player-pause" style="margin-right:4px"></i>paused — press space to resume</div>
+    <div class="flight-pause-badge" id="flight-pause-badge"><i class="ti ti-player-pause" style="margin-right:4px"></i>paused<span id="flight-pause-dur"></span> — click timer or press space to resume</div>
     <div class="flight-route">
       <span id="ft-from-disp">LHR</span>
       <span class="sep">→</span>
@@ -3509,6 +3530,12 @@ window.AccessGate={ hashCode:aqgHash };
   <div class="flight-goals-panel flight-idle-fade" id="flight-goals-panel" style="display:none">
     <div class="flight-goals-title">goals</div>
     <div class="flight-goals-list" id="flight-goals-list"></div>
+  </div>
+
+  <!-- Schedule panel — sits top-left, shows the pomodoro's session clock-times mid-flight -->
+  <div class="flight-schedule-panel flight-idle-fade" id="flight-schedule-panel" style="display:none">
+    <div class="flight-schedule-title">session times</div>
+    <div class="flight-schedule-list" id="flight-schedule-list"></div>
   </div>
 
   <!-- Break overlay (shown during a break) -->
@@ -5907,6 +5934,67 @@ function renderFlightGoals(){
   panelEl.style.display='flex';
 }
 
+// ── In-flight schedule panel: same "session times" list shown on the pomodoro
+//    setup screen (fmtClock / pomoPhaseSec live below), but rendered mid-flight
+//    and anchored on the live remaining time of whichever phase is in progress
+//    so it stays accurate through pauses. Revealed by the shared cursor-move
+//    idle-fade, same as the goals panel. ──
+function fspRow(label,start,end,type,current){
+  return `<div class="fsp-row fsp-${type}${current?' fsp-current':''}"><span class="fsp-label"><span class="fsp-dot"></span>${label}</span><span class="fsp-time">${fmtClock(start)} – ${fmtClock(end)}</span></div>`;
+}
+function renderFlightSchedule(){
+  const panelEl=document.getElementById('flight-schedule-panel');
+  const listEl=document.getElementById('flight-schedule-list');
+  if(!panelEl||!listEl) return;
+  if(!pomoRunning||!pomoWorkMin||pomoPhase==='done'){
+    panelEl.style.display='none';
+    listEl.innerHTML='';
+    return;
+  }
+  const workMin=pomoWorkMin, shortMin=pomoBreakMin, longMin=pomoLongBreakMin;
+  const every=Math.max(2,Math.min(12,pomoLongBreakEvery));
+  // Infinite mode has no fixed end, so just project a rolling window of upcoming sessions.
+  const totalCycles=pomoInfinite?(pomoCycleCount+6):Math.max(1,Math.min(12,pomoCyclesTarget));
+  const curCycle=pomoPhase==='work'?pomoCycleCount+1:pomoCycleCount;
+
+  let rows='';
+  let cursor=new Date(Date.now()+pomoRemSec*1000); // live end of the phase in progress
+  let i;
+  if(pomoPhase==='work'){
+    rows+=fspRow('focus '+curCycle,new Date(),cursor,'work',true);
+    if(curCycle<totalCycles||pomoInfinite){
+      const isLong=(curCycle%every===0);
+      const breakMin=isLong?longMin:shortMin;
+      const breakStart=cursor;
+      cursor=new Date(cursor.getTime()+breakMin*60000);
+      rows+=fspRow(isLong?'long break':'short break',breakStart,cursor,isLong?'long':'short');
+    }
+    i=curCycle+1;
+  } else {
+    const isLong=pomoPhase==='long';
+    rows+=fspRow(isLong?'long break':'short break',new Date(),cursor,isLong?'long':'short',true);
+    i=curCycle+1;
+  }
+  for(;i<=totalCycles;i++){
+    const workStart=cursor;
+    cursor=new Date(cursor.getTime()+workMin*60000);
+    rows+=fspRow('focus '+i,workStart,cursor,'work');
+    if(i<totalCycles||pomoInfinite){
+      const isLong=(i%every===0);
+      const breakMin=isLong?longMin:shortMin;
+      const breakStart=cursor;
+      cursor=new Date(cursor.getTime()+breakMin*60000);
+      rows+=fspRow(isLong?'long break':'short break',breakStart,cursor,isLong?'long':'short');
+    }
+  }
+  const footer=pomoInfinite
+    ? `<div class="fsp-finish"><i class="ti ti-infinity"></i> repeats until you quit</div>`
+    : `<div class="fsp-finish"><span>all done</span><span class="fsp-time">${fmtClock(cursor)}</span></div>`;
+
+  listEl.innerHTML=rows+footer;
+  panelEl.style.display='flex';
+}
+
 // Flight tracker open/close
 function openFlightTracker(){
   if(window.CanopusTrack) CanopusTrack.setFeature('flight');
@@ -6566,11 +6654,11 @@ function launchPomodoro(){
   document.getElementById('flight-hud').classList.add('pomo-mode');
   document.getElementById('flight-overlay').classList.add('tracking-flight');
 
-  // Pomodoro doesn't use the manual break panel or route/goal furniture
+  // Pomodoro doesn't use the manual break panel or route furniture, but goals
+  // and the session-time schedule are both still relevant mid-flight — refresh them.
   const breakRow=document.getElementById('flight-break-row');
   if(breakRow) breakRow.style.display='none';
-  const goalsPanel=document.getElementById('flight-goals-panel');
-  if(goalsPanel) goalsPanel.style.display='none';
+  renderFlightGoals();
   const bov=document.getElementById('flight-break-overlay');
   if(bov) bov.classList.remove('active');
 
@@ -6579,6 +6667,7 @@ function launchPomodoro(){
   document.getElementById('flight-status').className='flight-status';
 
   updatePomoDisplay();
+  renderFlightSchedule();
 
   if(pomoInterval) clearInterval(pomoInterval);
   pomoInterval=setInterval(tickPomodoro,1000);
@@ -6596,12 +6685,52 @@ function togglePomoPause(){
 }
 
 // Shared visual indicator for whichever timer (flight / pomodoro / pomomix) is paused
+// Shared visual indicator for whichever timer (flight / pomodoro / pomomix) is paused,
+// plus a live "paused for MM:SS" readout and a refresh of the in-flight schedule panel
+// once the session resumes (so its clock times account for the time spent paused).
+let pauseStartedAt=null, pauseBadgeInterval=null;
+function fmtPauseDur(sec){
+  const m=Math.floor(sec/60), s=sec%60;
+  return m+':'+pad(s);
+}
+function updatePauseBadgeText(){
+  const el=document.getElementById('flight-pause-dur');
+  if(!el||pauseStartedAt==null) return;
+  const elapsed=Math.floor((Date.now()-pauseStartedAt)/1000);
+  el.textContent=' '+fmtPauseDur(elapsed);
+}
 function syncPauseBadge(){
   const paused=flightPaused||pomoPaused||pomomixPaused;
   const hud=document.getElementById('flight-hud');
   const badge=document.getElementById('flight-pause-badge');
   if(hud) hud.classList.toggle('is-paused',paused);
   if(badge) badge.classList.toggle('show',paused);
+
+  if(paused){
+    if(pauseStartedAt==null){
+      pauseStartedAt=Date.now();
+      updatePauseBadgeText();
+      if(pauseBadgeInterval) clearInterval(pauseBadgeInterval);
+      pauseBadgeInterval=setInterval(updatePauseBadgeText,1000);
+    }
+  } else if(pauseStartedAt!=null){
+    if(pauseBadgeInterval){clearInterval(pauseBadgeInterval);pauseBadgeInterval=null;}
+    pauseStartedAt=null;
+    const durEl=document.getElementById('flight-pause-dur');
+    if(durEl) durEl.textContent='';
+    // The paused stretch just ended — every clock time after "now" has effectively
+    // shifted forward by however long the pause lasted, so re-project the schedule.
+    renderFlightSchedule();
+  }
+}
+
+// Single entry point for "toggle whichever session is currently running" — used by
+// both the spacebar shortcut and a direct click on the big timer digits.
+function toggleActivePause(){
+  if(flightOnBreak) return; // the break overlay has its own dedicated "resume flight" control
+  if(pomoRunning) togglePomoPause();
+  else if(pomomixRunning) togglePomomixPause();
+  else if(flightRunning) toggleFlightPause();
 }
 
 function tickPomodoro(){
@@ -6664,6 +6793,7 @@ function pomoAdvancePhase(){
     pomoTotalSec=0;pomoRemSec=0;
     flightRunning=false;
     updatePomoDisplay();
+    renderFlightSchedule();
     document.getElementById('flight-status').textContent='all done ✓';
     document.getElementById('flight-status').className='flight-status landed';
     document.getElementById('flight-eta').textContent='great work today';
@@ -6683,6 +6813,7 @@ function pomoAdvancePhase(){
     flightRunning=true;
   }
   updatePomoDisplay();
+  renderFlightSchedule();
 
   if('Notification' in window && Notification.permission==='granted'){
     new Notification('Canopus 🍅', pomoPhase==='work' ? 'Break\u2019s over — back to focus.' : 'Nice work — time for a '+(pomoPhase==='long'?'long':'short')+' break.');
@@ -14688,6 +14819,11 @@ document.addEventListener('DOMContentLoaded',function(){
   }
   timerEl.addEventListener('mousemove',showTip);
   timerEl.addEventListener('mouseleave',()=>tip.classList.remove('show'));
+  timerEl.title='Click to pause / resume';
+  timerEl.addEventListener('click',()=>{
+    toggleActivePause();
+    tip.classList.remove('show');
+  });
 })();
 
 /* ---- Flight tracker: spacebar pauses/resumes whichever timer is currently running
@@ -14703,9 +14839,7 @@ document.addEventListener('keydown',function(e){
   if(!overlay.classList.contains('tracking-flight')) return; // only during an active run, not the setup screens
   if(flightOnBreak) return; // the break overlay has its own "resume flight" control
   e.preventDefault();
-  if(pomoRunning) togglePomoPause();
-  else if(pomomixRunning) togglePomomixPause();
-  else if(flightRunning) toggleFlightPause();
+  toggleActivePause();
 },true);
 
 /* ---- Flight HUD: draggable + resizable floating panel ---- */
