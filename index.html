@@ -1918,14 +1918,21 @@ html,body{overflow-x:hidden}
    canvas and flattens every background to transparent so the whole app
    reads as CRT phosphor. That's wrong for the Capsule: memory photos and
    videos should stay full-color, and cards/modals/thumbnail badges need
-   a real background or they lose all structure against the black page. */
+   a real background or they lose all structure against the black page.
+   Reels (#capReelsOverlay) plays the same capsule videos but lives as its
+   own overlay outside #page-capsule in the DOM, so it needs the same
+   video/img exemption explicitly — otherwise a video looks full-color in
+   the Capsule feed but shows up phosphor-tinted the moment it's opened
+   in Reels. */
 html.crt-retro #page-capsule img,
 html.crt-retro #page-capsule video,
 html.crt-retro .cap-preview img,
 html.crt-retro .cap-preview video,
 html.crt-retro .cap-mtile img,
 html.crt-retro #capLightboxInner img,
-html.crt-retro #capLightboxInner video{
+html.crt-retro #capLightboxInner video,
+html.crt-retro #capReelsOverlay img,
+html.crt-retro #capReelsOverlay video{
   filter:none !important;
   opacity:1 !important;
 }
@@ -1961,6 +1968,17 @@ html.crt-retro .cap-preview-remove{
 html.crt-retro .cap-lb-close,
 html.crt-retro .cap-lb-download,
 html.crt-retro .cap-lb-nav{
+  background-color:rgba(0,0,0,.5) !important;
+}
+/* Reels overlay chrome (close button, counter pill) also relies on a real
+   black backdrop, same reasoning as .cap-overlay above. */
+html.crt-retro #capReelsOverlay,
+html.crt-retro .cap-reel-slide{
+  background-color:#000 !important;
+}
+html.crt-retro .cap-reel-close,
+html.crt-retro .cap-reel-counter,
+html.crt-retro .cap-reel-side button{
   background-color:rgba(0,0,0,.5) !important;
 }
 
