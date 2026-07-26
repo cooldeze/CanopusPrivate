@@ -1536,6 +1536,10 @@ body.light .prog-goal-sub{color:#ccc}
 .cap-reel-shuffle-btn:hover{background:rgba(255,255,255,.16)}
 .cap-reel-shuffle-btn.active{background:var(--accent);color:var(--accent-on);border-color:var(--accent)}
 .cap-reel-counter{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.08);border-radius:20px;padding:5px 12px}
+.cap-reel-top,.cap-reel-info,.cap-reel-side,.cap-reel-progress{transition:opacity .28s ease}
+.cap-reels-cinema .cap-reel-top,.cap-reels-cinema .cap-reel-info,.cap-reels-cinema .cap-reel-side,.cap-reels-cinema .cap-reel-progress{opacity:0;pointer-events:none}
+.cap-reel-cinema-hint{position:absolute;left:50%;bottom:calc(28px + env(safe-area-inset-bottom));transform:translateX(-50%);color:rgba(255,255,255,.55);font-size:11px;letter-spacing:.03em;pointer-events:none;opacity:0;transition:opacity .3s ease;z-index:2}
+.cap-reels-cinema .cap-reel-cinema-hint.show{opacity:1}
 .cap-reel-empty{color:rgba(255,255,255,.6);font-size:13px;text-align:center;padding:0 30px}
 #capWebViewOverlay{z-index:345}
 .cap-webview{width:min(1100px,94vw);height:min(820px,88vh);background:var(--cap-paper);border:0.5px solid var(--cap-line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transform:translateY(10px);transition:transform .2s}
@@ -2987,10 +2991,12 @@ window.AccessGate={ hashCode:aqgHash };
   <div class="cap-reel-top">
     <button class="cap-reel-close" id="capReelsClose" title="Close"><i class="ti ti-x"></i></button>
     <div class="cap-reel-top-right">
+      <button class="cap-reel-shuffle-btn" id="capReelsCinemaBtn" title="Cinema mode — hide controls, tap the video to bring them back"><i class="ti ti-eye-off"></i></button>
       <button class="cap-reel-shuffle-btn" id="capReelsShuffleBtn" title="Shuffle reels"><i class="ti ti-arrows-shuffle"></i></button>
       <span class="cap-reel-counter" id="capReelsCounter"></span>
     </div>
   </div>
+  <div class="cap-reel-cinema-hint" id="capReelsCinemaHint">Tap the video to bring controls back</div>
   <div class="cap-reels-scroll" id="capReelsScroll"></div>
 </div>
 
@@ -9728,6 +9734,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   let capPendingDeleteReelIndex = null; // index into capReelItems awaiting confirm-delete
   let capReelOriginalItems = [];   // capReelItems in their natural (unshuffled) order, for the currently open feed
   let capReelShuffle = (function(){ try{ return localStorage.getItem('canopus_reel_shuffle')==='1'; }catch(e){ return false; } })(); // persisted preference: show reels in random order
+  let capReelsCinema = false; // per-session — deliberately not persisted, so controls are never hidden unexpectedly on a fresh open
 
   const $ = id => document.getElementById(id);
 
@@ -10596,6 +10603,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     capReelCurrentIndex = 0;
     capBuildReelsDom();
     capReelsUpdateShuffleBtn();
+    capSetCinemaMode(false); // always start a fresh Reels session with controls visible
     $('capReelsOverlay').classList.add('open');
   }
   window.capOpenReels = capOpenReels;
@@ -10623,6 +10631,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     capReelCurrentIndex = 0;
     capBuildReelsDom();
     capReelsUpdateShuffleBtn();
+    capSetCinemaMode(false); // always start a fresh Reels session with controls visible
     $('capReelsOverlay').classList.add('open');
   }
   window.capOpenLocalFolderReels = capOpenLocalFolderReels;
@@ -10631,6 +10640,32 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     const btn = $('capReelsShuffleBtn');
     if(btn) btn.classList.toggle('active', capReelShuffle);
   }
+
+  // Cinema mode fades the top bar, caption/tag info, and side buttons (like/mute/download/
+  // etc.) out of view so nothing but the video is on screen. Tapping the video itself
+  // (see the video click handler below) brings controls back — the same gesture that
+  // already toggled play/pause, now doing double duty as "show me the controls again"
+  // the first time it's tapped while hidden.
+  function capSetCinemaMode(on){
+    capReelsCinema = on;
+    const overlay = $('capReelsOverlay');
+    if(overlay) overlay.classList.toggle('cap-reels-cinema', on);
+    const btn = $('capReelsCinemaBtn');
+    if(btn){
+      btn.classList.toggle('active', on);
+      const icon = btn.querySelector('i');
+      if(icon) icon.className = on ? 'ti ti-eye' : 'ti ti-eye-off';
+    }
+    if(on){
+      const hint = $('capReelsCinemaHint');
+      if(hint){
+        hint.classList.add('show');
+        clearTimeout(capReelsCinemaHintTimer);
+        capReelsCinemaHintTimer = setTimeout(()=>hint.classList.remove('show'), 2200);
+      }
+    }
+  }
+  let capReelsCinemaHintTimer = null;
 
   /* Toggle random order for the reels currently open. Re-orders in place
      (rather than reopening) so liked state, mute state, etc. carry over. */
@@ -10755,8 +10790,13 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   }
   $('capReelPickerCancel').addEventListener('click', ()=>$('capReelPickerModal').classList.remove('open'));
   $('capReelPickerModal').addEventListener('click', e=>{ if(e.target.id==='capReelPickerModal') $('capReelPickerModal').classList.remove('open'); });
-  $('capReelFolderBtn').addEventListener('click', ()=>$('capReelFolderInput').click());
-  $('capReelFolderInput').addEventListener('change', e=>{
+  // Guarded with existence checks: these two elements were added recently, and a missing
+  // element here would otherwise throw during initial script setup and silently prevent
+  // every button bound further down the script (New entry, Reels, Lock, etc.) from ever
+  // getting wired up — one broken line shouldn't be able to take the whole page down.
+  if($('capReelFolderBtn') && $('capReelFolderInput')){
+    $('capReelFolderBtn').addEventListener('click', ()=>$('capReelFolderInput').click());
+    $('capReelFolderInput').addEventListener('change', e=>{
     const files = Array.from(e.target.files||[]); // copy out before clearing .value below —
                                                     // e.target.files is live, so resetting the
                                                     // input would otherwise empty it in place
@@ -10764,7 +10804,8 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     $('capReelPickerModal').classList.remove('open');
     if(files.length) capOpenLocalFolderReels(files);
     else capToast('No video files found in that folder.');
-  });
+    });
+  }
 
   function capConfirmDeleteReel(i){
     const it = capReelItems[i];
@@ -10921,7 +10962,10 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     video.setAttribute('webkit-playsinline','');
     video.muted = capReelMuted;
     video.preload = 'auto';
-    video.addEventListener('click', ()=>{ if(video.paused) video.play().catch(()=>{}); else video.pause(); });
+    video.addEventListener('click', ()=>{
+      if(capReelsCinema){ capSetCinemaMode(false); return; } // first tap while hidden just brings controls back
+      if(video.paused) video.play().catch(()=>{}); else video.pause();
+    });
     const progFill = stillThere.querySelector('.cap-reel-progress-fill');
     if(progFill){
       progFill.style.width = '0%';
@@ -11058,6 +11102,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   }
 
   function capCloseReels(){
+    capSetCinemaMode(false);
     $('capReelsOverlay').classList.remove('open');
     const scroll = $('capReelsScroll');
     if(scroll){
@@ -11384,22 +11429,24 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     capPinned=!capPinned;
     $('capBtnPin').classList.toggle('active', capPinned);
   });
-  $('capBtnDeviceStorage').addEventListener('click', async ()=>{
-    if(capComposerForceFs){
-      capComposerForceFs = false;
-      $('capBtnDeviceStorage').classList.remove('active');
-      $('capBtnDeviceStorageLabel').textContent = 'Device folder';
-      capToast('New videos will go back to browser storage.');
-      return;
-    }
-    const dir = await capFsPickNewFolder(); // opens the OS folder-picker window
-    if(!dir) return; // picker cancelled/denied/unsupported — capFsPickNewFolder already toasted why
-    capComposerForceFs = true;
-    $('capBtnDeviceStorage').classList.add('active');
-    const name = dir.name || 'that folder';
-    $('capBtnDeviceStorageLabel').textContent = name.length>16 ? name.slice(0,15)+'…' : name;
-    capToast(`New videos in this entry will be saved into "${name}" instead of browser storage.`);
-  });
+  if($('capBtnDeviceStorage')){
+    $('capBtnDeviceStorage').addEventListener('click', async ()=>{
+      if(capComposerForceFs){
+        capComposerForceFs = false;
+        $('capBtnDeviceStorage').classList.remove('active');
+        $('capBtnDeviceStorageLabel').textContent = 'Device folder';
+        capToast('New videos will go back to browser storage.');
+        return;
+      }
+      const dir = await capFsPickNewFolder(); // opens the OS folder-picker window
+      if(!dir) return; // picker cancelled/denied/unsupported — capFsPickNewFolder already toasted why
+      capComposerForceFs = true;
+      $('capBtnDeviceStorage').classList.add('active');
+      const name = dir.name || 'that folder';
+      $('capBtnDeviceStorageLabel').textContent = name.length>16 ? name.slice(0,15)+'…' : name;
+      capToast(`New videos in this entry will be saved into "${name}" instead of browser storage.`);
+    });
+  }
   $('capBtnLock').addEventListener('click', ()=>{
     if(!capLocked && !capHasPin()){
       capOpenLockGate('setup-then-toggle');
@@ -11737,6 +11784,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   $('capLockedReelsBtn').addEventListener('click', ()=>capOpenReelPicker('locked'));
   $('capReelsClose').addEventListener('click', capCloseReels);
   $('capReelsShuffleBtn').addEventListener('click', capToggleReelShuffle);
+  if($('capReelsCinemaBtn')) $('capReelsCinemaBtn').addEventListener('click', ()=>capSetCinemaMode(!capReelsCinema));
   document.addEventListener('keydown', e=>{
     if(e.key==='Escape' && $('capReelsOverlay').classList.contains('open')) capCloseReels();
   });
@@ -16275,6 +16323,5 @@ window.jlRemovePassword=async function(){
 if(jlIsLocked()) jlShow();
 })();
 </script>
-
 </body>
 </html>
