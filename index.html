@@ -1325,8 +1325,8 @@ body.light .prog-goal-sub{color:#ccc}
 .cap-media-grid.n3{grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr}
 .cap-media-grid.n3 .cap-media-tile:first-child{grid-row:1/3}
 .cap-media-grid.n4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
-.cap-media-tile{position:relative;cursor:pointer;background:var(--surf-bg);overflow:hidden;border:0.5px solid var(--cap-line)}
-.cap-media-grid.n1 .cap-media-tile{max-height:520px;display:flex;align-items:center;justify-content:center;background:var(--surf-bg)}
+.cap-media-tile{position:relative;cursor:pointer;background:var(--surf-bg);overflow:hidden;border:0.5px solid var(--cap-line);min-height:110px}
+.cap-media-grid.n1 .cap-media-tile{max-height:520px;min-height:260px;display:flex;align-items:center;justify-content:center;background:var(--surf-bg)}
 .cap-media-grid.n1 .cap-media-tile img{position:static;width:auto;height:auto;max-width:100%;max-height:520px;object-fit:contain;display:block;margin:0 auto}
 .cap-media-tile img{display:block;width:100%;height:100%;min-height:110px;max-height:230px;object-fit:cover}
 .cap-media-more{position:absolute;inset:0;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:22px}
@@ -1449,6 +1449,19 @@ body.light .prog-goal-sub{color:#ccc}
 .cap-confirm p{font-size:12.5px;color:var(--cap-text-lo);line-height:1.55;margin-bottom:18px}
 .cap-confirm-actions{display:flex;justify-content:flex-end;gap:8px}
 .cap-btn-danger{padding:9px 15px;border-radius:9px;background:var(--cap-danger);border:none;color:#1a0a06;font-size:13px;font-weight:600;cursor:pointer;font-family:'Work Sans',sans-serif}
+#capStorageChoiceModal .cap-confirm{max-width:400px}
+.cap-storage-choice-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.cap-storage-opt{display:flex;align-items:flex-start;gap:11px;padding:12px;border-radius:11px;border:0.5px solid var(--cap-line);background:var(--cap-ink-2);color:inherit;text-align:left;cursor:pointer;font-family:'Work Sans',sans-serif;transition:border-color .15s,background .15s}
+.cap-storage-opt:hover{border-color:var(--cap-brass);background:var(--cap-paper-hi)}
+.cap-storage-opt i{font-size:18px;color:var(--cap-brass);margin-top:2px;flex-shrink:0}
+.cap-storage-opt-title{font-size:13px;font-weight:600;color:var(--cap-text-hi);margin-bottom:2px}
+.cap-storage-opt-sub{font-size:11.5px;color:var(--cap-text-lo);line-height:1.4}
+.cap-save-progress{padding:2px 0 10px}
+.cap-save-progress-track{height:5px;border-radius:3px;background:var(--cap-ink-2);border:0.5px solid var(--cap-line);overflow:hidden}
+.cap-save-progress-fill{height:100%;width:0%;background:var(--cap-brass);border-radius:3px;transition:width .2s ease}
+.cap-save-progress-text{margin-top:6px;font-size:11.5px;color:var(--cap-text-lo);font-family:'IBM Plex Mono',monospace}
+.cap-storage-remember{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--cap-text-lo);margin-bottom:14px;cursor:pointer}
+.cap-storage-remember input{accent-color:var(--cap-brass);cursor:pointer}
 .cap-dedupe-panel{width:100%;max-width:440px;max-height:82vh;overflow-y:auto;background:var(--cap-paper);border:0.5px solid var(--cap-line);border-radius:16px;padding:22px}
 .cap-dedupe-panel h3{font-family:'Fraunces',serif;font-size:16px;font-weight:500;color:var(--cap-text-hi);margin-bottom:6px}
 .cap-dedupe-panel>p{font-size:12.5px;color:var(--cap-text-lo);line-height:1.5;margin-bottom:16px}
@@ -2936,6 +2949,7 @@ window.AccessGate={ hashCode:aqgHash };
     <div class="cap-tools">
       <button class="cap-tool" id="capBtnPhoto"><i class="ti ti-photo"></i>Photo</button>
       <button class="cap-tool" id="capBtnVideo"><i class="ti ti-video"></i>Video</button>
+      <button class="cap-tool" id="capBtnDeviceStorage" title="Opens a window to pick a folder on your device. New videos for this entry are saved straight into it instead of browser storage. Desktop Chrome/Edge only."><i class="ti ti-folder"></i><span id="capBtnDeviceStorageLabel">Device folder</span></button>
       <button class="cap-tool" id="capBtnDedupe" title="Scan attached videos and remove any that are the same content"><i class="ti ti-copy-off"></i>Dedupe videos</button>
       <button class="cap-tool" id="capBtnLink"><i class="ti ti-link"></i>Link</button>
       <button class="cap-tool" id="capBtnGoal"><i class="ti ti-flag"></i>Goals</button>
@@ -2951,6 +2965,10 @@ window.AccessGate={ hashCode:aqgHash };
         <span class="cap-meta-lbl">When</span>
         <input type="datetime-local" id="capDateInput">
       </div>
+    </div>
+    <div class="cap-save-progress" id="capSaveProgress" style="display:none">
+      <div class="cap-save-progress-track"><div class="cap-save-progress-fill" id="capSaveProgressFill"></div></div>
+      <div class="cap-save-progress-text" id="capSaveProgressText"></div>
     </div>
     <div class="cap-footer">
       <button class="cap-btn-ghost" id="capCompCancel">Cancel</button>
@@ -3019,6 +3037,27 @@ window.AccessGate={ hashCode:aqgHash };
   </div>
 </div>
 
+<div class="cap-overlay" id="capStorageChoiceModal">
+  <div class="cap-confirm">
+    <h3 id="capStorageChoiceTitle">Where should these videos live?</h3>
+    <p id="capStorageChoiceBody">Locked entries can hold a lot of video. You can keep them in the browser's own storage, or save the original files straight to a folder on this device — that avoids running into the browser's storage limit.</p>
+    <div class="cap-storage-choice-opts">
+      <button type="button" class="cap-storage-opt" id="capStorageOptBrowser">
+        <i class="ti ti-database"></i>
+        <div><div class="cap-storage-opt-title">Browser storage</div><div class="cap-storage-opt-sub">Simplest — no extra prompts. Limited by the browser's own storage quota.</div></div>
+      </button>
+      <button type="button" class="cap-storage-opt" id="capStorageOptDevice">
+        <i class="ti ti-folder"></i>
+        <div><div class="cap-storage-opt-title">A folder on this device</div><div class="cap-storage-opt-sub">You'll pick a folder once. Videos are saved there as real files — room is limited only by your disk.</div></div>
+      </button>
+    </div>
+    <label class="cap-storage-remember"><input type="checkbox" id="capStorageRemember" checked>Remember this choice for locked entries</label>
+    <div class="cap-confirm-actions">
+      <button class="cap-btn-ghost" id="capStorageChoiceCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="cap-overlay" id="capReelPickerModal">
   <div class="cap-reelpick-panel">
     <h3 id="capReelPickerTitle">Watch which capsule?</h3>
@@ -3028,6 +3067,11 @@ window.AccessGate={ hashCode:aqgHash };
       <button type="button" class="cap-reelpick-tab" id="capReelPickerTabPost">By post</button>
     </div>
     <div class="cap-reelpick-list" id="capReelPickerList"></div>
+    <button type="button" class="cap-storage-opt" id="capReelFolderBtn" style="margin-top:2px">
+      <i class="ti ti-folder"></i>
+      <div><div class="cap-storage-opt-title">Watch a folder from this device</div><div class="cap-storage-opt-sub">Pick a folder of video files on your computer or phone — they'll play here without being copied into the capsule.</div></div>
+    </button>
+    <input type="file" id="capReelFolderInput" accept="video/*" multiple webkitdirectory hidden>
     <div class="cap-confirm-actions">
       <button class="cap-btn-ghost" id="capReelPickerCancel">Cancel</button>
     </div>
@@ -9651,6 +9695,9 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   let capEditingId = null;
   let capMediaList = [];
   let capOrigMediaIds = [];
+  let capComposerForceFs = false; // manual "Device folder" toggle in the composer toolbar — when on, new
+                                   // videos for this entry go straight to a device folder instead of the
+                                   // browser's own storage, regardless of lock state or remembered pref.
   let capPinned = false;
   let capLocked = false;
   let capLinkOpen = false;
@@ -9717,7 +9764,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   async function capGetMediaHash(m){
     if(m.hash) return m.hash;
     let blob = m.fullBlob;
-    if(!blob){ try{ blob = await capIdbGet(m.id); }catch(e){ blob = null; } }
+    if(!blob){ try{ blob = await capBlobGet(m); }catch(e){ blob = null; } }
     if(!blob) return null;
     try{ m.hash = await capSha256(blob); return m.hash; }
     catch(e){ return null; }
@@ -9785,6 +9832,229 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     }catch(e){ return false; }
   }
 
+  /* ── On-device folder storage (File System Access API) — an alternate backend for the
+     same photo/video blobs. Some browsers (Brave in particular) cap IndexedDB/origin
+     storage well below actual free disk space, so someone with a few hundred videos can
+     hit "not enough storage" long before their device is anywhere near full. Saving the
+     original files straight into a folder the person picks sidesteps that browser-side
+     quota entirely — it's limited only by real disk space. The chosen folder handle is
+     itself kept in IndexedDB (handles are structured-cloneable) so it survives reloads;
+     the browser still requires a fresh permission grant each session, which is a
+     platform restriction, not something this code can skip. ── */
+  const CAP_FS_HANDLE_DB = 'dayplan_capsule_fs_handle';
+  let capFsHandleDbPromise = null;
+  let capFsDirHandle = null;
+  function capFsHandleDb(){
+    if(capFsHandleDbPromise) return capFsHandleDbPromise;
+    capFsHandleDbPromise = new Promise((resolve, reject)=>{
+      if(!('indexedDB' in window)){ reject(new Error('no indexeddb')); return; }
+      const req = indexedDB.open(CAP_FS_HANDLE_DB, 1);
+      req.onupgradeneeded = ()=>{ if(!req.result.objectStoreNames.contains('handles')) req.result.createObjectStore('handles'); };
+      req.onsuccess = ()=>resolve(req.result);
+      req.onerror = ()=>{ capFsHandleDbPromise=null; reject(req.error); };
+    });
+    return capFsHandleDbPromise;
+  }
+  async function capFsSaveHandle(handle){
+    try{
+      const db = await capFsHandleDb();
+      return new Promise((resolve, reject)=>{
+        const tx = db.transaction('handles','readwrite');
+        tx.objectStore('handles').put(handle,'dir');
+        tx.oncomplete=()=>resolve(true);
+        tx.onerror=()=>reject(tx.error);
+      });
+    }catch(e){ return false; }
+  }
+  async function capFsLoadHandle(){
+    try{
+      const db = await capFsHandleDb();
+      return new Promise((resolve, reject)=>{
+        const tx = db.transaction('handles','readonly');
+        const req = tx.objectStore('handles').get('dir');
+        req.onsuccess=()=>resolve(req.result||null);
+        req.onerror=()=>reject(req.error);
+      });
+    }catch(e){ return null; }
+  }
+  // Ensures a folder handle is mounted with read/write permission. If promptIfNeeded is
+  // false this only tries silently (re-using a previously granted handle) and never shows
+  // a picker or permission dialog — used by background reads where popping a prompt would
+  // be surprising. Returns null if no folder is available/permitted.
+  async function capFsEnsureMounted(promptIfNeeded){
+    if(!capFsDirHandle){
+      try{ capFsDirHandle = await capFsLoadHandle(); }catch(e){}
+    }
+    if(capFsDirHandle){
+      try{
+        let perm = await capFsDirHandle.queryPermission({mode:'readwrite'});
+        if(perm!=='granted' && promptIfNeeded) perm = await capFsDirHandle.requestPermission({mode:'readwrite'});
+        if(perm==='granted') return capFsDirHandle;
+      }catch(e){ /* handle likely stale (folder moved/deleted) — fall through */ }
+    }
+    if(!promptIfNeeded) return null;
+    if(!window.showDirectoryPicker){
+      capToast("Your browser doesn't support saving to a folder — try Chrome, Edge, or Brave on desktop.");
+      return null;
+    }
+    try{
+      const handle = await window.showDirectoryPicker();
+      let perm = await handle.queryPermission({mode:'readwrite'});
+      if(perm!=='granted') perm = await handle.requestPermission({mode:'readwrite'});
+      if(perm!=='granted'){ capToast('Permission to save to that folder was denied.'); return null; }
+      capFsDirHandle = handle;
+      await capFsSaveHandle(handle);
+      return handle;
+    }catch(e){
+      if(!(e && e.name==='AbortError')) capToast('Could not access that folder.');
+      return null;
+    }
+  }
+  // Unlike capFsEnsureMounted (which is meant to quietly reuse an already-granted folder
+  // whenever possible — e.g. for automatic quota-fallback mid-save), this always pops the
+  // OS folder picker so the person can pick a different folder each time they ask to.
+  async function capFsPickNewFolder(){
+    if(!window.showDirectoryPicker){
+      capToast("Your browser doesn't support saving to a folder — try Chrome, Edge, or Brave on desktop.");
+      return null;
+    }
+    try{
+      const handle = await window.showDirectoryPicker();
+      let perm = await handle.queryPermission({mode:'readwrite'});
+      if(perm!=='granted') perm = await handle.requestPermission({mode:'readwrite'});
+      if(perm!=='granted'){ capToast('Permission to save to that folder was denied.'); return null; }
+      capFsDirHandle = handle;
+      await capFsSaveHandle(handle);
+      return handle;
+    }catch(e){
+      if(!(e && e.name==='AbortError')) capToast('Could not access that folder.');
+      return null;
+    }
+  }
+  // File System Access API gives no way to see or set the actual filesystem path from
+  // the browser (that's deliberate — the platform doesn't let a web page learn where on
+  // disk a folder actually lives). All it can do is give the folder a readable *name* on
+  // the button, and — as of here — write files with a normal video/photo extension
+  // instead of an opaque ".bin" so that opening the chosen folder in Explorer/Finder
+  // shows recognizable, double-click-playable files instead of unlabeled blobs.
+  const CAP_FS_EXT_MAP = {
+    'video/mp4':'mp4','video/quicktime':'mov','video/webm':'webm','video/x-matroska':'mkv',
+    'video/x-msvideo':'avi','video/3gpp':'3gp','video/ogg':'ogv','video/x-m4v':'m4v',
+    'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','image/heic':'heic'
+  };
+  function capFsExt(mime){ return CAP_FS_EXT_MAP[(mime||'').toLowerCase()] || 'bin'; }
+  async function capFsPut(key, blob, mime){
+    const dir = await capFsEnsureMounted(true);
+    if(!dir) throw new Error('no folder mounted');
+    const fh = await dir.getFileHandle('capsule-'+key+'.'+capFsExt(mime||blob.type), {create:true});
+    const w = await fh.createWritable();
+    await w.write(blob);
+    await w.close();
+    return true;
+  }
+  async function capFsGet(key, mime){
+    const dir = await capFsEnsureMounted(false);
+    if(!dir) return null;
+    // Try the extensioned filename first, then fall back to the old ".bin" naming used
+    // before this change, so videos saved with an earlier version still load.
+    for(const name of [`capsule-${key}.${capFsExt(mime)}`, `capsule-${key}.bin`]){
+      try{
+        const fh = await dir.getFileHandle(name);
+        const file = await fh.getFile();
+        return mime ? file.slice(0, file.size, mime) : file;
+      }catch(e){}
+    }
+    return null;
+  }
+  async function capFsDelete(key, mime){
+    const dir = await capFsEnsureMounted(false);
+    if(!dir) return false;
+    let deleted = false;
+    for(const name of [`capsule-${key}.${capFsExt(mime)}`, `capsule-${key}.bin`]){
+      try{ await dir.removeEntry(name); deleted = true; }catch(e){}
+    }
+    return deleted;
+  }
+
+  /* ── Unified blob access: dispatches to whichever backend a given media item was saved
+     with (m.store — 'idb' default, or 'fs' for the on-device folder). Everything reading
+     or writing a Capsule photo/video blob should go through these three rather than
+     calling capIdbPut/capFsPut etc directly, so a mixed set of idb + fs items (which is
+     normal — the storage choice can change over time) always resolves correctly. ── */
+  async function capBlobGet(m){
+    if(!m) return null;
+    if(m.local) return m.file || null; // ephemeral "watch a folder" reel item — a File is a Blob already
+    if(m.store==='fs') return await capFsGet(m.id, m.mime);
+    try{ return await capIdbGet(m.id); }catch(e){ return null; }
+  }
+  async function capBlobPut(m, blob){
+    if(m.store==='fs') return await capFsPut(m.id, blob, m.mime);
+    return await capIdbPut(m.id, blob);
+  }
+  async function capBlobDelete(idOrMedia, store, mime){
+    if(idOrMedia && typeof idOrMedia==='object' && idOrMedia.local) return true; // nothing to clean up — never stored
+    const id = (idOrMedia && typeof idOrMedia==='object') ? idOrMedia.id : idOrMedia;
+    const st = (idOrMedia && typeof idOrMedia==='object') ? idOrMedia.store : store;
+    const mt = (idOrMedia && typeof idOrMedia==='object') ? idOrMedia.mime : mime;
+    if(st==='fs') return await capFsDelete(id, mt);
+    return await capIdbDelete(id);
+  }
+
+  /* ── Storage-choice prompt: for locked (Vault) entries specifically, ask once whether
+     new video/photo blobs should go to browser storage (IndexedDB) or a folder on the
+     device, since locked entries tend to accumulate the most media over time and are
+     the most likely place to run into a browser storage ceiling. The choice is
+     remembered per-device unless the person unticks "remember" or clears it. ── */
+  const CAP_STORAGE_PREF_KEY = 'canopus_capsule_storage_pref';
+  function capGetStoragePref(){
+    try{ return localStorage.getItem(CAP_STORAGE_PREF_KEY) || null; }catch(e){ return null; }
+  }
+  function capSetStoragePref(v){
+    try{
+      if(v) localStorage.setItem(CAP_STORAGE_PREF_KEY, v);
+      else localStorage.removeItem(CAP_STORAGE_PREF_KEY);
+    }catch(e){}
+  }
+  let capStorageChoiceResolve = null;
+  function capAskStorageChoice(){
+    return new Promise(resolve=>{
+      capStorageChoiceResolve = resolve;
+      $('capStorageRemember').checked = true;
+      $('capStorageChoiceModal').classList.add('open');
+    });
+  }
+  function capCloseStorageChoice(result){
+    $('capStorageChoiceModal').classList.remove('open');
+    const resolve = capStorageChoiceResolve;
+    capStorageChoiceResolve = null;
+    if(resolve) resolve(result);
+  }
+  $('capStorageChoiceCancel').addEventListener('click', ()=>capCloseStorageChoice(null));
+  $('capStorageChoiceModal').addEventListener('click', e=>{ if(e.target.id==='capStorageChoiceModal') capCloseStorageChoice(null); });
+  $('capStorageOptBrowser').addEventListener('click', ()=>{
+    if($('capStorageRemember').checked) capSetStoragePref('idb');
+    capCloseStorageChoice('idb');
+  });
+  $('capStorageOptDevice').addEventListener('click', async ()=>{
+    const remember = $('capStorageRemember').checked;
+    const dir = await capFsPickNewFolder();
+    if(!dir) return; // picker cancelled or denied — leave the modal open so they can pick browser storage instead
+    if(remember) capSetStoragePref('fs');
+    capCloseStorageChoice('fs');
+  });
+  // Resolves which backend new media should use for the entry currently open in the
+  // composer, asking the person only when it's a locked entry and there's no remembered
+  // preference yet. Unlocked entries default straight to browser storage (unchanged
+  // behaviour) unless space runs out, which is handled separately in capCheckSpace's caller.
+  async function capResolveStorageChoice(){
+    if(capComposerForceFs) return 'fs';
+    const pref = capGetStoragePref();
+    if(pref) return pref;
+    if(!capLocked) return 'idb';
+    const choice = await capAskStorageChoice();
+    return choice || 'idb';
+  }
+
   /* ── Locked capsule: a local PIN gate, not real encryption — it hides entries from the
      normal feed and requires a 4-digit PIN to view them. Forgetting the PIN wipes locked
      entries + their media, since there's no key to recover them with. ── */
@@ -9843,7 +10113,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
       const isLast = i===shown.length-1;
       const overlay = (isLast && extra>0) ? `<div class="cap-media-more">+${extra}</div>` : '';
       const play = (m.type==='video' && !overlay) ? `<div class="cap-media-play"><i class="ti ti-player-play-filled"></i></div>` : '';
-      const img = m.thumb ? `<img src="${m.thumb}" loading="lazy" alt="">` : '';
+      const img = m.thumb ? `<img src="${m.thumb}" loading="lazy" alt="">` : `<div class="cap-mtile-blank"><i class="ti ti-${m.type==='video'?'video':'photo'}"></i></div>`;
       return `<div class="cap-media-tile" data-id="${p.id}" data-mi="${i}">${img}${play}${overlay}</div>`;
     }).join('');
     return `<div class="cap-media-grid n${Math.min(shown.length,4)}">${tiles}</div>`;
@@ -10124,7 +10394,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     if(capLbObjUrl){ URL.revokeObjectURL(capLbObjUrl); capLbObjUrl = null; }
     let src = m.thumb;
     try{
-      const blob = await capIdbGet(m.id);
+      const blob = await capBlobGet(m);
       if(blob){ src = URL.createObjectURL(blob); capLbObjUrl = src; }
     }catch(e){}
     if(!capLbPost || capLbPost.media[capLbIndex] !== m) return; // stale, user navigated away
@@ -10199,7 +10469,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     if(!m) return;
 
     let blob = null;
-    try{ blob = await capIdbGet(m.id); }catch(e){}
+    try{ blob = await capBlobGet(m); }catch(e){}
 
     const extFromMime = m.mime && m.mime.includes('/') ? m.mime.split('/')[1].replace('jpeg','jpg') : null;
     const ext = extFromMime || (m.type==='video' ? 'mp4' : 'jpg');
@@ -10330,6 +10600,33 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   }
   window.capOpenReels = capOpenReels;
 
+  // Opens Reels using video files picked straight from a folder on the device, rather
+  // than anything saved in the capsule. Each file becomes a throwaway "post" that exists
+  // only in memory for the life of this Reels session — nothing is written to storage,
+  // and closing Reels discards the object URLs. Existing per-slide code (capBlobGet,
+  // download, remove-from-view) already understands m.local via the guards added there.
+  function capOpenLocalFolderReels(fileList){
+    const videoExtRe = /\.(mp4|mov|m4v|webm|mkv|avi|3gp|ogv)$/i;
+    const files = Array.from(fileList||[]).filter(f=>(f.type||'').startsWith('video/') || videoExtRe.test(f.name||''));
+    if(!files.length){ capToast('No video files found in that folder.'); return; }
+    files.sort((a,b)=>a.name.localeCompare(b.name, undefined, {numeric:true}));
+    const extMimeMap = {mp4:'video/mp4', mov:'video/quicktime', m4v:'video/x-m4v', webm:'video/webm', mkv:'video/x-matroska', avi:'video/x-msvideo', '3gp':'video/3gpp', ogv:'video/ogg'};
+    const items = files.map(f=>{
+      const ext = (f.name.match(/\.([a-z0-9]+)$/i)||[])[1]||'';
+      const mime = f.type || extMimeMap[ext.toLowerCase()] || 'video/mp4';
+      const media = {id:capGenId(), type:'video', mime, local:true, file:f, thumb:null, liked:false};
+      const post = {id:'local:'+media.id, ts:f.lastModified||Date.now(), text:f.webkitRelativePath||f.name, tag:'On this device', media:[media], locked:false};
+      return {post, media, mi:0};
+    });
+    capReelOriginalItems = items;
+    capReelItems = capReelShuffle ? capShuffleArray(items.slice()) : items;
+    capReelCurrentIndex = 0;
+    capBuildReelsDom();
+    capReelsUpdateShuffleBtn();
+    $('capReelsOverlay').classList.add('open');
+  }
+  window.capOpenLocalFolderReels = capOpenLocalFolderReels;
+
   function capReelsUpdateShuffleBtn(){
     const btn = $('capReelsShuffleBtn');
     if(btn) btn.classList.toggle('active', capReelShuffle);
@@ -10458,14 +10755,31 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   }
   $('capReelPickerCancel').addEventListener('click', ()=>$('capReelPickerModal').classList.remove('open'));
   $('capReelPickerModal').addEventListener('click', e=>{ if(e.target.id==='capReelPickerModal') $('capReelPickerModal').classList.remove('open'); });
+  $('capReelFolderBtn').addEventListener('click', ()=>$('capReelFolderInput').click());
+  $('capReelFolderInput').addEventListener('change', e=>{
+    const files = Array.from(e.target.files||[]); // copy out before clearing .value below —
+                                                    // e.target.files is live, so resetting the
+                                                    // input would otherwise empty it in place
+    e.target.value = '';
+    $('capReelPickerModal').classList.remove('open');
+    if(files.length) capOpenLocalFolderReels(files);
+    else capToast('No video files found in that folder.');
+  });
 
   function capConfirmDeleteReel(i){
-    if(!capReelItems[i]) return;
+    const it = capReelItems[i];
+    if(!it) return;
     capPendingDeleteReelIndex = i;
     capConfirmAction = 'delete-reel-media';
-    $('capConfirmTitle').textContent = 'Delete this video?';
-    $('capConfirmBody').textContent = "This video will be permanently removed from its entry. This can't be undone.";
-    $('capConfirmOk').textContent = 'Delete';
+    if(it.media.local){
+      $('capConfirmTitle').textContent = 'Remove from this view?';
+      $('capConfirmBody').textContent = "This only removes it from the current Reels view — the file on your device is untouched.";
+      $('capConfirmOk').textContent = 'Remove';
+    } else {
+      $('capConfirmTitle').textContent = 'Delete this video?';
+      $('capConfirmBody').textContent = "This video will be permanently removed from its entry. This can't be undone.";
+      $('capConfirmOk').textContent = 'Delete';
+    }
     $('capConfirmOverlay').classList.add('open');
   }
 
@@ -10482,15 +10796,18 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
       const tag = p.tag ? `<span class="cap-reel-tag">${capEsc(p.tag)}</span><br>` : '';
       const text = p.text ? `<div class="cap-reel-text">${capEsc(p.text)}</div>` : '';
       const likedIcon = m.liked ? 'ti-heart-filled' : 'ti-heart';
+      const likeBtn = m.local ? '' : `<button class="cap-reel-like-btn${m.liked?' liked':''}" data-i="${i}" title="Like"><i class="ti ${likedIcon}"></i></button>`;
+      const transferBtn = m.local ? '' : `<button class="cap-reel-transfer-btn" data-i="${i}" title="Transfer to another entry"><i class="ti ti-corner-down-right"></i></button>`;
+      const removeTitle = m.local ? 'Remove from this view' : 'Remove video';
       return `<div class="cap-reel-slide" data-i="${i}">
         <div class="cap-reel-loading"><i class="ti ti-loader-2"></i></div>
         <div class="cap-reel-info">${tag}<div class="cap-reel-date">${dateStr}</div>${text}</div>
         <div class="cap-reel-side">
-          <button class="cap-reel-like-btn${m.liked?' liked':''}" data-i="${i}" title="Like"><i class="ti ${likedIcon}"></i></button>
+          ${likeBtn}
           <button class="cap-reel-mute-btn" data-i="${i}" title="Mute/unmute"><i class="ti ti-volume-3"></i></button>
           <button class="cap-reel-dl-btn" data-i="${i}" title="Download"><i class="ti ti-download"></i></button>
-          <button class="cap-reel-transfer-btn" data-i="${i}" title="Transfer to another entry"><i class="ti ti-corner-down-right"></i></button>
-          <button class="cap-reel-remove-btn" data-i="${i}" title="Remove video"><i class="ti ti-trash"></i></button>
+          ${transferBtn}
+          <button class="cap-reel-remove-btn" data-i="${i}" title="${removeTitle}"><i class="ti ti-trash"></i></button>
         </div>
         <div class="cap-reel-progress"><div class="cap-reel-progress-fill"></div></div>
       </div>`;
@@ -10583,7 +10900,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     if(!slide || slide.querySelector('video')) return; // not present, or already loaded
     const m = capReelItems[i].media;
     let blob = null;
-    try{ blob = await capIdbGet(m.id); }catch(e){}
+    try{ blob = await capBlobGet(m); }catch(e){}
     // bail if the reels view was closed or rebuilt while the blob was loading
     if(!$('capReelsOverlay').classList.contains('open')) return;
     const stillThere = $('capReelsScroll').querySelector(`.cap-reel-slide[data-i="${i}"]`);
@@ -10757,7 +11074,10 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
 
   function capResetComposer(){
     capEditingId = null; capMediaList = []; capOrigMediaIds = []; capPinned = false; capLocked = false; capLinkOpen = false;
-    capLinksList = []; capPostCapsuleId = ''; capGoalOpen = false; capGoalsList = [];
+    capLinksList = []; capPostCapsuleId = ''; capGoalOpen = false; capGoalsList = []; capComposerForceFs = false;
+    $('capBtnDeviceStorage').classList.remove('active');
+    $('capBtnDeviceStorageLabel').textContent = 'Device folder';
+    $('capSaveProgress').style.display = 'none';
     $('capEntryText').value = '';
     $('capTagInput').value = '';
     $('capLinkInput').value = '';
@@ -10802,8 +11122,8 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
       }
       capPostCapsuleId = post.capsuleId || '';
       if(post.media && post.media.length){
-        capMediaList = post.media.map(m=>({id:m.id, type:m.type, mime:m.mime, thumb:m.thumb, fullBlob:null, isNew:false, size:m.size||0, hash:m.hash||null}));
-        capOrigMediaIds = post.media.map(m=>m.id);
+        capMediaList = post.media.map(m=>({id:m.id, type:m.type, mime:m.mime, thumb:m.thumb, fullBlob:null, isNew:false, size:m.size||0, hash:m.hash||null, store:m.store||'idb'}));
+        capOrigMediaIds = post.media.map(m=>({id:m.id, store:m.store||'idb', mime:m.mime}));
         capRenderPreview();
       }
     }
@@ -10941,17 +11261,31 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   /* ── Video: keep the original file as-is (Blob) in IndexedDB so large videos aren't size-limited by localStorage; only a small poster frame goes inline ── */
   function capVideoPoster(file){
     return new Promise(resolve=>{
-      let settled = false;
-      const done = thumb => { if(settled) return; settled = true; URL.revokeObjectURL(url); resolve(thumb); };
+      let settled = false, captured = false, timer = null;
+      const done = thumb => {
+        if(settled) return; settled = true;
+        if(timer) clearTimeout(timer);
+        URL.revokeObjectURL(url);
+        resolve(thumb);
+      };
       const url = URL.createObjectURL(file);
       const v = document.createElement('video');
-      v.preload = 'metadata'; v.muted = true; v.playsInline = true; v.src = url;
-      v.onloadeddata = ()=>{
+      v.preload = 'auto'; v.muted = true; v.playsInline = true; v.src = url;
+      // Different browsers fire these at different points for different codecs/containers —
+      // listen for both rather than betting on one, and only try to seek once metadata
+      // (duration/dimensions) is actually available.
+      const trySeek = ()=>{
+        if(captured || v.readyState < 1) return; // HAVE_METADATA
         try{ v.currentTime = Math.min(0.3, (v.duration||1)/4); }
         catch(e){ capture(); }
       };
+      v.onloadedmetadata = trySeek;
+      v.onloadeddata = trySeek;
+      v.oncanplay = trySeek;
       v.onseeked = capture;
       function capture(){
+        if(captured) return;
+        captured = true;
         try{
           const c = document.createElement('canvas');
           const maxDim = 480;
@@ -10964,7 +11298,10 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
         }catch(e){ done(null); }
       }
       v.onerror = ()=>done(null);
-      setTimeout(()=>done(null), 4000);
+      // A generous ceiling — local blob decoding is normally near-instant, but very large
+      // files or unusual codecs can take a few seconds, and it's better to wait than to
+      // silently leave the entry without a preview.
+      timer = setTimeout(()=>done(null), 9000);
     });
   }
 
@@ -10973,10 +11310,17 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
       if(navigator.storage && navigator.storage.estimate){
         const est = await navigator.storage.estimate();
         const free = (est.quota||0) - (est.usage||0);
-        // Keep a 15% safety margin under whatever the browser reports as free,
-        // since the estimate can drift during a large write.
-        if(est.quota && fileSize > free * 0.85){
-          return {ok:false, free};
+        // `navigator.storage.estimate()` is notoriously unreliable on some browsers
+        // (iOS Safari/WebView in particular can report a tiny or even zero quota
+        // while there's plenty of real disk free), so a quota under ~5MB is treated
+        // as "the browser doesn't know" rather than "there's no room" — otherwise a
+        // single normal-sized video would get rejected before it's even attempted.
+        if(est.quota && est.quota > 5*1024*1024){
+          // Keep a small safety margin under whatever the browser reports as free,
+          // since the estimate can drift during a large write.
+          if(fileSize > free * 0.95){
+            return {ok:false, free};
+          }
         }
       }
     }catch(e){}
@@ -11040,6 +11384,22 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     capPinned=!capPinned;
     $('capBtnPin').classList.toggle('active', capPinned);
   });
+  $('capBtnDeviceStorage').addEventListener('click', async ()=>{
+    if(capComposerForceFs){
+      capComposerForceFs = false;
+      $('capBtnDeviceStorage').classList.remove('active');
+      $('capBtnDeviceStorageLabel').textContent = 'Device folder';
+      capToast('New videos will go back to browser storage.');
+      return;
+    }
+    const dir = await capFsPickNewFolder(); // opens the OS folder-picker window
+    if(!dir) return; // picker cancelled/denied/unsupported — capFsPickNewFolder already toasted why
+    capComposerForceFs = true;
+    $('capBtnDeviceStorage').classList.add('active');
+    const name = dir.name || 'that folder';
+    $('capBtnDeviceStorageLabel').textContent = name.length>16 ? name.slice(0,15)+'…' : name;
+    capToast(`New videos in this entry will be saved into "${name}" instead of browser storage.`);
+  });
   $('capBtnLock').addEventListener('click', ()=>{
     if(!capLocked && !capHasPin()){
       capOpenLockGate('setup-then-toggle');
@@ -11068,7 +11428,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     for(const file of files){
       try{
         const {thumb, fullBlob} = await capProcessImage(file);
-        capMediaList.push({id:capGenId(), type:'image', mime:'image/jpeg', thumb, fullBlob, isNew:true, size:fullBlob?fullBlob.size:0});
+        capMediaList.push({id:capGenId(), type:'image', mime:'image/jpeg', thumb, fullBlob, isNew:true, size:fullBlob?fullBlob.size:0, store:'idb'});
         capRenderPreview();
       }catch(err){ capToast(`Couldn't read "${file.name}".`); }
     }
@@ -11079,14 +11439,42 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     const files = Array.from(e.target.files).filter(f=>f.type.startsWith('video/'));
     e.target.value='';
     if(!files.length) return;
+    // Ask once per batch (not once per file) — for locked entries, unless a preference is
+    // already remembered. Unlocked entries default to browser storage unchanged.
+    let storeChoice = await capResolveStorageChoice();
+
+    // Whole-batch space check, done immediately — before any per-file hashing/thumbnailing.
+    // A folder picker can only open in direct response to a fresh user gesture, and that
+    // gesture (picking these files) is still "fresh" right here. Checking file-by-file deep
+    // inside the loop below is too late: by the time a later file fails, dozens of prior
+    // files have already been hashed and thumbnailed, the gesture has expired, and the
+    // picker call fails silently — which is why storage errors could appear with no prompt.
+    if(storeChoice==='idb'){
+      const totalSize = files.reduce((s,f)=>s+f.size, 0);
+      const spaceAll = await capCheckSpace(totalSize);
+      if(!spaceAll.ok){
+        const freeStr = spaceAll.free!==undefined ? ` — need ${capFmtSize(totalSize)} total, only ${capFmtSize(Math.max(spaceAll.free,0))} free in browser storage` : '';
+        const dir = await capFsEnsureMounted(true);
+        if(dir){
+          storeChoice = 'fs';
+          capToast(`Browser storage can't fit all ${files.length} videos${freeStr}. Saving them to a folder on this device instead.`);
+        } else {
+          capToast(`Browser storage is too full for all ${files.length} videos${freeStr}. Try the "Device folder" button before adding video (Chrome/Edge on desktop), add fewer at a time, or free up space on your device.`);
+        }
+      }
+    }
+
     let addedCount = 0;
+    let skippedForSpace = 0;
     const dupeCandidates = []; // held back pending user confirmation
     for(const file of files){
-      const space = await capCheckSpace(file.size);
-      if(!space.ok){
-        const freeStr = space.free!==undefined ? ` — need ${capFmtSize(file.size)}, only ${capFmtSize(Math.max(space.free,0))} free` : '';
-        capToast(`Not enough storage space for "${file.name}"${freeStr}.`);
-        continue;
+      let store = storeChoice;
+      if(store==='idb'){
+        // Per-file safety net for drift in the estimate above (e.g. one unusually large
+        // file). No gesture is left at this point to open a picker, so this just skips
+        // the file cleanly rather than trying (and silently failing) to prompt again.
+        const space = await capCheckSpace(file.size);
+        if(!space.ok){ skippedForSpace++; continue; }
       }
       capSetUploadStatus(`Reading "${file.name}" (${capFmtSize(file.size)})…`);
       const hash = await capSha256(file).catch(()=>null);
@@ -11106,15 +11494,17 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
         }
       }
       if(isDupe){
-        dupeCandidates.push({key:capGenId(), file, hash, thumb, label:file.name, size:file.size});
+        dupeCandidates.push({key:capGenId(), file, hash, thumb, label:file.name, size:file.size, store});
       } else {
-        capMediaList.push({id:capGenId(), type:'video', mime:file.type||'video/mp4', thumb, fullBlob:file, isNew:true, size:file.size, hash});
+        capMediaList.push({id:capGenId(), type:'video', mime:file.type||'video/mp4', thumb, fullBlob:file, isNew:true, size:file.size, hash, store});
         addedCount++;
         capRenderPreview();
       }
     }
     capSetUploadStatus(null);
-    if(addedCount>0 && dupeCandidates.length>0){
+    if(skippedForSpace>0){
+      capToast(`${skippedForSpace} video${skippedForSpace>1?'s':''} skipped — still not enough browser storage. Re-select just those and try again.`);
+    } else if(addedCount>0 && dupeCandidates.length>0){
       capToast(`${addedCount} video${addedCount>1?'s':''} added.`);
     }
     if(dupeCandidates.length>0) capOpenDedupeReview('upload', dupeCandidates);
@@ -11198,16 +11588,62 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     if(!text && !capMediaList.length && !links.length && !goals.length){ capToast('Add some words, photos, a video, a link, or goals first.'); return; }
 
     const saveBtn = $('capCompSave');
+    const progressWrap = $('capSaveProgress');
+    const progressFill = $('capSaveProgressFill');
+    const progressText = $('capSaveProgressText');
+    const newVideos = capMediaList.filter(m=>m.isNew && m.fullBlob && m.type==='video');
+    const showProgress = newVideos.length > 0;
+    if(showProgress){
+      progressWrap.style.display = '';
+      progressFill.style.width = '0%';
+      progressText.textContent = `Saving 0 of ${newVideos.length} video${newVideos.length>1?'s':''}…`;
+    }
     saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
     try{
+      let droppedForSpace = 0;
+      let savedVideos = 0;
+      const keepList = [];
       for(const m of capMediaList){
-        if(m.isNew && m.fullBlob){ await capIdbPut(m.id, m.fullBlob); }
+        if(m.isNew && m.fullBlob){
+          try{
+            await capBlobPut(m, m.fullBlob);
+          }catch(writeErr){
+            // Real (not just estimated) out-of-space error on this one file specifically —
+            // try a device folder as a fallback for this file alone rather than failing the
+            // whole entry and losing everything else that's already been typed/attached.
+            let saved = false;
+            if(m.store!=='fs'){
+              const dir = await capFsEnsureMounted(true);
+              if(dir){
+                try{ m.store='fs'; await capBlobPut(m, m.fullBlob); saved = true; }catch(e2){ saved = false; }
+              }
+            }
+            if(!saved){
+              droppedForSpace++;
+              if(m.type==='video' && showProgress){
+                progressText.textContent = `Saving ${savedVideos} of ${newVideos.length} video${newVideos.length>1?'s':''}… (1 failed)`;
+              }
+              continue; // skip this one file, keep going with the rest
+            }
+          }
+          if(m.type==='video' && showProgress){
+            savedVideos++;
+            progressFill.style.width = Math.round((savedVideos/newVideos.length)*100) + '%';
+            progressText.textContent = `Saving ${savedVideos} of ${newVideos.length} video${newVideos.length>1?'s':''}…`;
+          }
+        }
+        keepList.push(m);
+      }
+      capMediaList = keepList;
+      if(showProgress) progressText.textContent = `Saved ${savedVideos} of ${newVideos.length} video${newVideos.length>1?'s':''}`;
+      if(droppedForSpace){
+        capToast(`Browser storage is full — ${droppedForSpace} video${droppedForSpace>1?'s were':' was'} not saved. The rest of this entry was kept; try the "Device folder" button and re-add ${droppedForSpace>1?'them':'it'}.`);
       }
       const keptIds = new Set(capMediaList.map(m=>m.id));
-      for(const oldId of capOrigMediaIds){
-        if(!keptIds.has(oldId)) await capIdbDelete(oldId);
+      for(const old of capOrigMediaIds){
+        if(!keptIds.has(old.id)) await capBlobDelete(old.id, old.store, old.mime);
       }
-      const media = capMediaList.map(m=>({id:m.id, type:m.type, mime:m.mime, thumb:m.thumb||null, size:m.size||0, hash:m.hash||null}));
+      const media = capMediaList.map(m=>({id:m.id, type:m.type, mime:m.mime, thumb:m.thumb||null, size:m.size||0, hash:m.hash||null, store:m.store||'idb'}));
       const ts = $('capDateInput').value ? new Date($('capDateInput').value).getTime() : Date.now();
       const post = {
         id: capEditingId||capGenId(),
@@ -11223,7 +11659,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
       const idx = capPosts.findIndex(p=>p.id===post.id);
       if(idx>=0) capPosts[idx]=post; else capPosts.push(post);
       capPosts.sort((a,b)=>b.ts-a.ts);
-      if(!capSaveAll()){ saveBtn.disabled=false; saveBtn.textContent='Save entry'; return; }
+      if(!capSaveAll()){ saveBtn.disabled=false; saveBtn.textContent='Save entry'; progressWrap.style.display='none'; return; }
       capCloseComposer();
       capRefreshAll();
       capToast(capEditingId ? 'Entry updated' : (capLocked ? 'Locked entry saved' : 'Entry saved'));
@@ -11231,6 +11667,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
       capToast("Couldn't save — storage may be full.");
     }
     saveBtn.disabled = false; saveBtn.textContent = 'Save entry';
+    progressWrap.style.display = 'none';
   });
 
   $('capConfirmCancel').addEventListener('click', ()=>{ $('capConfirmOverlay').classList.remove('open'); capPendingDelete=null; capPendingDeleteReelIndex=null; });
@@ -11255,12 +11692,12 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
           // cleanup below — that write can be slow (or, rarely, blocked by another
           // open tab), and there's no reason the visible delete should wait on it.
           capRefreshAll();
-          capToast('Video deleted');
+          capToast(it.media.local ? 'Removed from view' : 'Video deleted');
           capRemoveReelSlide(i);
         }catch(err){
           capToast("Couldn't delete that video — please try again.");
         }
-        capIdbDelete(it.media.id).catch(()=>{}); // best-effort blob cleanup, runs in the background
+        capBlobDelete(it.media).catch(()=>{}); // best-effort blob cleanup, runs in the background
       }
       return;
     }
@@ -11286,7 +11723,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     capToast('Entry deleted');
     capPendingDelete=null;
     if(post && post.media && post.media.length){
-      for(const m of post.media){ await capIdbDelete(m.id); }
+      for(const m of post.media){ await capBlobDelete(m); }
     }
   });
 
@@ -11388,7 +11825,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
     capRefreshAll();
     capToast('Locked capsule reset.');
     for(const p of lockedPosts){
-      if(p.media){ for(const m of p.media){ await capIdbDelete(m.id); } }
+      if(p.media){ for(const m of p.media){ await capBlobDelete(m); } }
     }
   }
 
