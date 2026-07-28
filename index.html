@@ -709,6 +709,9 @@ html.crt-retro .flight-hud.hud-idle .flight-hud-grip span{
 .flight-status:not(.landed)::before{animation:fscPulse 2.2s ease-in-out infinite}
 @keyframes fscPulse{0%,100%{opacity:1}50%{opacity:.3}}
 .flight-status.landed{color:rgba(100,255,180,0.9)}
+.freerun-land-btn{display:none;margin:10px auto 0;padding:9px 20px;border-radius:9px;background:rgba(120,200,255,0.12);border:0.5px solid rgba(120,200,255,0.35);color:rgba(255,255,255,0.85);font-size:10px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-align:center}
+.freerun-land-btn:hover{background:rgba(120,200,255,0.22);border-color:rgba(120,200,255,0.6)}
+.freerun-land-btn:active{transform:scale(.97)}
 .fsc-sep{color:rgba(255,255,255,0.15);font-size:9px}
 .flight-eta{font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:.14em;text-transform:uppercase}
 .fsc-divider{width:100%;height:0.5px;background:rgba(255,255,255,0.1);margin:10px 0 8px}
@@ -3359,6 +3362,7 @@ window.AccessGate={ hashCode:aqgHash };
           <button class="fdc" onclick="ftPickDur(360,this)">6h</button>
           <button class="fdc" onclick="ftPickDur(480,this)">8h</button>
           <button class="fdc" onclick="ftPickDur(600,this)">10h</button>
+          <button class="fdc" id="fdc-freerun" onclick="ftPickFreeRun(this)" title="No fixed duration — land whenever you want">Free Run ∞</button>
         </div>
         <div class="flight-custom-row">
           <div class="fdc-custom-label">or custom</div>
@@ -3374,6 +3378,7 @@ window.AccessGate={ hashCode:aqgHash };
             </div>
           </div>
         </div>
+        <div class="fbs-none" id="freerun-hint" style="display:none">no fixed duration — timer counts up until you land</div>
         <div class="flight-sched-load-wrap">
           <button type="button" class="flight-sched-load-btn" onclick="toggleFlightSchedPicker(event)">
             <i class="ti ti-calendar-event" style="font-size:12px"></i> load from schedule
@@ -3605,6 +3610,7 @@ window.AccessGate={ hashCode:aqgHash };
       <div class="flight-progress-fill" id="flight-prog" style="width:0%"></div>
     </div>
     <div class="pomo-nudge" id="pomo-nudge"></div>
+    <button class="freerun-land-btn" id="freerun-land-btn" onclick="landFreeRunNow()" title="End the free run and save your progress"><i class="ti ti-plane-arrival" style="margin-right:6px"></i>land now</button>
 
     <div class="flight-hud-resize" id="flight-hud-resize" title="Drag to resize"><i class="ti ti-arrows-maximize"></i></div>
   </div>
@@ -4726,6 +4732,8 @@ let flightRemSec=60*60;
 let flightFrom='LHR';
 let flightTo='JFK';
 let ftPickedDur=60;
+let flightFreeRun=false;     // true when "Free Run ∞" is selected — timer counts up with no fixed duration
+let flightElapsedSec=0;      // elapsed seconds for free-run mode
 let myGlobe=null;
 let globeInited=false;
 let flightInterval=null;
@@ -6136,10 +6144,20 @@ function closeFlightTracker(){
     pomoFlashLocked(document.querySelector('.flight-close'));
     return;
   }
+  // Free Run: closing mid-flight still counts as landing — save what's accumulated so far
+  if(flightRunning&&flightFreeRun&&flightElapsedSec>=10){
+    const fromInfo2=getAirportCoords(flightFrom);
+    const toInfo2=getAirportCoords(flightTo);
+    const flightName=(fromInfo2.name||flightFrom)+' → '+(toInfo2.name||flightTo);
+    recordSession(flightName,flightElapsedSec,'flight','flight');
+    if(window.passportRecordLanding) passportRecordLanding(flightFrom,flightTo,flightElapsedSec);
+  }
   document.getElementById('flight-overlay').classList.remove('open');
   document.getElementById('flight-overlay').classList.remove('tracking-flight');
   flightRunning=false; flightPaused=false;
   flightEndTime=null;
+  flightFreeRun=false; flightElapsedSec=0;
+  { const landBtn=document.getElementById('freerun-land-btn'); if(landBtn) landBtn.style.display='none'; }
   idleFlightsEnabled=false;
   if(flightInterval){clearInterval(flightInterval);flightInterval=null;}
   if(flightBreakInterval){clearInterval(flightBreakInterval);flightBreakInterval=null;}
@@ -6178,8 +6196,24 @@ function showFlightSetup(){
   const badge=document.getElementById('idle-flights-badge');
   if(badge) badge.style.display='none';
 
+  // Free Run: heading back to setup mid-flight still counts as landing — save progress
+  if(flightRunning&&flightFreeRun&&flightElapsedSec>=10){
+    const fromInfo2=getAirportCoords(flightFrom);
+    const toInfo2=getAirportCoords(flightTo);
+    const flightName=(fromInfo2.name||flightFrom)+' → '+(toInfo2.name||flightTo);
+    recordSession(flightName,flightElapsedSec,'flight','flight');
+    if(window.passportRecordLanding) passportRecordLanding(flightFrom,flightTo,flightElapsedSec);
+  }
   flightRunning=false; flightPaused=false;
   flightEndTime=null;
+  flightFreeRun=false; flightElapsedSec=0;
+  { const landBtn=document.getElementById('freerun-land-btn'); if(landBtn) landBtn.style.display='none'; }
+  { const hi=document.getElementById('fdc-h'),mi=document.getElementById('fdc-m'); if(hi)hi.disabled=false; if(mi)mi.disabled=false; }
+  setFreeRunHint(false);
+  if(!document.querySelector('#flight-form .fdc.sel')){
+    const defChip=document.querySelector('#flight-form .fdc[onclick^="ftPickDur(60,"]');
+    if(defChip){ defChip.classList.add('sel'); ftPickedDur=60; const hi2=document.getElementById('fdc-h'),mi2=document.getElementById('fdc-m'); if(hi2)hi2.value=1; if(mi2)mi2.value=0; }
+  }
   if(flightInterval){clearInterval(flightInterval);flightInterval=null;}
   if(flightBreakInterval){clearInterval(flightBreakInterval);flightBreakInterval=null;}
   flightOnBreak=false;
@@ -6200,19 +6234,36 @@ function showFlightSetup(){
 }
 
 function ftPickDur(mins,btn){
+  flightFreeRun=false;
+  setFreeRunHint(false);
   ftPickedDur=mins;
   document.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
   const h=Math.floor(mins/60),m=mins%60;
   const hi=document.getElementById('fdc-h'),mi=document.getElementById('fdc-m');
-  if(hi)hi.value=h;if(mi)mi.value=m;
+  if(hi){hi.value=h;hi.disabled=false;}if(mi){mi.value=m;mi.disabled=false;}
 }
 function ftCustomChanged(){
+  flightFreeRun=false;
+  setFreeRunHint(false);
   document.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
   const h=Math.max(0,Math.min(20,parseInt(document.getElementById('fdc-h').value)||0));
   const m=Math.max(0,Math.min(59,parseInt(document.getElementById('fdc-m').value)||0));
   ftPickedDur=h*60+m;
   if(ftPickedDur<1)ftPickedDur=1;
+}
+// ── Free Run: no fixed duration — timer counts up until the user lands manually ──
+function ftPickFreeRun(btn){
+  flightFreeRun=true;
+  setFreeRunHint(true);
+  document.querySelectorAll('.fdc').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const hi=document.getElementById('fdc-h'),mi=document.getElementById('fdc-m');
+  if(hi)hi.disabled=true;if(mi)mi.disabled=true;
+}
+function setFreeRunHint(on){
+  const hint=document.getElementById('freerun-hint');
+  if(hint) hint.style.display=on?'block':'none';
 }
 
 // ── Load flight duration from a saved schedule session ──
@@ -6246,13 +6297,15 @@ function pickFlightSchedule(idx){
 // Like ftPickDur, but also matches a preset chip if the duration lines up exactly,
 // otherwise just fills the custom hour/minute inputs.
 function ftPickDurCustom(mins){
+  flightFreeRun=false;
+  setFreeRunHint(false);
   ftPickedDur=mins;
   document.querySelectorAll('.fdc').forEach(b=>{
     b.classList.toggle('sel', parseInt(b.getAttribute('onclick').match(/ftPickDur\((\d+)/)?.[1])===mins);
   });
   const h=Math.floor(mins/60),m=mins%60;
   const hi=document.getElementById('fdc-h'),mi=document.getElementById('fdc-m');
-  if(hi)hi.value=h;if(mi)mi.value=m;
+  if(hi){hi.value=h;hi.disabled=false;}if(mi){mi.value=m;mi.disabled=false;}
 }
 
 // ── Break setup (before launch) ──
@@ -6347,16 +6400,26 @@ function launchFlight(){
   const toVal=getAirportIATA(document.getElementById('ft-to').value)||'JFK';
   flightFrom=fromVal;
   flightTo=toVal;
-  // Re-read custom inputs
-  const fh=parseInt(document.getElementById('fdc-h').value)||0;
-  const fm=parseInt(document.getElementById('fdc-m').value)||0;
-  const customMins=Math.max(1,fh*60+fm);
-  ftPickedDur=customMins;
-  flightTotalSec=ftPickedDur*60;
-  flightRemSec=flightTotalSec;
-  flightEndTime=Date.now()+flightRemSec*1000;
+  if(flightFreeRun){
+    // No fixed duration — count up instead of down, land manually
+    flightElapsedSec=0;
+    flightTotalSec=0;
+    flightRemSec=0;
+    flightEndTime=null;
+  } else {
+    // Re-read custom inputs
+    const fh=parseInt(document.getElementById('fdc-h').value)||0;
+    const fm=parseInt(document.getElementById('fdc-m').value)||0;
+    const customMins=Math.max(1,fh*60+fm);
+    ftPickedDur=customMins;
+    flightTotalSec=ftPickedDur*60;
+    flightRemSec=flightTotalSec;
+    flightEndTime=Date.now()+flightRemSec*1000;
+  }
   flightRunning=true;
   flightPaused=false;
+  const landBtn=document.getElementById('freerun-land-btn');
+  if(landBtn) landBtn.style.display=flightFreeRun?'block':'none';
 
   // Initialise breaks (locked from this point)
   flightBreaksLeft=flightScheduledBreaks;
@@ -6419,6 +6482,14 @@ function toggleFlightPause(){
 
 function tickFlight(){
   if(!flightRunning||flightPaused) return;
+  if(flightFreeRun){
+    flightElapsedSec++;
+    updateFlightDisplay();
+    if(flightElapsedSec%3===0) updateGlobeArcs();
+    const btn=document.getElementById('flight-break-btn');
+    if(btn&&!flightOnBreak) btn.disabled=(flightBreaksLeft<=0);
+    return;
+  }
   flightRemSec=Math.max(0,Math.round((flightEndTime-Date.now())/1000));
   if(flightRemSec>0){
     updateFlightDisplay();
@@ -6460,6 +6531,32 @@ function tickFlight(){
 }
 
 function updateFlightDisplay(){
+  if(flightFreeRun){
+    const eh=Math.floor(flightElapsedSec/3600);
+    const em=Math.floor((flightElapsedSec%3600)/60);
+    const es=flightElapsedSec%60;
+    document.getElementById('flight-countdown').textContent=
+      eh>0?eh+':'+pad(em)+':'+pad(es):pad(em)+':'+pad(es);
+    document.getElementById('flight-prog').style.width='100%';
+    document.getElementById('flight-eta').textContent='free run — land whenever you like';
+    const phaseEl=document.getElementById('flight-phase-row');
+    if(phaseEl) phaseEl.textContent='✦ cruising · '+Math.round(35000)+'ft';
+    const destTimeEl=document.getElementById('flight-dest-time');
+    if(destTimeEl) destTimeEl.textContent=getDestLocalTime(flightTo);
+    const windEl=document.getElementById('flight-wind-row');
+    if(windEl) windEl.textContent=getWindStr();
+    drawAltCurve(0.5);
+    const fromNameEl=document.getElementById('ft-from-name-disp');
+    if(fromNameEl){
+      if(flightViewMode==='minimal'){
+        fromNameEl.textContent='elapsed · no fixed arrival';
+      } else {
+        const fc=getAirportCoords(flightFrom), tc=getAirportCoords(flightTo);
+        fromNameEl.textContent=(fc.name||flightFrom)+' → '+(tc.name||flightTo);
+      }
+    }
+    return;
+  }
   const h=Math.floor(flightRemSec/3600);
   const m=Math.floor((flightRemSec%3600)/60);
   const s=flightRemSec%60;
@@ -6508,6 +6605,38 @@ function updateFlightDisplay(){
   }
 }
 
+// ── Free Run: land manually, save whatever time has accumulated ──
+function landFreeRunNow(){
+  if(!flightRunning||!flightFreeRun) return;
+  flightRunning=false;
+  document.getElementById('flight-status').textContent='landed ✓';
+  document.getElementById('flight-status').className='flight-status landed';
+  document.getElementById('flight-eta').textContent='welcome to '+flightTo;
+  playFlightChime();
+  const breakBtn=document.getElementById('flight-break-btn');
+  if(breakBtn){breakBtn.disabled=true;}
+  const landBtn=document.getElementById('freerun-land-btn');
+  if(landBtn) landBtn.style.display='none';
+
+  // Save the free-run session to progress history
+  const fromInfo2=getAirportCoords(flightFrom);
+  const toInfo2=getAirportCoords(flightTo);
+  const flightName=(fromInfo2.name||flightFrom)+' → '+(toInfo2.name||flightTo);
+  recordSession(flightName,flightElapsedSec,'flight','flight');
+
+  // Passport: record this landing same as a regular flight
+  if(window.passportRecordLanding) passportRecordLanding(flightFrom,flightTo,flightElapsedSec);
+
+  if(flightInterval){clearInterval(flightInterval);flightInterval=null;}
+
+  updateGlobeArcs();
+  const toC2=getAirportCoords(flightTo);
+  globeLambda=toC2.lon*Math.PI/180;
+  if('Notification' in window && Notification.permission==='granted'){
+    new Notification('Canopus ✈','Landed at '+flightTo+'! Safe travels.');
+  }
+}
+window.landFreeRunNow=landFreeRunNow;
 
 // =================== POMODORO ===================
 let pomoLoadedType='work', pomoLoadedLabel=''; // set when focus length is loaded from a scheduled study session
