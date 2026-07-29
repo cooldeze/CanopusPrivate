@@ -1023,8 +1023,13 @@ body.light kbd{background:#f0f0eb;border-color:#ddd;color:#666}
 .flight-goals-list{display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-height:34vh;overflow-y:auto;padding:2px}
 .flight-goals-list::-webkit-scrollbar{width:3px}
 .flight-goals-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15)}
-.flight-goal-item{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.8);letter-spacing:.02em;text-align:right;line-height:1.4}
-.flight-goal-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);flex-shrink:0}
+.flight-goal-item{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.8);letter-spacing:.02em;text-align:right;line-height:1.4;cursor:pointer;transition:opacity .3s ease .3s}
+.flight-goal-item:hover .flight-goal-dot{background:rgba(255,255,255,0.8)}
+.flight-goal-item span:last-child{transition:color .15s ease}
+.flight-goal-item.done{opacity:0;pointer-events:none}
+.flight-goal-item.done span:last-child{text-decoration:line-through;color:rgba(255,255,255,0.35)}
+.flight-goal-item.done .flight-goal-dot{background:rgba(120,235,170,0.85)}
+.flight-goal-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);flex-shrink:0;transition:background-color .15s ease}
 
 /* ── SCHEDULE PANEL (top-left corner, isolated from HUD; lists the pomodoro's
    focus/break session clock-times so they're visible mid-flight — same layout
@@ -6009,30 +6014,56 @@ function updateGlobeArcs(){ /* canvas redraws automatically in anim loop */ }
 function clearGlobeData(){ /* no-op */ }
 
 // ── Pull incomplete goals from the unlocked (non-locked/PIN-free) capsule
-//    entries and surface them in the flight goals panel. Reads capsule
-//    data straight from localStorage since capPosts lives in its own
-//    closure and isn't exposed globally. ──
+//    entries and surface them in the flight goals panel. Reads capsule data
+//    straight from localStorage since capPosts lives in its own closure and
+//    isn't exposed globally — goals are marked done the same way, writing
+//    straight back to that storage key so Capsule picks it up next render. ──
 function ftEscGoal(s){
   return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function renderFlightGoals(){
-  const panelEl=document.getElementById('flight-goals-panel');
-  const listEl=document.getElementById('flight-goals-list');
-  if(!panelEl||!listEl) return;
+function getIncompleteGoals(){
   let posts=[];
   try{ posts=JSON.parse(localStorage.getItem('dayplan_capsule')||'[]'); }
   catch(e){ posts=[]; }
   const goals=[];
   posts.filter(p=>!p.locked).forEach(p=>{
-    (p.goals||[]).forEach(g=>{ if(!g.done && g.text) goals.push(g.text); });
+    (p.goals||[]).forEach(g=>{ if(!g.done && g.text) goals.push({postId:p.id,goalId:g.id,text:g.text}); });
   });
+  return goals;
+}
+function renderFlightGoals(){
+  const goals=getIncompleteGoals();
+  const panelEl=document.getElementById('flight-goals-panel');
+  const listEl=document.getElementById('flight-goals-list');
+  if(!panelEl||!listEl) return;
   if(!goals.length){
     panelEl.style.display='none';
     listEl.innerHTML='';
     return;
   }
-  listEl.innerHTML=goals.map(t=>`<div class="flight-goal-item"><span class="flight-goal-dot"></span><span>${ftEscGoal(t)}</span></div>`).join('');
+  listEl.innerHTML=goals.map(g=>`<div class="flight-goal-item" data-pid="${g.postId}" data-gid="${g.goalId}" title="Mark done"><span class="flight-goal-dot"></span><span>${ftEscGoal(g.text)}</span></div>`).join('');
+  listEl.querySelectorAll('.flight-goal-item').forEach(el=>{
+    el.addEventListener('click',()=>completeFlightGoal(el.getAttribute('data-pid'),el.getAttribute('data-gid'),el));
+  });
   panelEl.style.display='flex';
+}
+
+// ── Strike off a goal from the flight panel mid-flight — shows the check
+//    immediately, then persists the completion and drops it from the list
+//    once the strike-through has had a moment to register. ──
+function completeFlightGoal(postId,goalId,itemEl){
+  if(!itemEl||itemEl.classList.contains('done')) return;
+  itemEl.classList.add('done');
+  setTimeout(()=>{
+    let posts=[];
+    try{ posts=JSON.parse(localStorage.getItem('dayplan_capsule')||'[]'); }
+    catch(e){ posts=[]; }
+    const p=posts.find(x=>x.id===postId);
+    const g=p&&p.goals&&p.goals.find(x=>x.id===goalId);
+    if(g) g.done=true;
+    try{ localStorage.setItem('dayplan_capsule',JSON.stringify(posts)); }catch(e){}
+    renderFlightGoals();
+  },620);
 }
 
 // ── In-flight schedule panel: same "session times" list shown on the pomodoro
@@ -10254,6 +10285,7 @@ window.SKY_CONST_NAMES={"And":"Andromeda","Ant":"Antlia","Aps":"Apus","Aql":"Aqu
   function capSaveAll(){
     try{
       localStorage.setItem(CAP_KEY, JSON.stringify(capPosts));
+      if(typeof renderFlightGoals==='function') renderFlightGoals();
       return true;
     }catch(e){
       capToast("Couldn't save — storage may be full.");
