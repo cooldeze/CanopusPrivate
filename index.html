@@ -4755,7 +4755,20 @@ function pickRandomAirport(excludeCodes){
   const exclude=Array.isArray(excludeCodes)?excludeCodes:[excludeCodes];
   const codes=Object.keys(AIRPORTS).filter(c=>!exclude.includes(c));
   if(!codes.length) return exclude[exclude.length-1]; // exhausted the whole airport list — nowhere new left
-  return codes[Math.floor(Math.random()*codes.length)];
+  // Prefer airports in countries not yet stamped in the Passport, so randomized
+  // routes help fill out the collection instead of repeatedly landing somewhere
+  // already visited. Airports with no country mapping, or once every remaining
+  // country has been stamped, fall back to the full candidate pool.
+  let pool=codes;
+  if(typeof PP_AIRPORT_COUNTRY!=='undefined' && typeof ppLoad==='function'){
+    try{
+      const visits=(ppLoad().visits)||{};
+      const visitedIsos=new Set(Object.keys(visits).filter(iso=>visits[iso].length));
+      const unvisited=codes.filter(c=>{const iso=PP_AIRPORT_COUNTRY[c]; return !iso||!visitedIsos.has(iso);});
+      if(unvisited.length) pool=unvisited;
+    }catch(e){}
+  }
+  return pool[Math.floor(Math.random()*pool.length)];
 }
 
 function genPomoRoute(numLegs){
@@ -15651,15 +15664,43 @@ function ppPassesFilter(iso,data){
 /* ---- achievements page ---- */
 function ppComputeAchievements(data){
   const isoList=Object.keys(data.visits).filter(i=>data.visits[i].length);
-  const totalVisits=isoList.reduce((a,iso)=>a+data.visits[iso].length,0);
+  const allVisits=isoList.flatMap(iso=>data.visits[iso]);
+  const totalVisits=allVisits.length;
+  const totalCountries=Object.keys(PP_COUNTRIES).length;
   const continents=new Set(isoList.map(iso=>PP_COUNTRIES[iso]?.continent).filter(Boolean));
   const islandCount=isoList.filter(iso=>PP_ISLANDS.includes(iso)).length;
+  const totalDistKm=allVisits.reduce((a,v)=>a+(v.distKm||0),0);
+  const totalDurSec=allVisits.reduce((a,v)=>a+(v.durSec||0),0);
+  const pomoCount=allVisits.filter(v=>v.pomo).length;
+  const longestFlightKm=allVisits.reduce((m,v)=>Math.max(m,v.distKm||0),0);
+  const maxVisitsToOneCountry=isoList.reduce((m,iso)=>Math.max(m,data.visits[iso].length),0);
+  const nightFlights=allVisits.filter(v=>{const h=new Date(v.date).getHours();return h>=0&&h<5;}).length;
+  // count distinct countries first-visited on the same calendar day
+  const dayFirstVisitCountries={};
+  isoList.forEach(iso=>{
+    const first=data.visits[iso][0];
+    if(!first) return;
+    const day=new Date(first.date).toDateString();
+    if(!dayFirstVisitCountries[day]) dayFirstVisitCountries[day]=new Set();
+    dayFirstVisitCountries[day].add(iso);
+  });
+  const maxCountriesInOneDay=Math.max(0,...Object.values(dayFirstVisitCountries).map(s=>s.size));
   return [
     {name:'First Flight',desc:'Complete your first international flight',ico:'✈',unlocked:totalVisits>=1},
     {name:'Visited Every Continent',desc:'Set foot on all six inhabited continents',ico:'🌍',unlocked:continents.size>=6},
     {name:'World Explorer',desc:'Collect stamps from 15 different countries',ico:'🧭',unlocked:isoList.length>=15},
     {name:'Island Hopper',desc:'Visit 3 island nations',ico:'🏝',unlocked:islandCount>=3},
     {name:'UNESCO Collector',desc:'Discover landmarks across 5+ countries',ico:'🏛',unlocked:isoList.length>=5},
+    {name:'Frequent Flyer',desc:'Log 10 flights in your passport',ico:'🎫',unlocked:totalVisits>=10},
+    {name:'Jetsetter',desc:'Collect stamps from 25 different countries',ico:'🌏',unlocked:isoList.length>=25},
+    {name:'Full Passport',desc:`Visit all ${totalCountries} countries in the atlas`,ico:'👑',unlocked:isoList.length>=totalCountries},
+    {name:'Long Haul',desc:'Fly a single route of 5,000 km or more',ico:'🛫',unlocked:longestFlightKm>=5000},
+    {name:'Around the World',desc:'Rack up 40,075 km of total flight distance',ico:'🌐',unlocked:totalDistKm>=40075},
+    {name:'Marathon Flyer',desc:'Accumulate 24 hours of total flight time',ico:'⏱',unlocked:totalDurSec>=86400},
+    {name:'Pomodoro Pilot',desc:'Log 10 flights while running a Pomodoro session',ico:'🍅',unlocked:pomoCount>=10},
+    {name:'Regular Visitor',desc:'Return to the same country 3 times',ico:'🔁',unlocked:maxVisitsToOneCountry>=3},
+    {name:'Globe in a Day',desc:'Stamp 3 new countries in a single day',ico:'📅',unlocked:maxCountriesInOneDay>=3},
+    {name:'Red-Eye Flyer',desc:'Land somewhere new between midnight and 5am',ico:'🌙',unlocked:nightFlights>=1},
   ];
 }
 function ppRenderAchievements(){
