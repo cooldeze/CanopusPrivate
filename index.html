@@ -226,6 +226,23 @@ body.light .nm-modal-signoff{color:#8a8578}
 .elapsed-prog-wrap{width:280px;height:1px;background:var(--surf-panel-hi);border-radius:1px;margin:16px auto 0}
 .elapsed-prog-fill{height:100%;background:var(--accent-muted);transition:width 1s linear,background .25s;border-radius:1px}
 .elapsed-controls{display:flex;gap:10px;justify-content:center;margin-top:20px}
+/* ── COUNTDOWN WIDGET ── */
+.focus-countdown-list{margin-top:20px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:min(90vw,560px)}
+.fc-card{cursor:pointer;display:inline-flex;align-items:center;gap:12px;padding:10px 16px;border:0.5px solid rgba(255,255,255,.12);border-radius:12px;transition:border-color .2s}
+.fc-card:hover{border-color:rgba(255,255,255,.32)}
+.fc-menu-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.14);color:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;align-self:center;font-size:15px}
+.fc-menu-btn:hover{color:#fff;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.08)}
+.fc-empty-hint{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:.12em;text-transform:uppercase;align-self:center}
+.fc-nums{display:flex;align-items:baseline;gap:8px}
+.fc-num-block{text-align:center;min-width:34px}
+.fc-num{font-size:19px;font-weight:500;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+.fc-unit{font-size:8.5px;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+.fc-sep{color:rgba(255,255,255,.18);font-size:14px}
+.fc-label-wrap{text-align:left;border-left:0.5px solid rgba(255,255,255,.15);padding-left:12px;max-width:150px}
+.fc-label{font-size:12px;color:rgba(255,255,255,.75);line-height:1.3;word-break:break-word}
+.fc-label-sub{font-size:9.5px;color:rgba(255,255,255,.35);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+.fc-remove{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:rgba(255,255,255,.4);font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.fc-remove:hover{color:#fff;background:rgba(255,255,255,.14)}
 .session-picker{position:absolute;top:calc(100% + 16px);left:50%;transform:translateX(-50%);background:var(--surf-panel);border:0.5px solid #1e1e1e;border-radius:12px;padding:8px;min-width:240px;z-index:100;display:none}
 .session-picker.open{display:block}
 .sp-item{padding:10px 14px;border-radius:8px;cursor:pointer;transition:background .15s;font-size:12px;color:#666;letter-spacing:.04em}
@@ -939,6 +956,19 @@ body.light .elapsed-time{color:#111}
 body.light .elapsed-session{color:#999}
 body.light .elapsed-prog-wrap{background:#ddd}
 body.light .elapsed-prog-fill{background:var(--accent-muted)}
+body.light .fc-card{border-color:#ddd}
+body.light .fc-card:hover{border-color:#bbb}
+body.light .fc-menu-btn{border-color:#ccc;color:#999;background:#f5f5f0}
+body.light .fc-menu-btn:hover{border-color:#999;color:#333;background:#eee}
+body.light .fc-empty-hint{color:#aaa}
+body.light .fc-num{color:#111}
+body.light .fc-unit{color:#999}
+body.light .fc-sep{color:#ccc}
+body.light .fc-label-wrap{border-color:#ddd}
+body.light .fc-label{color:#333}
+body.light .fc-label-sub{color:#999}
+body.light .fc-remove{background:#eee;color:#999}
+body.light .fc-remove:hover{background:#e0e0e0;color:#333}
 
 /* ── GREETING ── */
 .focus-greeting{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.22em;text-transform:uppercase;margin-bottom:18px;transition:color .3s;min-height:14px}
@@ -2424,6 +2454,8 @@ window.AccessGate={ hashCode:aqgHash };
   <button class="nav-menu-item" onclick="openLOQ();closeNavMenu()"><i class="ti ti-quote"></i>Sirius (LOQ)</button>
   <button class="nav-menu-item" onclick="openInterests();closeNavMenu()"><i class="ti ti-chart-radar"></i>Interests</button>
   <button class="nav-menu-item" onclick="openAnimation();closeNavMenu()"><i class="ti ti-wave-sine"></i>Animation</button>
+  <button class="nav-menu-item" onclick="openCountdownModal();closeNavMenu()"><i class="ti ti-calendar-plus"></i>Add countdown</button>
+  <button class="nav-menu-item" onclick="window.location.href='videoclock.html'"><i class="ti ti-video"></i>Video Clock</button>
   <button class="nav-menu-item" onclick="toggleFS();closeNavMenu()"><i class="ti ti-maximize"></i>Fullscreen</button>
   <button class="nav-menu-item" onclick="openKbd();closeNavMenu()"><i class="ti ti-keyboard"></i>Shortcuts</button>
   <button class="nav-menu-item" onclick="openJlSettings();closeNavMenu()"><i class="ti ti-lock"></i>App Lock</button>
@@ -2452,6 +2484,7 @@ window.AccessGate={ hashCode:aqgHash };
         00<span class="sep">:</span>00<span class="sep">:</span>00
       </div>
       <div class="focus-date" id="focus-date"></div>
+      <div class="focus-countdown-list" id="focus-countdown-list"></div>
       <div class="focus-mode-hint" onclick="toggleFocusPicker()">click to track session</div>
       <button class="jee-link" onclick="window.location.href='jeejournal.html'" title="Open JEE Journal" aria-label="Open JEE Journal"><i class="ti ti-checklist"></i>JEE Journal</button>
       <div class="session-picker" id="session-picker"></div>
@@ -3730,6 +3763,27 @@ window.AccessGate={ hashCode:aqgHash };
   </div>
 </div>
 
+<!-- COUNTDOWN MODAL -->
+<div class="modal-bg" id="modal-countdown" onclick="if(event.target===this)closeCountdownModal()">
+  <div class="modal">
+    <h3 id="cd-modal-title">Add countdown</h3>
+    <div class="f-row"><label>What's the day?</label><input type="text" id="cd-label" placeholder="e.g. JEE Mains" maxlength="40"></div>
+    <div class="f-row cp-field">
+      <label>Date</label>
+      <div class="cp-trigger" id="cd-date-trigger" onclick="cdOpenDatePicker()">
+        <span class="cp-val" id="cd-date-val">Select date</span>
+        <i class="ti ti-calendar cp-icon"></i>
+      </div>
+      <input type="date" id="cd-date" class="sdn-date-input" onchange="cdOnDateChange(this.value)">
+    </div>
+    <div class="modal-btns" id="cd-modal-btns">
+      <button class="m-btn cancel" onclick="closeCountdownModal()">Cancel</button>
+      <button class="m-btn save" onclick="saveCountdown()">Save</button>
+    </div>
+    <button class="m-btn" id="cd-remove-btn" style="display:none;width:100%;margin-top:8px;background:#c94a4a;color:#fff" onclick="removeCountdown()">Remove countdown</button>
+  </div>
+</div>
+
 <!-- SCHEDULE TEMPLATE MODAL (save / load reusable day-schedules) -->
 <div class="modal-bg" id="modal-template" onclick="if(event.target===this)closeTemplateModal()">
   <div class="modal modal-wide">
@@ -4000,6 +4054,117 @@ function clockTick(){
   const de=document.getElementById('focus-date');
   if(de)de.textContent=days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()];
   tickElapsed();checkNowSession();
+  renderCountdownWidget();
+}
+
+/* ── COUNTDOWN WIDGET (supports multiple countdowns) ── */
+const CD_KEY='canopus_countdown';
+let cdEditingId=null;
+function cdLoad(){
+  try{
+    const raw=localStorage.getItem(CD_KEY);
+    if(!raw) return [];
+    const parsed=JSON.parse(raw);
+    if(Array.isArray(parsed)) return parsed;
+    // migrate legacy single-countdown object into the new array format
+    if(parsed && parsed.date){
+      const migrated=[{id:cdNewId(),label:parsed.label||'Countdown',date:parsed.date}];
+      cdSaveAll(migrated);
+      return migrated;
+    }
+    return [];
+  }catch(e){ return []; }
+}
+function cdSaveAll(list){ localStorage.setItem(CD_KEY, JSON.stringify(list)); }
+function cdNewId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function renderCountdownWidget(){
+  const wrap=document.getElementById('focus-countdown-list');
+  if(!wrap) return;
+  const list=cdLoad();
+  const now=new Date();
+  let html='';
+  list.forEach(cd=>{
+    const target=new Date(cd.date+'T00:00:00');
+    const diffMs=target-now;
+    if(diffMs<=0){
+      html+=`<div class="fc-card" onclick="openCountdownModal('${cd.id}')">
+        <div class="fc-nums"><div class="fc-num-block"><div class="fc-num">🎉</div><div class="fc-unit">today</div></div></div>
+        <div class="fc-label-wrap"><div class="fc-label">${cdEsc(cd.label||'Countdown')}</div><div class="fc-label-sub">has arrived</div></div>
+        <button class="fc-remove" onclick="event.stopPropagation();removeCountdown('${cd.id}')" title="Remove"><i class="ti ti-x"></i></button>
+      </div>`;
+    } else {
+      const totalHours=Math.floor(diffMs/3600000);
+      const days=Math.floor(totalHours/24);
+      const hours=totalHours%24;
+      html+=`<div class="fc-card" onclick="openCountdownModal('${cd.id}')">
+        <div class="fc-nums">
+          <div class="fc-num-block"><div class="fc-num">${days}</div><div class="fc-unit">${days===1?'day':'days'}</div></div>
+          <div class="fc-sep">:</div>
+          <div class="fc-num-block"><div class="fc-num">${hours}</div><div class="fc-unit">${hours===1?'hr':'hrs'}</div></div>
+        </div>
+        <div class="fc-label-wrap"><div class="fc-label">${cdEsc(cd.label||'Countdown')}</div><div class="fc-label-sub">remaining</div></div>
+        <button class="fc-remove" onclick="event.stopPropagation();removeCountdown('${cd.id}')" title="Remove"><i class="ti ti-x"></i></button>
+      </div>`;
+    }
+  });
+  if(!list.length){
+    wrap.innerHTML=`<div class="fc-empty-hint">No countdowns yet — add one from the menu (⋯) top right</div>`;
+    return;
+  }
+  wrap.innerHTML=html;
+}
+function cdEsc(str){ const d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
+function cdOpenDatePicker(){
+  const el=document.getElementById('cd-date');
+  if(!el) return;
+  if(el.showPicker){ try{ el.showPicker(); return; }catch(e){} }
+  el.click();
+}
+function cdUpdateDateVal(val){
+  const span=document.getElementById('cd-date-val');
+  if(!span) return;
+  if(!val){ span.textContent='Select date'; return; }
+  const d=new Date(val+'T00:00:00');
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  span.textContent=months[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+}
+function cdOnDateChange(val){ cdUpdateDateVal(val); }
+function openCountdownModal(id){
+  cdEditingId=id||null;
+  const list=cdLoad();
+  const cd=cdEditingId?list.find(c=>c.id===cdEditingId):null;
+  document.getElementById('cd-modal-title').textContent=cd?'Edit countdown':'Add countdown';
+  document.getElementById('cd-label').value=cd?(cd.label||''):'';
+  const dateVal=cd?(cd.date||''):'';
+  document.getElementById('cd-date').value=dateVal;
+  cdUpdateDateVal(dateVal);
+  document.getElementById('cd-remove-btn').style.display=cd?'block':'none';
+  document.getElementById('modal-countdown').classList.add('open');
+  setTimeout(()=>document.getElementById('cd-label').focus(),50);
+}
+function closeCountdownModal(){ document.getElementById('modal-countdown').classList.remove('open'); cdEditingId=null; }
+function saveCountdown(){
+  const label=document.getElementById('cd-label').value.trim();
+  const date=document.getElementById('cd-date').value;
+  if(!date){ alert('Pick a date for your countdown.'); return; }
+  const list=cdLoad();
+  if(cdEditingId){
+    const entry=list.find(c=>c.id===cdEditingId);
+    if(entry){ entry.label=label||'Countdown'; entry.date=date; }
+  } else {
+    list.push({id:cdNewId(),label:label||'Countdown',date});
+  }
+  cdSaveAll(list);
+  closeCountdownModal();
+  renderCountdownWidget();
+}
+function removeCountdown(id){
+  const targetId=id||cdEditingId;
+  if(!targetId) return;
+  const list=cdLoad().filter(c=>c.id!==targetId);
+  cdSaveAll(list);
+  closeCountdownModal();
+  renderCountdownWidget();
 }
 
 function setFocusMode(m){
@@ -15685,6 +15850,14 @@ function ppComputeAchievements(data){
     dayFirstVisitCountries[day].add(iso);
   });
   const maxCountriesInOneDay=Math.max(0,...Object.values(dayFirstVisitCountries).map(s=>s.size));
+  const seasonsSet=new Set(allVisits.map(v=>{const m=new Date(v.date).getMonth();return m<=1||m===11?'winter':m<=4?'spring':m<=7?'summer':'fall';}));
+  const yearsSet=new Set(allVisits.map(v=>new Date(v.date).getFullYear()));
+  const minFlightKm=allVisits.length?Math.min(...allVisits.map(v=>v.distKm||Infinity)):Infinity;
+  const longestFlightSec=allVisits.reduce((m,v)=>Math.max(m,v.durSec||0),0);
+  const weekendFlights=allVisits.filter(v=>{const d=new Date(v.date).getDay();return d===0||d===6;}).length;
+  const notesCount=Object.keys(data.notes||{}).filter(k=>data.notes[k]&&data.notes[k].trim()).length;
+  const safeCountries=isoList.filter(iso=>PP_COUNTRIES[iso]?.r?.safety===5).length;
+  const foodCountries=isoList.filter(iso=>PP_COUNTRIES[iso]?.r?.food===5).length;
   return [
     {name:'First Flight',desc:'Complete your first international flight',ico:'✈',unlocked:totalVisits>=1},
     {name:'Visited Every Continent',desc:'Set foot on all six inhabited continents',ico:'🌍',unlocked:continents.size>=6},
@@ -15701,6 +15874,18 @@ function ppComputeAchievements(data){
     {name:'Regular Visitor',desc:'Return to the same country 3 times',ico:'🔁',unlocked:maxVisitsToOneCountry>=3},
     {name:'Globe in a Day',desc:'Stamp 3 new countries in a single day',ico:'📅',unlocked:maxCountriesInOneDay>=3},
     {name:'Red-Eye Flyer',desc:'Land somewhere new between midnight and 5am',ico:'🌙',unlocked:nightFlights>=1},
+    {name:'Globetrotter',desc:'Collect stamps from 35 different countries',ico:'🗺',unlocked:isoList.length>=35},
+    {name:'Four Corners',desc:'Set foot on 4 different continents',ico:'🚩',unlocked:continents.size>=4},
+    {name:'Archipelago Master',desc:`Visit all ${PP_ISLANDS.length} island nations`,ico:'🏖',unlocked:islandCount>=PP_ISLANDS.length},
+    {name:'Note Taker',desc:'Write travel notes for 5 different countries',ico:'📝',unlocked:notesCount>=5},
+    {name:'All Four Seasons',desc:'Log a flight in every season of the year',ico:'🍂',unlocked:seasonsSet.size>=4},
+    {name:'Multi-Year Flyer',desc:'Log flights across 3 different calendar years',ico:'📆',unlocked:yearsSet.size>=3},
+    {name:'Short Hop',desc:'Complete a flight under 500 km',ico:'🐦',unlocked:minFlightKm<500},
+    {name:'Weekend Wanderer',desc:'Log 5 flights on a Saturday or Sunday',ico:'🎉',unlocked:weekendFlights>=5},
+    {name:'Safe Travels',desc:'Visit 5 countries with a top safety rating',ico:'🛡',unlocked:safeCountries>=5},
+    {name:'Foodie Explorer',desc:'Visit 5 countries with a top food rating',ico:'🍽',unlocked:foodCountries>=5},
+    {name:'Ultra Long-Haul',desc:'Fly a single route lasting 10+ hours',ico:'🛬',unlocked:longestFlightSec>=36000},
+    {name:'Double World',desc:'Rack up 80,150 km of total flight distance',ico:'🌎',unlocked:totalDistKm>=80150},
   ];
 }
 function ppRenderAchievements(){

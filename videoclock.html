@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Video Clock — Canopus</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Inter',sans-serif}
+
+  /* ── upload / empty state ── */
+  #drop-zone{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;cursor:pointer;color:rgba(255,255,255,.55);transition:color .2s,border-color .2s;border:1.5px dashed rgba(255,255,255,.18);margin:18px;border-radius:18px}
+  #drop-zone:hover,#drop-zone.drag-over{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.4)}
+  #drop-zone i{font-size:42px}
+  #drop-zone .dz-title{font-size:15px;letter-spacing:.04em}
+  #drop-zone .dz-hint{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+  #file-input{display:none}
+
+  /* ── video stage ── */
+  #video-stage{position:fixed;inset:0;display:none;background:#000}
+  #video-stage.active{display:block}
+  #bg-video{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* ── time overlay ── */
+  #time-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;padding:22px 34px;border-radius:16px;background:transparent;border:0.5px solid transparent;user-select:none;cursor:grab;touch-action:none;transition:background .2s,border-color .2s}
+  #time-box:hover{background:rgba(0,0,0,.14);border-color:rgba(255,255,255,.16)}
+  #time-box.dragging{cursor:grabbing;background:rgba(0,0,0,.14);border-color:rgba(255,255,255,.16)}
+  #time-inner{transform:scale(1);transition:transform .12s ease-out}
+  #time-clock{font-size:clamp(48px,10vw,120px);font-weight:300;letter-spacing:-.03em;color:#fff;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 2px 20px rgba(0,0,0,.65)}
+  #time-clock span.sep{color:rgba(255,255,255,.4)}
+  #time-date{margin-top:10px;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.85);text-shadow:0 1px 10px rgba(0,0,0,.65)}
+
+  /* ── controls ── */
+  #controls{position:fixed;top:calc(16px + env(safe-area-inset-top));right:calc(16px + env(safe-area-inset-right));display:flex;gap:8px;z-index:20}
+  .vc-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);border:0.5px solid rgba(255,255,255,.18);color:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;backdrop-filter:blur(8px);transition:all .2s}
+  .vc-btn:hover{color:#fff;background:rgba(0,0,0,.6);border-color:rgba(255,255,255,.35)}
+
+  @media (max-width:520px){
+    #time-box{padding:16px 24px}
+    #time-date{font-size:11px;letter-spacing:.16em}
+  }
+</style>
+</head>
+<body>
+
+  <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+    <i class="ti ti-video"></i>
+    <div class="dz-title">Click to choose a video</div>
+    <div class="dz-hint">or drag &amp; drop a file here</div>
+  </div>
+  <input type="file" id="file-input" accept="video/*">
+
+  <div id="video-stage">
+    <video id="bg-video" autoplay loop muted playsinline></video>
+    <div id="time-box" title="Drag to move · scroll to resize">
+      <div id="time-inner">
+        <div id="time-clock">00<span class="sep">:</span>00<span class="sep">:</span>00</div>
+        <div id="time-date"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="controls" style="display:none">
+    <button class="vc-btn" id="mute-btn" onclick="toggleMute()" title="Mute / unmute"><i class="ti ti-volume-3"></i></button>
+    <button class="vc-btn" onclick="toggleFullscreen()" title="Fullscreen"><i class="ti ti-arrows-maximize"></i></button>
+    <button class="vc-btn" onclick="adjustClockScale(-0.1)" title="Smaller text"><i class="ti ti-zoom-out"></i></button>
+    <button class="vc-btn" onclick="adjustClockScale(0.1)" title="Bigger text"><i class="ti ti-zoom-in"></i></button>
+    <button class="vc-btn" onclick="resetTimeBoxPosition()" title="Re-center timer"><i class="ti ti-focus-2"></i></button>
+    <button class="vc-btn" onclick="changeVideo()" title="Change video"><i class="ti ti-replace"></i></button>
+    <button class="vc-btn" onclick="window.location.href='index.html'" title="Back to Canopus"><i class="ti ti-x"></i></button>
+  </div>
+
+<script>
+const dropZone=document.getElementById('drop-zone');
+const fileInput=document.getElementById('file-input');
+const videoStage=document.getElementById('video-stage');
+const video=document.getElementById('bg-video');
+const controls=document.getElementById('controls');
+let objectUrl=null;
+
+function handleFile(file){
+  if(!file||!file.type.startsWith('video/')) return;
+  if(objectUrl) URL.revokeObjectURL(objectUrl);
+  objectUrl=URL.createObjectURL(file);
+  video.src=objectUrl;
+  video.play().catch(()=>{});
+  dropZone.style.display='none';
+  videoStage.classList.add('active');
+  controls.style.display='flex';
+  // try to enter fullscreen automatically once the video is ready
+  const goFs=()=>{ requestFs(document.documentElement); document.removeEventListener('click',goFs); };
+  document.addEventListener('click',goFs,{once:true});
+}
+
+fileInput.addEventListener('change',()=>handleFile(fileInput.files[0]));
+
+['dragenter','dragover'].forEach(evt=>{
+  dropZone.addEventListener(evt,e=>{ e.preventDefault(); dropZone.classList.add('drag-over'); });
+});
+['dragleave','drop'].forEach(evt=>{
+  dropZone.addEventListener(evt,e=>{ e.preventDefault(); dropZone.classList.remove('drag-over'); });
+});
+dropZone.addEventListener('drop',e=>{
+  const file=e.dataTransfer.files&&e.dataTransfer.files[0];
+  handleFile(file);
+});
+
+function changeVideo(){
+  video.pause();
+  if(objectUrl){ URL.revokeObjectURL(objectUrl); objectUrl=null; }
+  video.removeAttribute('src'); video.load();
+  videoStage.classList.remove('active');
+  controls.style.display='none';
+  dropZone.style.display='flex';
+}
+
+/* ── draggable + resizable time box ── */
+const timeBox=document.getElementById('time-box');
+const timeInner=document.getElementById('time-inner');
+const TB_POS_KEY='canopus_videoclock_pos';
+const TB_SCALE_KEY='canopus_videoclock_scale';
+let dragState=null;
+let clockScale=1;
+
+function applyScale(){
+  timeInner.style.transform='scale('+clockScale+')';
+}
+function restoreClockScale(){
+  const saved=parseFloat(localStorage.getItem(TB_SCALE_KEY));
+  clockScale=(!isNaN(saved)&&saved>0)?saved:1;
+  applyScale();
+}
+function adjustClockScale(delta){
+  clockScale=Math.min(2.5,Math.max(0.5,+(clockScale+delta).toFixed(2)));
+  applyScale();
+  try{ localStorage.setItem(TB_SCALE_KEY,clockScale); }catch(e){}
+}
+timeBox.addEventListener('wheel',e=>{
+  e.preventDefault();
+  adjustClockScale(e.deltaY<0?0.05:-0.05);
+},{passive:false});
+
+function applyPosFromPct(pct){
+  const rect=timeBox.getBoundingClientRect();
+  const maxLeft=Math.max(0,window.innerWidth-rect.width);
+  const maxTop=Math.max(0,window.innerHeight-rect.height);
+  const left=Math.min(Math.max(pct.leftPct*window.innerWidth,0),maxLeft);
+  const top=Math.min(Math.max(pct.topPct*window.innerHeight,0),maxTop);
+  timeBox.style.transform='none';
+  timeBox.style.left=left+'px';
+  timeBox.style.top=top+'px';
+}
+function restoreTimeBoxPosition(){
+  let saved=null;
+  try{ saved=JSON.parse(localStorage.getItem(TB_POS_KEY)); }catch(e){}
+  if(saved&&typeof saved.leftPct==='number') applyPosFromPct(saved);
+}
+function resetTimeBoxPosition(){
+  localStorage.removeItem(TB_POS_KEY);
+  timeBox.style.left='50%';
+  timeBox.style.top='50%';
+  timeBox.style.transform='translate(-50%,-50%)';
+}
+timeBox.addEventListener('pointerdown',e=>{
+  const rect=timeBox.getBoundingClientRect();
+  dragState={startX:e.clientX,startY:e.clientY,startLeft:rect.left,startTop:rect.top};
+  timeBox.style.transform='none';
+  timeBox.style.left=rect.left+'px';
+  timeBox.style.top=rect.top+'px';
+  timeBox.classList.add('dragging');
+  timeBox.setPointerCapture(e.pointerId);
+});
+timeBox.addEventListener('pointermove',e=>{
+  if(!dragState) return;
+  const rect=timeBox.getBoundingClientRect();
+  const maxLeft=Math.max(0,window.innerWidth-rect.width);
+  const maxTop=Math.max(0,window.innerHeight-rect.height);
+  const dx=e.clientX-dragState.startX, dy=e.clientY-dragState.startY;
+  const left=Math.min(Math.max(dragState.startLeft+dx,0),maxLeft);
+  const top=Math.min(Math.max(dragState.startTop+dy,0),maxTop);
+  timeBox.style.left=left+'px';
+  timeBox.style.top=top+'px';
+});
+function endDrag(){
+  if(!dragState) return;
+  dragState=null;
+  timeBox.classList.remove('dragging');
+  const rect=timeBox.getBoundingClientRect();
+  try{
+    localStorage.setItem(TB_POS_KEY,JSON.stringify({leftPct:rect.left/window.innerWidth,topPct:rect.top/window.innerHeight}));
+  }catch(e){}
+}
+timeBox.addEventListener('pointerup',endDrag);
+timeBox.addEventListener('pointercancel',endDrag);
+window.addEventListener('resize',restoreTimeBoxPosition);
+restoreTimeBoxPosition();
+restoreClockScale();
+
+function toggleMute(){
+  video.muted=!video.muted;
+  const icon=document.querySelector('#mute-btn i');
+  icon.className=video.muted?'ti ti-volume-3':'ti ti-volume';
+}
+
+function requestFs(el){
+  if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+  else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+}
+function toggleFullscreen(){
+  if(document.fullscreenElement||document.webkitFullscreenElement){
+    if(document.exitFullscreen) document.exitFullscreen();
+    else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+  } else {
+    requestFs(document.documentElement);
+  }
+}
+
+function clockTick(){
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const h=pad(d.getHours()),m=pad(d.getMinutes()),s=pad(d.getSeconds());
+  document.getElementById('time-clock').innerHTML=h+'<span class="sep">:</span>'+m+'<span class="sep">:</span>'+s;
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('time-date').textContent=days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()];
+}
+clockTick();
+setInterval(clockTick,1000);
+</script>
+</body>
+</html>
