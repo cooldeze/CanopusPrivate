@@ -3624,7 +3624,7 @@ window.AccessGate={ hashCode:aqgHash };
   </div>
 
   <!-- Goals panel — sits top-right, shows incomplete goals from the unlocked capsule -->
-  <div class="flight-goals-panel flight-idle-fade" id="flight-goals-panel" style="display:none">
+  <div class="flight-goals-panel" id="flight-goals-panel" style="display:none">
     <div class="flight-goals-title">goals</div>
     <div class="flight-goals-list" id="flight-goals-list"></div>
   </div>
@@ -4734,6 +4734,8 @@ let flightTo='JFK';
 let ftPickedDur=60;
 let flightFreeRun=false;     // true when "Free Run ∞" is selected — timer counts up with no fixed duration
 let flightElapsedSec=0;      // elapsed seconds for free-run mode
+let flightFreeRunBaseSec=0;  // elapsed seconds banked before the current run segment (pre pause/break)
+let flightFreeRunStart=null; // wall-clock timestamp (ms) the current run segment resumed counting from
 let myGlobe=null;
 let globeInited=false;
 let flightInterval=null;
@@ -6156,7 +6158,7 @@ function closeFlightTracker(){
   document.getElementById('flight-overlay').classList.remove('tracking-flight');
   flightRunning=false; flightPaused=false;
   flightEndTime=null;
-  flightFreeRun=false; flightElapsedSec=0;
+  flightFreeRun=false; flightElapsedSec=0; flightFreeRunBaseSec=0; flightFreeRunStart=null;
   { const landBtn=document.getElementById('freerun-land-btn'); if(landBtn) landBtn.style.display='none'; }
   idleFlightsEnabled=false;
   if(flightInterval){clearInterval(flightInterval);flightInterval=null;}
@@ -6206,7 +6208,7 @@ function showFlightSetup(){
   }
   flightRunning=false; flightPaused=false;
   flightEndTime=null;
-  flightFreeRun=false; flightElapsedSec=0;
+  flightFreeRun=false; flightElapsedSec=0; flightFreeRunBaseSec=0; flightFreeRunStart=null;
   { const landBtn=document.getElementById('freerun-land-btn'); if(landBtn) landBtn.style.display='none'; }
   { const hi=document.getElementById('fdc-h'),mi=document.getElementById('fdc-m'); if(hi)hi.disabled=false; if(mi)mi.disabled=false; }
   setFreeRunHint(false);
@@ -6389,8 +6391,14 @@ function resumeFromBreak(){
     pomomixEndTime=Date.now()+pomomixRemSec*1000;
     if(!pomomixInterval) pomomixInterval=setInterval(tickPomomix,1000);
   } else if(flightRunning&&!flightInterval){
-    // Resume flight interval — reset the end time since flightRemSec was frozen during the break
-    flightEndTime=Date.now()+flightRemSec*1000;
+    if(flightFreeRun){
+      // Re-anchor the wall clock — flightElapsedSec was frozen during the break
+      flightFreeRunBaseSec=flightElapsedSec;
+      flightFreeRunStart=Date.now();
+    } else {
+      // Resume flight interval — reset the end time since flightRemSec was frozen during the break
+      flightEndTime=Date.now()+flightRemSec*1000;
+    }
     flightInterval=setInterval(tickFlight,1000);
   }
 }
@@ -6403,6 +6411,8 @@ function launchFlight(){
   if(flightFreeRun){
     // No fixed duration — count up instead of down, land manually
     flightElapsedSec=0;
+    flightFreeRunBaseSec=0;
+    flightFreeRunStart=Date.now();
     flightTotalSec=0;
     flightRemSec=0;
     flightEndTime=null;
@@ -6470,7 +6480,16 @@ function launchFlight(){
 function toggleFlightPause(){
   if(!flightRunning) return;
   flightPaused=!flightPaused;
-  if(flightPaused){
+  if(flightFreeRun){
+    if(flightPaused){
+      // Bank elapsed seconds and stop the wall-clock anchor while paused
+      flightFreeRunBaseSec=flightElapsedSec;
+      flightFreeRunStart=null;
+    } else {
+      // Resume counting up from the banked total
+      flightFreeRunStart=Date.now();
+    }
+  } else if(flightPaused){
     // Freeze remaining time at the moment of pausing
     flightRemSec=Math.max(0,Math.round((flightEndTime-Date.now())/1000));
   } else {
@@ -6483,7 +6502,9 @@ function toggleFlightPause(){
 function tickFlight(){
   if(!flightRunning||flightPaused) return;
   if(flightFreeRun){
-    flightElapsedSec++;
+    // Recompute from the wall clock rather than incrementing by 1 per tick — background
+    // tabs throttle/skip setInterval ticks, which would otherwise let this fall behind.
+    flightElapsedSec=flightFreeRunBaseSec+(flightFreeRunStart!=null?Math.floor((Date.now()-flightFreeRunStart)/1000):0);
     updateFlightDisplay();
     if(flightElapsedSec%3===0) updateGlobeArcs();
     const btn=document.getElementById('flight-break-btn');
@@ -6608,7 +6629,9 @@ function updateFlightDisplay(){
 // ── Free Run: land manually, save whatever time has accumulated ──
 function landFreeRunNow(){
   if(!flightRunning||!flightFreeRun) return;
+  if(!flightPaused&&!flightOnBreak) tickFlight(); // final wall-clock sync in case the last tick was throttled
   flightRunning=false;
+  flightFreeRunBaseSec=0; flightFreeRunStart=null;
   document.getElementById('flight-status').textContent='landed ✓';
   document.getElementById('flight-status').className='flight-status landed';
   document.getElementById('flight-eta').textContent='welcome to '+flightTo;
@@ -8232,7 +8255,7 @@ document.addEventListener('visibilitychange',()=>{
   if(pomoRunning&&!pomoPaused&&pomoEndTime!=null)tickPomodoro();
   if(pomoQuitLocked()) pomoStrictNudge();
   if(pomomixRunning&&!pomomixPaused&&!flightOnBreak&&pomomixEndTime!=null)tickPomomix();
-  if(flightRunning&&!flightPaused&&!flightOnBreak&&!pomoRunning&&flightEndTime!=null)tickFlight();
+  if(flightRunning&&!flightPaused&&!flightOnBreak&&!pomoRunning&&(flightFreeRun||flightEndTime!=null))tickFlight();
   if(flightOnBreak&&flightBreakStartTime!=null){
     flightBreakElapsed=Math.round((Date.now()-flightBreakStartTime)/1000);
     updateBreakDisplay();
