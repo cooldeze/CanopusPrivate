@@ -1083,12 +1083,38 @@ body.light kbd{background:#f0f0eb;border-color:#ddd;color:#666}
 
 /* ── BREAK OVERLAY ── */
 .flight-break-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.78);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;pointer-events:none;opacity:0;transition:opacity .35s}
-.flight-break-overlay.active{opacity:1;pointer-events:auto}
+.flight-break-overlay.active{opacity:1}
+.flight-overlay.open .flight-break-overlay.active{pointer-events:auto}
 .fbo-label{font-size:10px;color:rgba(255,255,255,0.6);letter-spacing:.28em;text-transform:uppercase;margin-bottom:14px}
 .fbo-time{font-size:clamp(56px,14vw,130px);font-weight:300;letter-spacing:-.04em;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
 .fbo-sub{font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:.14em;text-transform:uppercase;margin-top:10px}
 .fbo-resume-btn{margin-top:32px;padding:10px 28px;border-radius:10px;border:0.5px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.08);color:#fff;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s}
 .fbo-resume-btn:hover{background:rgba(255,255,255,0.15);border-color:#fff}
+.fbo-actions{display:flex;gap:12px;align-items:center;margin-top:32px;flex-wrap:wrap;justify-content:center}
+.fbo-actions .fbo-resume-btn{margin-top:0}
+.fbo-capsule-btn{padding:10px 24px;border-radius:10px;border:0.5px solid rgba(255,255,255,0.22);background:transparent;color:rgba(255,255,255,0.75);font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.fbo-capsule-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.5);color:#fff}
+/* ── Floating "on break" pill — shown when the flight overlay is minimized
+   (e.g. the user opened Capsule mid-break) so they can jump straight back. ── */
+.flight-break-float{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);
+  display:flex;align-items:center;gap:12px;padding:10px 12px 10px 16px;
+  background:rgba(10,10,14,0.88);backdrop-filter:blur(10px);
+  border:0.5px solid rgba(255,255,255,0.14);border-radius:999px;
+  box-shadow:0 18px 40px -12px rgba(0,0,0,0.6);z-index:590;
+  opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;
+}
+.flight-break-float.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.fbf-dot{width:7px;height:7px;border-radius:50%;background:#5a5aff;flex-shrink:0;animation:fscPulse 2.2s ease-in-out infinite}
+.fbf-text{font-size:11px;color:rgba(255,255,255,0.75);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.fbf-text #fbf-time{color:#fff;font-variant-numeric:tabular-nums}
+.fbf-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:0.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.06);color:#fff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s;white-space:nowrap}
+.fbf-btn:hover{background:rgba(255,255,255,0.16);border-color:#fff}
+@media (max-width:640px){
+  .flight-break-float{left:12px;right:12px;transform:translateY(120%);bottom:16px;justify-content:space-between}
+  .flight-break-float.show{transform:translateY(0)}
+  .fbf-text{overflow:hidden;text-overflow:ellipsis}
+}
 
 /* ── SATELLITE LEGEND (detailed mode) ── */
 .sat-legend{
@@ -3678,7 +3704,10 @@ window.AccessGate={ hashCode:aqgHash };
     <div class="fbo-label">on break</div>
     <div class="fbo-time" id="fbo-break-time">00:00</div>
     <div class="fbo-sub" id="fbo-breaks-left"></div>
-    <button class="fbo-resume-btn" onclick="resumeFromBreak()">resume flight</button>
+    <div class="fbo-actions">
+      <button class="fbo-resume-btn" onclick="resumeFromBreak()">resume flight</button>
+      <button class="fbo-capsule-btn" onclick="openCapsuleFromBreak()"><i class="ti ti-notebook"></i> open capsule</button>
+    </div>
   </div>
   <!-- Lat/lon tooltip -->
   <div class="globe-tooltip" id="globe-tooltip" style="position:fixed"></div>
@@ -3693,6 +3722,14 @@ window.AccessGate={ hashCode:aqgHash };
     <span class="gsc-val" id="gsc-zoom-val">0.5×</span>
     <button onclick="adjustGlobeZoom(0.15)" style="background:none;border:0.5px solid rgba(255,255,255,0.12);border-radius:5px;width:22px;height:22px;color:rgba(255,255,255,0.4);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Inter',sans-serif;padding:0" onmouseover="this.style.borderColor='rgba(255,255,255,0.35)';this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.4)'">+</button>
   </div>
+</div>
+<!-- Floating pill shown while on a flight break but the flight overlay is minimized
+     (e.g. the user hopped into Capsule). Lets them jump straight back to the flight;
+     resumeFromBreak() also auto re-opens the flight overlay on its own. -->
+<div class="flight-break-float" id="flight-break-float">
+  <span class="fbf-dot"></span>
+  <span class="fbf-text">on break — <span id="fbf-time">00:00</span></span>
+  <button class="fbf-btn" onclick="returnToFlightFromBreak()"><i class="ti ti-plane-departure"></i> back to flight</button>
 </div>
 <div class="modal-bg" id="modal-session" onclick="if(event.target===this)closeModal('session')">
   <div class="modal">
@@ -6386,6 +6423,7 @@ function closeFlightTracker(){
   if(badge) badge.style.display='none';
   if(globeAnimFrame){cancelAnimationFrame(globeAnimFrame);globeAnimFrame=null;}
   if(typeof termFlightDocked!=='undefined'&&termFlightDocked&&typeof termCloseFlightDock==='function')termCloseFlightDock();
+  { const fbf=document.getElementById('flight-break-float'); if(fbf) fbf.classList.remove('show'); }
 }
 
 function showFlightSetup(){
@@ -6561,6 +6599,7 @@ function takeBreak(){
   const ov=document.getElementById('flight-break-overlay');
   if(ov) ov.classList.add('active');
   updateBreakDisplay();
+  syncFlightBreakFloat();
   // Update break button to show we're on break
   const btn=document.getElementById('flight-break-btn');
   if(btn){btn.textContent='on break';btn.disabled=true;}
@@ -6579,6 +6618,38 @@ function updateBreakDisplay(){
   if(el) el.textContent=pad(m)+':'+pad(s);
   const sub=document.getElementById('fbo-breaks-left');
   if(sub) sub.textContent=flightBreaksLeft>0?flightBreaksLeft+' break'+(flightBreaksLeft===1?'':' s')+' remaining':'last break';
+  // Keep the floating "back to flight" pill (shown while the flight overlay is
+  // minimized for Capsule) in sync with the same elapsed time.
+  const fbf=document.getElementById('fbf-time');
+  if(fbf) fbf.textContent=pad(m)+':'+pad(s);
+}
+
+// Minimize the flight overlay so the Capsule page is visible underneath, while the
+// break (and its wall-clock timer) keeps running exactly as before. The flight overlay
+// is a fixed, full-screen layer — just dropping its 'open' class reveals whatever page
+// is active behind it without touching any flight/break state.
+function openCapsuleFromBreak(){
+  if(!flightOnBreak) return;
+  document.getElementById('flight-overlay').classList.remove('open');
+  showPage('capsule');
+  syncFlightBreakFloat();
+}
+
+// Bring the flight overlay back to the front without ending the break — used by the
+// floating pill. If the break has already ended by other means this is a no-op beyond
+// re-showing the overlay.
+function returnToFlightFromBreak(){
+  document.getElementById('flight-overlay').classList.add('open');
+  syncFlightBreakFloat();
+}
+
+// Show/hide the floating "on break" pill depending on whether the flight overlay is
+// currently minimized while a break is in progress.
+function syncFlightBreakFloat(){
+  const pill=document.getElementById('flight-break-float');
+  if(!pill) return;
+  const overlayOpen=document.getElementById('flight-overlay').classList.contains('open');
+  pill.classList.toggle('show', flightOnBreak && !overlayOpen);
 }
 
 function resumeFromBreak(){
@@ -6610,6 +6681,10 @@ function resumeFromBreak(){
     }
     flightInterval=setInterval(tickFlight,1000);
   }
+  // Break is over — automatically bring the flight back to the front if the user had
+  // minimized it to visit Capsule (or anywhere else). Harmless no-op if it was already open.
+  document.getElementById('flight-overlay').classList.add('open');
+  syncFlightBreakFloat();
 }
 
 function launchFlight(){
@@ -8450,13 +8525,15 @@ setInterval(()=>{if(document.getElementById('page-schedule').classList.contains(
 clockTick();
 setInterval(clockTick,1000);
 
-// ── Correct all running timers the instant the tab becomes visible again ──
+// ── Keep every running timer correct even while the tab is minimized/backgrounded ──
 // Browsers throttle/suspend setInterval in background tabs, which lets tick-counted
 // timers fall behind. Every timer above now derives its value from a fixed wall-clock
-// end/start time, so the moment we regain visibility we just recompute from Date.now()
-// and everything snaps back in sync instead of waiting for a slow/skipped tick.
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState!=='visible')return;
+// end/start time, so a resync just recomputes from Date.now() and everything snaps
+// back in sync instead of waiting for a slow/skipped tick. resyncAllTimers() is the
+// shared implementation, called both when the tab regains visibility AND on every
+// heartbeat from the background Web Worker below (workers keep ticking even while the
+// tab/window is minimized or hidden, unlike a plain setInterval on the main thread).
+function resyncAllTimers(){
   clockTick();
   if(timerRunning&&timerEndTime!=null)pomodoroTick();
   if(fsRunning&&fsEndTime!=null)fsTick();
@@ -8469,7 +8546,32 @@ document.addEventListener('visibilitychange',()=>{
     flightBreakElapsed=Math.round((Date.now()-flightBreakStartTime)/1000);
     updateBreakDisplay();
   }
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState!=='visible')return;
+  resyncAllTimers();
 });
+
+// ── Background heartbeat via a dedicated Web Worker ──
+// A worker's own setInterval keeps firing roughly on schedule even while this tab is
+// minimized or in another background tab, whereas the main thread's setInterval calls
+// get heavily throttled (as slow as once a minute) once the page is hidden. Every
+// heartbeat just re-runs the same wall-clock resync used above, so all clocks/timers
+// (including the flight break timer and its floating pill) keep advancing in near
+// real time instead of freezing until the tab is refocused.
+try{
+  const heartbeatWorker=new Worker(URL.createObjectURL(new Blob(
+    ['setInterval(()=>postMessage(1),1000);'],
+    {type:'application/javascript'}
+  )));
+  heartbeatWorker.onmessage=()=>{
+    resyncAllTimers();
+    syncFlightBreakFloat();
+  };
+}catch(e){
+  // Worker unsupported/blocked — the visibilitychange resync above still keeps
+  // everything correct the moment the tab is refocused.
+}
 updateTimerDisplay();
 renderSessions();
 
