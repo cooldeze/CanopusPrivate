@@ -14371,7 +14371,7 @@ const TERM_QUICK_COMMANDS=[
   'harsh','harsh on','harsh off',
   'calc','time','sysinfo','battery','uptime','search','country','country clear','note add','note list','note rm','note clear',
   'history','history clear','echo','roll','roll 2d6','flip','matrix',
-  'alias','alias list','alias rm','man','sysmon','backup','restore','zeus','zeus restore','zeus flight','zeus status','zeus wipe','zeus lock on','zeus lock off','reload'
+  'alias','alias list','alias rm','man','sysmon','backup','restore','zeus','zeus simple','zeus restore','zeus flight','zeus status','zeus wipe','zeus lock on','zeus lock off','reload'
 ];
 const TERM_TOP_COMMANDS=['help','clear','status','open','goto','report','accent','surface','theme','shortcut','set','fs','ls','dir','cd','cat','read','pwd','calc','time','date','sysinfo','battery','uptime','search','find','note','history','echo','roll','flip','matrix','alias','man','sysmon','backup','restore','zeus','reload','grep','harsh','country','ask','alfred','model','detail','setup'];
 let termGhostSuggestion=''; // the full suggested command string, or '' if none
@@ -14645,6 +14645,9 @@ function termRunSingle(raw,depth){
         'zeus             FULL device backup — countries/passport, progress stats,',
         '                 time per feature, Vault (incl. locked entries), JEE journal,',
         '                 capsule photos/videos, everything — as one .json file',
+        'zeus simple      same as "zeus" but SKIPS capsule videos (keeps photos +',
+        '                 everything else) — smaller, faster, and shows how many',
+        '                 videos were skipped and how much space that saved',
         'zeus restore     load a zeus backup file — merges it into this device\'s data,',
         '                 keeping what\'s already here and adding what\'s new from the file',
         'zeus flight      opens a mini flight panel on the right — terminal stays',
@@ -14976,7 +14979,7 @@ const TERM_MAN={
   roll:['USAGE: roll  |  roll 2d6  |  roll d20','Rolls dice in the form <count>d<sides>. Defaults to 1d6.'],
   backup:['USAGE: backup','Downloads a JSON file with this page\'s saved settings, notes, aliases,','schedule, and progress data. The Vault keeps its own separate storage','and is not included — back it up from its own page, or use "zeus".'],
   restore:['USAGE: restore','Pick a previously downloaded backup .json file to write its data back','into this browser. Reload the page afterward to see the restored data.'],
-  zeus:['USAGE: zeus  |  zeus restore  |  zeus flight [from] [to] [mins]  |  zeus status  |  zeus wipe  |  zeus lock on|off','FULL device backup, not just this page\'s settings. Sweeps every piece of','Canopus data on this origin into one .json file: countries visited','(passport), progress stats, time spent on each feature, every Vault','entry (including ones behind the PIN lock), and the JEE journal — including every Capsule photo/video, base64-encoded','straight into the same .json file, not just a reference to it.','"zeus" downloads the file. "zeus restore" loads one back in — this','MERGES the backup into whatever is already on this device: entries','already here are kept, entries only in the file are added, and any','entry present in both (same id) is kept just once — nothing is wiped.','"zeus flight" opens a mini flight panel docked into the right half of','the terminal — a trimmed-down setup (not the full flight/pomodoro/pomomix','picker screen) where you can still set a destination, duration and','breaks, floating over a globe that fills the whole pane. Typing it','again just closes the panel; anything running keeps going and stays','visible on the terminal\'s small globe. You can also quick-launch:','"zeus flight lhr jfk 45" opens the panel already flying that route.','"zeus status" is read-only: shows how much is stored on this origin,','plus the current App Lock / Access Gate / harsh-mode / theme state.','"zeus wipe" permanently erases every key on this device — asks you to','confirm and type WIPE; there\'s no undo unless you made a "zeus" backup.','"zeus lock on" / "zeus lock off" flips the App Lock toggle directly,','same effect as the on/off switch in App Lock Settings.'],
+  zeus:['USAGE: zeus  |  zeus simple  |  zeus restore  |  zeus flight [from] [to] [mins]  |  zeus status  |  zeus wipe  |  zeus lock on|off','FULL device backup, not just this page\'s settings. Sweeps every piece of','Canopus data on this origin into one .json file: countries visited','(passport), progress stats, time spent on each feature, every Vault','entry (including ones behind the PIN lock), and the JEE journal — including every Capsule photo/video, base64-encoded','straight into the same .json file, not just a reference to it.','"zeus" downloads the file. "zeus simple" does the exact same sweep but','SKIPS every Capsule video (still keeps photos and everything else) —','much faster and a much smaller file when your library has big videos.','It prints how many videos were skipped and roughly how much space that','saved. "zeus restore" loads either kind of file back in — this','MERGES the backup into whatever is already on this device: entries','already here are kept, entries only in the file are added, and any','entry present in both (same id) is kept just once — nothing is wiped.','"zeus flight" opens a mini flight panel docked into the right half of','the terminal — a trimmed-down setup (not the full flight/pomodoro/pomomix','picker screen) where you can still set a destination, duration and','breaks, floating over a globe that fills the whole pane. Typing it','again just closes the panel; anything running keeps going and stays','visible on the terminal\'s small globe. You can also quick-launch:','"zeus flight lhr jfk 45" opens the panel already flying that route.','"zeus status" is read-only: shows how much is stored on this origin,','plus the current App Lock / Access Gate / harsh-mode / theme state.','"zeus wipe" permanently erases every key on this device — asks you to','confirm and type WIPE; there\'s no undo unless you made a "zeus" backup.','"zeus lock on" / "zeus lock off" flips the App Lock toggle directly,','same effect as the on/off switch in App Lock Settings.'],
   sysmon:['USAGE: sysmon  |  sysmon stop','Shows a single line of live-updating system stats (clock, memory, online','status, session uptime) until stopped.'],
   grep:['USAGE: <command> | grep <term>','Runs <command>, then only prints the lines from its output that contain','<term> (case-insensitive). EXAMPLE: history | grep open']
 };
@@ -15171,24 +15174,32 @@ async function zeusClearAllMedia(){
     });
   }catch(e){ return false; }
 }
-async function termZeusBackup(){
+async function termZeusBackup(simple){
   const keys=termZeusKeys();
   if(!keys.length){termErr('NOTHING TO BACK UP.');return;}
   const data={};
   keys.forEach(k=>{ try{ data[k]=localStorage.getItem(k); }catch(e){} });
-  const rawMedia=await zeusReadAllMedia();
+  const rawMediaAll=await zeusReadAllMedia();
+  // "zeus simple" skips video blobs entirely — those are almost always the
+  // bulk of the backup's size and time. Everything else (photos, and any
+  // non-video blob) still gets swept in, same as a full zeus backup.
+  const rawMedia=simple?rawMediaAll.filter(it=>!(it.blob.type||'').startsWith('video/')):rawMediaAll;
+  const skipped=simple?rawMediaAll.filter(it=>(it.blob.type||'').startsWith('video/')):[];
+  let skippedBytes=0;
+  skipped.forEach(it=>{ try{ skippedBytes+=it.blob.size||0; }catch(e){} });
   const media=[];
-  const progressLine=termAppendLine(rawMedia.length?('ENCODING PHOTO/VIDEO 0 OF '+rawMedia.length+'…'):'NO CAPSULE MEDIA TO ENCODE.','term-dim');
+  const label=simple?'PHOTO/OTHER':'PHOTO/VIDEO';
+  const progressLine=termAppendLine(rawMedia.length?('ENCODING '+label+' 0 OF '+rawMedia.length+'…'):('NO '+(simple?'PHOTO/OTHER':'CAPSULE')+' MEDIA TO ENCODE.'),'term-dim');
   for(let i=0;i<rawMedia.length;i++){
     const it=rawMedia[i];
     try{
       const buf=await it.blob.arrayBuffer();
       media.push({key:it.key, mime:it.blob.type||'application/octet-stream', data:zeusBufferToBase64(buf)});
     }catch(e){}
-    if(progressLine) progressLine.textContent='ENCODING PHOTO/VIDEO '+(i+1)+' OF '+rawMedia.length+'…';
+    if(progressLine) progressLine.textContent='ENCODING '+label+' '+(i+1)+' OF '+rawMedia.length+'…';
     termScrollToBottom();
   }
-  if(progressLine&&rawMedia.length) progressLine.textContent='ENCODED '+rawMedia.length+' PHOTO/VIDEO FILE(S).';
+  if(progressLine&&rawMedia.length) progressLine.textContent='ENCODED '+rawMedia.length+' '+label+' FILE(S).';
   termAppendLine('BUILDING THE BACKUP FILE…','term-dim');
   // Deliberately NOT JSON.stringify(payload) here — with hundreds of files that
   // builds one single string that can run into hundreds of MB to a few GB,
@@ -15196,7 +15207,7 @@ async function termZeusBackup(){
   // length. Instead we assemble the same JSON as an array of small pieces and
   // hand that straight to Blob, which concatenates them without ever needing
   // one giant string in memory.
-  const parts=['{"_zeusBackup":true,"ts":'+JSON.stringify(new Date().toISOString())+',"data":'+JSON.stringify(data)+',"media":['];
+  const parts=['{"_zeusBackup":true,"_zeusSimple":'+(simple?'true':'false')+',"ts":'+JSON.stringify(new Date().toISOString())+',"data":'+JSON.stringify(data)+',"skippedVideoCount":'+skipped.length+',"skippedVideoBytes":'+skippedBytes+',"media":['];
   for(let i=0;i<media.length;i++){
     const m=media[i];
     parts.push((i>0?',':'')+'{"key":'+JSON.stringify(m.key)+',"mime":'+JSON.stringify(m.mime)+',"data":"'+m.data+'"}');
@@ -15207,11 +15218,16 @@ async function termZeusBackup(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   const stamp=new Date().toISOString().slice(0,10);
-  a.href=url;a.download='zeus-backup-'+stamp+'.json';
+  a.href=url;a.download=(simple?'zeus-simple-backup-':'zeus-backup-')+stamp+'.json';
   document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),2000);
-  termOk('ZEUS BACKUP DOWNLOADED — '+keys.length+' KEY(S) + '+media.length+' MEDIA FILE(S), '+(approxBytes/1024/1024).toFixed(2)+'MB.');
-  termAppendLine('INCLUDES EVERYTHING ON THIS ORIGIN: COUNTRIES/PASSPORT, PROGRESS STATS, TIME PER FEATURE, VAULT (INCLUDING LOCKED ENTRIES), JEE JOURNAL, NOTES, SETTINGS, AND CAPSULE PHOTOS/VIDEOS.','term-dim');
+  if(simple){
+    termOk('ZEUS SIMPLE BACKUP DOWNLOADED — '+keys.length+' KEY(S) + '+media.length+' PHOTO/OTHER FILE(S), '+(approxBytes/1024/1024).toFixed(2)+'MB.');
+    termAppendLine('SKIPPED '+skipped.length+' VIDEO FILE(S), SAVING ~'+(skippedBytes/1024/1024).toFixed(2)+'MB. EVERYTHING ELSE (COUNTRIES/PASSPORT, PROGRESS STATS, TIME PER FEATURE, VAULT, JEE JOURNAL, NOTES, SETTINGS, CAPSULE PHOTOS) IS INCLUDED.','term-dim');
+  }else{
+    termOk('ZEUS BACKUP DOWNLOADED — '+keys.length+' KEY(S) + '+media.length+' MEDIA FILE(S), '+(approxBytes/1024/1024).toFixed(2)+'MB.');
+    termAppendLine('INCLUDES EVERYTHING ON THIS ORIGIN: COUNTRIES/PASSPORT, PROGRESS STATS, TIME PER FEATURE, VAULT (INCLUDING LOCKED ENTRIES), JEE JOURNAL, NOTES, SETTINGS, AND CAPSULE PHOTOS/VIDEOS.','term-dim');
+  }
 }
 /* Merge one localStorage value with an incoming backup value for the same key.
    If both sides parse as JSON arrays of objects, merge them entry-by-entry
@@ -15291,14 +15307,15 @@ function termZeusRestore(){
 function termZeus(rest){
   const raw=(rest||'').trim();
   const low=raw.toLowerCase();
-  if(low===''||low==='backup'){termZeusBackup();return;}
+  if(low===''||low==='backup'){termZeusBackup(false);return;}
+  if(low==='simple'||low==='simple backup'||low==='backup simple'){termZeusBackup(true);return;}
   if(low==='restore'||low==='load'||low==='import'){termZeusRestore();return;}
   if(low==='flight'||low.indexOf('flight ')===0){termZeusFlight(raw.slice(6).trim());return;}
   if(low==='status'||low==='info'){termZeusStatus();return;}
   if(low==='wipe'||low==='wipe all'||low==='nuke'){termZeusWipe();return;}
   if(low==='lock on'||low==='lock enable'){termZeusLock(true);return;}
   if(low==='lock off'||low==='lock disable'){termZeusLock(false);return;}
-  termErr('TRY: zeus  /  zeus restore  /  zeus flight  /  zeus status  /  zeus wipe  /  zeus lock on|off');
+  termErr('TRY: zeus  /  zeus simple  /  zeus restore  /  zeus flight  /  zeus status  /  zeus wipe  /  zeus lock on|off');
 }
 
 /* ---- Terminal: ZEUS STATUS — one-shot overview of everything zeus touches:
@@ -15320,7 +15337,7 @@ function termZeusStatus(){
   termAppendLine('  access gate:     '+(gateOn?'unlocked on this browser':'not yet unlocked'),'term-dim');
   termAppendLine('  harsh mode:      '+(harshOn?'ON':'off'),'term-dim');
   termAppendLine('  theme:           '+theme+' / accent '+accent+' / surface '+surface,'term-dim');
-  termOk('USE "zeus" FOR A FULL BACKUP, OR "zeus wipe" / "zeus lock on|off" TO CHANGE THE ABOVE.');
+  termOk('USE "zeus" FOR A FULL BACKUP, "zeus simple" TO SKIP VIDEOS, OR "zeus wipe" / "zeus lock on|off" TO CHANGE THE ABOVE.');
 }
 
 /* ---- Terminal: ZEUS WIPE — erase every key this origin owns, no file involved.
