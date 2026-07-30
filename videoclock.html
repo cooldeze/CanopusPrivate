@@ -24,16 +24,16 @@
   #bg-video{width:100%;height:100%;object-fit:cover;display:block}
 
   /* ── time overlay ── */
-  #time-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;padding:22px 34px;border-radius:16px;background:transparent;border:0.5px solid transparent;user-select:none;cursor:grab;touch-action:none;transition:background .2s,border-color .2s}
-  #time-box:hover{background:rgba(0,0,0,.14);border-color:rgba(255,255,255,.16)}
-  #time-box.dragging{cursor:grabbing;background:rgba(0,0,0,.14);border-color:rgba(255,255,255,.16)}
+  #time-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;padding:22px 34px;border-radius:16px;background:transparent;border:0.5px solid transparent;user-select:none;cursor:grab;touch-action:none}
+  #time-box.dragging{cursor:grabbing}
   #time-inner{transform:scale(1);transition:transform .12s ease-out}
   #time-clock{font-size:clamp(48px,10vw,120px);font-weight:300;letter-spacing:-.03em;color:#fff;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 2px 20px rgba(0,0,0,.65)}
   #time-clock span.sep{color:rgba(255,255,255,.4)}
   #time-date{margin-top:10px;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.85);text-shadow:0 1px 10px rgba(0,0,0,.65)}
 
   /* ── controls ── */
-  #controls{position:fixed;top:calc(16px + env(safe-area-inset-top));right:calc(16px + env(safe-area-inset-right));display:flex;gap:8px;z-index:20}
+  #controls{position:fixed;top:calc(16px + env(safe-area-inset-top));right:calc(16px + env(safe-area-inset-right));display:flex;gap:8px;z-index:20;opacity:1;transition:opacity .5s ease;pointer-events:auto}
+  #controls.idle{opacity:0;pointer-events:none}
   .vc-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);border:0.5px solid rgba(255,255,255,.18);color:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;backdrop-filter:blur(8px);transition:all .2s}
   .vc-btn:hover{color:#fff;background:rgba(0,0,0,.6);border-color:rgba(255,255,255,.35)}
 
@@ -197,6 +197,19 @@ timeBox.addEventListener('pointercancel',endDrag);
 window.addEventListener('resize',restoreTimeBoxPosition);
 restoreTimeBoxPosition();
 restoreClockScale();
+
+/* ── auto-hide controls on idle ── */
+const IDLE_DELAY=2500;
+let idleTimer=null;
+function showControls(){
+  controls.classList.remove('idle');
+  clearTimeout(idleTimer);
+  idleTimer=setTimeout(()=>{ controls.classList.add('idle'); },IDLE_DELAY);
+}
+['mousemove','pointerdown','touchstart','keydown'].forEach(evt=>{
+  window.addEventListener(evt,showControls,{passive:true});
+});
+showControls();
 
 function toggleMute(){
   video.muted=!video.muted;
