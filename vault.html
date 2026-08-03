@@ -540,6 +540,22 @@ function toggleFS(){
   if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
   else document.exitFullscreen();
 }
+
+/* Auto-fullscreen on first interaction (matches index.html behavior) */
+(function(){
+  try{ if(localStorage.getItem('canopus_autofs_disabled')==='1') return; }catch(e){}
+  function armAutoFullscreen(){
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+    document.removeEventListener('click',armAutoFullscreen,true);
+    document.removeEventListener('touchend',armAutoFullscreen,true);
+    document.removeEventListener('keydown',armAutoFullscreen,true);
+  }
+  document.addEventListener('click',armAutoFullscreen,true);
+  document.addEventListener('touchend',armAutoFullscreen,true);
+  document.addEventListener('keydown',armAutoFullscreen,true);
+})();
 document.addEventListener('click',function(e){
   const menuPop=document.getElementById('navMenuPop');
   const menuBtn=document.getElementById('navMoreBtn');

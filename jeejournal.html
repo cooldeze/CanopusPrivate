@@ -250,10 +250,21 @@ body.light .reco-list li{color:rgba(0,0,0,.78)}
 .obj-head{font-family:'Fraunces',serif;font-size:16px;font-weight:500;margin-bottom:11px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;letter-spacing:-.01em}
 .obj-count{font-size:11px;font-weight:400;color:rgba(255,255,255,.38);font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
 body.light .obj-count{color:rgba(0,0,0,.4)}
-.obj-group-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.32);margin:16px 3px 9px;font-weight:500}
+.obj-group{margin-bottom:6px}
+.obj-group-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.32);margin:16px 3px 9px;font-weight:500;
+  display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:4px 2px;border-radius:6px;transition:color .18s var(--ease)}
+.obj-group-label:hover{color:rgba(255,255,255,.55)}
 body.light .obj-group-label{color:rgba(0,0,0,.36)}
+body.light .obj-group-label:hover{color:rgba(0,0,0,.6)}
+.obj-group-label .chev{font-size:11px;transition:transform .2s var(--ease);flex-shrink:0}
+.obj-group.collapsed .obj-group-label .chev{transform:rotate(-90deg)}
+.obj-group-label .obj-group-hint{font-weight:400;letter-spacing:0;text-transform:none;font-size:10.5px;color:rgba(255,255,255,.28);margin-left:auto}
+body.light .obj-group-label .obj-group-hint{color:rgba(0,0,0,.32)}
+.obj-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;
+  overflow:hidden;max-height:2000px;transition:max-height .28s var(--ease),opacity .2s var(--ease),margin .2s var(--ease);opacity:1}
+.obj-group.collapsed .obj-cards-grid{max-height:0;opacity:0;margin-top:-8px}
 .obj-card{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-left:3px solid transparent;
-  border-radius:var(--r-md);padding:13px 15px;margin-bottom:8px;transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+  border-radius:var(--r-md);padding:13px 15px;transition:all .18s var(--ease);box-shadow:var(--shadow-1);display:flex;flex-direction:column}
 .obj-card:hover{border-color:rgba(255,255,255,.16);box-shadow:var(--shadow-2)}
 body.light .obj-card:hover{border-color:rgba(0,0,0,.14)}
 .obj-card.is-backlog{border-left-color:var(--bad)}
@@ -268,7 +279,7 @@ body.light .obj-card:hover{border-color:rgba(0,0,0,.14)}
 .obj-pill.mid{background:rgba(201,149,42,.14);color:#c9952a}
 .obj-pill.high{background:var(--good-soft);color:var(--good)}
 .obj-action{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
-  margin-top:11px;padding-top:11px;border-top:0.5px dashed var(--surf-line)}
+  margin-top:auto;padding-top:11px;border-top:0.5px dashed var(--surf-line)}
 .obj-goal{font-size:11px;color:rgba(255,255,255,.46);flex:1;min-width:160px;font-style:italic}
 body.light .obj-goal{color:rgba(0,0,0,.5)}
 .obj-btn{background:var(--accent-soft);border:0.5px solid var(--accent);color:var(--accent);border-radius:9px;
@@ -309,6 +320,8 @@ body.light .toast{color:#1c1a15}
   </div>
   <div class="hdr-spacer"></div>
   <div class="hdr-actions">
+    <button class="icon-btn" onclick="window.location.href='goalrecord.html'" title="Open Goal Record" aria-label="Open Goal Record"><i class="ti ti-target-arrow"></i></button>
+    <button class="icon-btn" onclick="window.location.href='analyst.html'" title="Open Study Analyst" aria-label="Open Study Analyst"><i class="ti ti-report-analytics"></i></button>
     <button class="icon-btn" onclick="exportJournal()" title="Export progress"><i class="ti ti-download"></i></button>
     <button class="icon-btn" onclick="resetJournal()" title="Reset to defaults"><i class="ti ti-refresh"></i></button>
   </div>
@@ -689,6 +702,31 @@ function objUnfinishedCard(c){
     </div>
   </div>`;
 }
+const OBJ_COLLAPSE_KEY='dayplan_jee_obj_collapse';
+function getObjCollapse(){
+  try{ const raw=localStorage.getItem(OBJ_COLLAPSE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return {backlog:false,progress:true}; // backlog open by default, in-progress collapsed by default
+}
+function setObjCollapse(state){
+  try{ localStorage.setItem(OBJ_COLLAPSE_KEY,JSON.stringify(state)); }catch(e){}
+}
+function toggleObjGroup(key){
+  const state=getObjCollapse();
+  state[key]=!state[key];
+  setObjCollapse(state);
+  renderObjectives();
+}
+function objGroupBlock(key,label,items,cardFn){
+  const state=getObjCollapse();
+  const collapsed=!!state[key];
+  return `<div class="obj-group${collapsed?' collapsed':''}">
+    <div class="obj-group-label" onclick="toggleObjGroup('${key}')">
+      <i class="ti ti-chevron-down chev"></i>${label}
+      <span class="obj-group-hint">${collapsed?'tap to expand':'tap to collapse'}</span>
+    </div>
+    <div class="obj-cards-grid">${items.map(cardFn).join('')}</div>
+  </div>`;
+}
 function renderObjectives(){
   const wrap=document.getElementById('objectives-wrap');
   if(!wrap) return;
@@ -703,12 +741,10 @@ function renderObjectives(){
   }
   let html=`<div class="obj-head">Objectives <span class="obj-count">${total} chapter${total===1?'':'s'} need attention</span></div>`;
   if(backlogChs.length){
-    html+=`<div class="obj-group-label">Backlog (${backlogChs.length}) &mdash; get these taught</div>`;
-    html+=backlogChs.map(objBacklogCard).join('');
+    html+=objGroupBlock('backlog',`Backlog (${backlogChs.length}) &mdash; get these taught`,backlogChs,objBacklogCard);
   }
   if(unfinishedChs.length){
-    html+=`<div class="obj-group-label">In progress (${unfinishedChs.length}) &mdash; finish the remaining practice</div>`;
-    html+=unfinishedChs.map(objUnfinishedCard).join('');
+    html+=objGroupBlock('progress',`In progress (${unfinishedChs.length}) &mdash; finish the remaining practice`,unfinishedChs,objUnfinishedCard);
   }
   wrap.innerHTML=html;
 }
@@ -905,6 +941,15 @@ function render(){
 }
 
 render();
+
+/* Live cross-tab sync: if Goal Record (or another JEE Journal tab) edits chapter data,
+   pick up the change immediately instead of waiting for a manual reload. */
+window.addEventListener('storage', function(e){
+  if(e.key===JJ_KEY){
+    chapters=jjLoad();
+    render();
+  }
+});
 </script>
 <script>
 /* ---- Canopus global terminal shortcut: redirects into index.html's Terminal page ---- */
@@ -947,6 +992,23 @@ render();
       setHidden(!document.documentElement.classList.contains('chdr-hidden'));
     }
   },true);
+})();
+</script>
+<script>
+/* Auto-fullscreen on first interaction (matches index.html behavior) */
+(function(){
+  try{ if(localStorage.getItem('canopus_autofs_disabled')==='1') return; }catch(e){}
+  function armAutoFullscreen(){
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+    document.removeEventListener('click',armAutoFullscreen,true);
+    document.removeEventListener('touchend',armAutoFullscreen,true);
+    document.removeEventListener('keydown',armAutoFullscreen,true);
+  }
+  document.addEventListener('click',armAutoFullscreen,true);
+  document.addEventListener('touchend',armAutoFullscreen,true);
+  document.addEventListener('keydown',armAutoFullscreen,true);
 })();
 </script>
 </body>

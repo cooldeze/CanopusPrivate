@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
+<script>(function(){try{if(localStorage.getItem('canopus_harsh_ui')==='1')document.documentElement.classList.add('harsh-ui');}catch(e){}})();</script>
+<script>(function(){try{if(localStorage.getItem('canopus_lock_enabled')==='1'&&localStorage.getItem('canopus_lock_hash')&&sessionStorage.getItem('canopus_lock_session_unlocked')!=='1')document.documentElement.classList.add('app-locked');}catch(e){}})();</script>
+<script>(function(){try{if(localStorage.getItem('canopus_access_granted')!=='1')document.documentElement.classList.add('access-locked');}catch(e){}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Video Notes — Canopus</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="retro-theme.css">
+<link rel="stylesheet" href="vhs-theme.css">
+<link rel="stylesheet" href="harsh-mode.css">
+<style>
+:root,body[data-accent="white"]{--accent:#fff;--accent-hover:#ddd;--accent-on:#000;--accent-muted:#2a2a2a;--accent-soft:rgba(255,255,255,.06);}
+body[data-accent="blue"]{--accent:#5a9fd4;--accent-hover:#4a8fc4;--accent-on:#000;--accent-muted:#2a4a6a;--accent-soft:rgba(90,159,212,.12);}
+body[data-accent="green"]{--accent:#4a9a6a;--accent-hover:#3a8a5a;--accent-on:#000;--accent-muted:#1a3a2a;--accent-soft:rgba(74,154,106,.12);}
+body[data-accent="amber"]{--accent:#c9952a;--accent-hover:#b8851a;--accent-on:#000;--accent-muted:#4a3a1a;--accent-soft:rgba(201,149,42,.12);}
+body[data-accent="pink"]{--accent:#e0629c;--accent-hover:#cf4f8a;--accent-on:#000;--accent-muted:#4a1a32;--accent-soft:rgba(224,98,156,.12);}
+body.light[data-accent="white"]{--accent:#111;--accent-hover:#333;--accent-on:#fff;--accent-muted:#aaa;--accent-soft:rgba(0,0,0,.05);}
+:root{--surf-bg:#000;--surf-panel:#0a0a0a;--surf-panel-hi:#111;--surf-modal:#0d0e10;--surf-line:#1c1c1e;}
+body.grey{--surf-bg:#0A0A0B;--surf-panel:#111214;--surf-panel-hi:#17181B;--surf-modal:#111214;--surf-line:#212327;}
+body.light{--surf-bg:#F5F0E6;--surf-panel:#FFFDF8;--surf-panel-hi:#F0EBE0;--surf-modal:#FFFDF8;--surf-line:#DDD6C8;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--surf-bg);color:#fff;font-family:'Inter',sans-serif;min-height:100%}
+body.light{color:#161512}
+html.chdr-hidden #vn-nav{display:none!important}
+html.access-locked body,html.app-locked body{overflow:hidden}
+
+#vn-nav{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(14px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 14px calc(20px + env(safe-area-inset-left));background:linear-gradient(var(--surf-bg) 70%,transparent);z-index:50}
+.vn-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;font-size:12px;letter-spacing:.04em;cursor:pointer;padding:6px 10px;border-radius:7px;transition:color .2s,background .2s}
+body.light .vn-back{color:rgba(0,0,0,.55)}
+.vn-back:hover{color:#fff;background:rgba(255,255,255,.06)}
+body.light .vn-back:hover{color:#000;background:rgba(0,0,0,.05)}
+.vn-title{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+body.light .vn-title{color:rgba(0,0,0,.55)}
+
+.vn-wrap{max-width:880px;margin:0 auto;padding:8px 20px 80px}
+.vn-heading{font-size:26px;font-weight:500;letter-spacing:-.01em;margin-bottom:4px}
+.vn-sub{font-size:13px;color:rgba(255,255,255,.45);margin-bottom:28px;max-width:480px;line-height:1.5}
+body.light .vn-sub{color:rgba(0,0,0,.45)}
+
+/* ── recorder panel ── */
+.vn-recorder{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:16px;padding:16px;margin-bottom:36px}
+.vn-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:11px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.vn-stage video{width:100%;height:100%;object-fit:cover}
+.vn-stage.mirrored video#vnLiveVideo{transform:scaleX(-1)}
+.vn-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;color:rgba(255,255,255,.35);font-size:13px;text-align:center;padding:0 24px}
+.vn-placeholder i{font-size:30px}
+.vn-rec-badge{position:absolute;top:12px;left:12px;display:none;align-items:center;gap:6px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border-radius:20px;padding:5px 11px 5px 9px;font-size:11.5px;font-weight:500;color:#fff;letter-spacing:.03em}
+.vn-rec-badge.on{display:inline-flex}
+.vn-rec-dot{width:7px;height:7px;border-radius:50%;background:#e0554f;animation:vnPulse 1.1s infinite}
+@keyframes vnPulse{0%,100%{opacity:1}50%{opacity:.35}}
+.vn-timer{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border-radius:20px;padding:5px 11px;font-size:11.5px;font-variant-numeric:tabular-nums;color:#fff;display:none}
+.vn-timer.on{display:inline-flex}
+
+.vn-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:16px}
+.vn-rec-btn{width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.65);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s,border-color .2s}
+body.light .vn-rec-btn{border-color:rgba(0,0,0,.55)}
+.vn-rec-btn:hover{transform:scale(1.05)}
+.vn-rec-btn .dot{width:24px;height:24px;border-radius:50%;background:#e0554f;transition:border-radius .2s,width .2s,height .2s}
+.vn-rec-btn.recording .dot{border-radius:6px;width:20px;height:20px}
+.vn-hint{font-size:11.5px;color:rgba(255,255,255,.4)}
+body.light .vn-hint{color:rgba(0,0,0,.4)}
+
+.vn-review{display:none;margin-top:16px;gap:12px;flex-direction:column}
+.vn-review.on{display:flex}
+.vn-title-input{width:100%;background:var(--surf-panel-hi);border:0.5px solid var(--surf-line);border-radius:9px;padding:11px 13px;color:inherit;font-family:'Inter',sans-serif;font-size:14px}
+.vn-title-input:focus{outline:none;border-color:var(--accent)}
+.vn-review-actions{display:flex;gap:10px;justify-content:flex-end}
+.vn-btn{border:0.5px solid var(--surf-line);background:var(--surf-panel-hi);color:inherit;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;letter-spacing:.02em;padding:9px 16px;border-radius:8px;cursor:pointer;transition:background .2s,color .2s,border-color .2s;display:inline-flex;align-items:center;gap:6px}
+.vn-btn:hover{background:rgba(255,255,255,.08)}
+body.light .vn-btn:hover{background:rgba(0,0,0,.04)}
+.vn-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-on)}
+.vn-btn.primary:hover{background:var(--accent-hover)}
+.vn-btn.danger{color:#e0857f}
+.vn-btn[disabled]{opacity:.4;pointer-events:none}
+
+.vn-cam-error{display:none;align-items:center;gap:10px;background:rgba(224,85,79,.1);border:0.5px solid rgba(224,85,79,.3);color:#e0857f;font-size:12.5px;border-radius:9px;padding:11px 13px;margin-top:14px}
+.vn-cam-error.on{display:flex}
+
+/* ── notes list ── */
+.vn-list-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.vn-list-head h2{font-size:14px;font-weight:500;letter-spacing:.02em;color:rgba(255,255,255,.75)}
+body.light .vn-list-head h2{color:rgba(0,0,0,.7)}
+.vn-count{font-size:11.5px;color:rgba(255,255,255,.35)}
+body.light .vn-count{color:rgba(0,0,0,.4)}
+
+.vn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.vn-card{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:13px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s}
+.vn-card:hover{border-color:rgba(255,255,255,.22);transform:translateY(-1px)}
+body.light .vn-card:hover{border-color:rgba(0,0,0,.18)}
+.vn-thumb{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden}
+.vn-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.vn-thumb-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.25);font-size:22px}
+.vn-thumb-dur{position:absolute;bottom:6px;right:7px;background:rgba(0,0,0,.6);color:#fff;font-size:10.5px;padding:2px 6px;border-radius:5px;font-variant-numeric:tabular-nums}
+.vn-thumb-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;background:rgba(0,0,0,.25)}
+.vn-card:hover .vn-thumb-play{opacity:1}
+.vn-thumb-play i{font-size:26px;color:#fff}
+.vn-meta{padding:10px 12px 11px}
+.vn-note-title{font-size:12.5px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vn-note-date{font-size:10.5px;color:rgba(255,255,255,.4)}
+body.light .vn-note-date{color:rgba(0,0,0,.42)}
+
+.vn-empty{border:1px dashed var(--surf-line);border-radius:14px;padding:36px 20px;text-align:center;color:rgba(255,255,255,.35);font-size:13px}
+body.light .vn-empty{color:rgba(0,0,0,.35)}
+
+/* ── player / confirm modal ── */
+.vn-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.vn-modal-bg.open{display:flex}
+.vn-modal{background:var(--surf-modal);border:0.5px solid var(--surf-line);border-radius:16px;width:100%;max-width:560px;overflow:hidden}
+.vn-modal-player video{width:100%;max-height:70vh;display:block;background:#000}
+.vn-modal-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.vn-modal-bar .vn-note-title{font-size:13px;max-width:320px}
+.vn-modal-actions{display:flex;gap:8px}
+.vn-icon-btn{width:32px;height:32px;border-radius:8px;border:none;background:none;color:rgba(255,255,255,.55);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s}
+body.light .vn-icon-btn{color:rgba(0,0,0,.5)}
+.vn-icon-btn:hover{color:#fff;background:rgba(255,255,255,.08)}
+body.light .vn-icon-btn:hover{color:#000;background:rgba(0,0,0,.05)}
+
+.vn-confirm{padding:22px}
+.vn-confirm p{font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.75);margin-bottom:18px}
+body.light .vn-confirm p{color:rgba(0,0,0,.7)}
+.vn-confirm-actions{display:flex;justify-content:flex-end;gap:10px}
+
+@media(max-width:520px){
+  .vn-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+  .vn-wrap{padding:8px 14px 70px}
+}
+</style>
+</head>
+<body data-accent="white">
+
+<div id="vn-nav">
+  <button class="vn-back" onclick="window.location.href='index.html'"><i class="ti ti-chevron-left"></i>Canopus</button>
+  <div class="vn-title">Video Notes</div>
+  <div style="width:64px"></div>
+</div>
+
+<div class="vn-wrap">
+  <div class="vn-heading">Video Notes</div>
+  <div class="vn-sub">Record a quick video note. Everything is saved locally on this device — nothing is uploaded anywhere.</div>
+
+  <div class="vn-recorder">
+    <div class="vn-stage mirrored" id="vnStage">
+      <video id="vnLiveVideo" autoplay muted playsinline></video>
+      <video id="vnReviewVideo" playsinline controls style="display:none"></video>
+      <div class="vn-placeholder" id="vnPlaceholder">
+        <i class="ti ti-video"></i>
+        <span>Camera preview will appear here</span>
+      </div>
+      <div class="vn-rec-badge" id="vnRecBadge"><span class="vn-rec-dot"></span>REC</div>
+      <div class="vn-timer" id="vnTimer">00:00</div>
+    </div>
+
+    <div class="vn-controls" id="vnControls">
+      <button class="vn-rec-btn" id="vnRecBtn" onclick="vnToggleRecording()" title="Start recording" aria-label="Start recording"><span class="dot"></span></button>
+    </div>
+    <div style="text-align:center;margin-top:8px">
+      <span class="vn-hint" id="vnHint">Tap to start recording</span>
+    </div>
+
+    <div class="vn-review" id="vnReview">
+      <input type="text" class="vn-title-input" id="vnTitleInput" placeholder="Give this note a title" maxlength="80">
+      <div class="vn-review-actions">
+        <button class="vn-btn" onclick="vnDiscard()"><i class="ti ti-trash"></i>Discard</button>
+        <button class="vn-btn primary" onclick="vnSave()"><i class="ti ti-check"></i>Save note</button>
+      </div>
+    </div>
+
+    <div class="vn-cam-error" id="vnCamError">
+      <i class="ti ti-camera-off"></i>
+      <span id="vnCamErrorText">Camera access is needed to record a video note. Allow camera &amp; microphone permission and try again.</span>
+    </div>
+  </div>
+
+  <div class="vn-list-head">
+    <h2>Saved notes</h2>
+    <span class="vn-count" id="vnCount"></span>
+  </div>
+  <div id="vnListArea"></div>
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="vn-modal-bg" id="vnPlayerBg" onclick="if(event.target===this)vnClosePlayer()">
+  <div class="vn-modal">
+    <div class="vn-modal-player"><video id="vnPlayerVideo" controls playsinline></video></div>
+    <div class="vn-modal-bar">
+      <div class="vn-note-title" id="vnPlayerTitle"></div>
+      <div class="vn-modal-actions">
+        <button class="vn-icon-btn" onclick="vnRenamePrompt()" title="Rename" aria-label="Rename"><i class="ti ti-edit"></i></button>
+        <button class="vn-icon-btn" onclick="vnDownloadCurrent()" title="Download" aria-label="Download"><i class="ti ti-download"></i></button>
+        <button class="vn-icon-btn" onclick="vnAskDelete()" title="Delete" aria-label="Delete"><i class="ti ti-trash"></i></button>
+        <button class="vn-icon-btn" onclick="vnClosePlayer()" title="Close" aria-label="Close"><i class="ti ti-x"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="vn-modal-bg" id="vnConfirmBg" onclick="if(event.target===this)vnCloseConfirm()">
+  <div class="vn-modal">
+    <div class="vn-confirm">
+      <p>Delete this video note? This can't be undone.</p>
+      <div class="vn-confirm-actions">
+        <button class="vn-btn" onclick="vnCloseConfirm()">Cancel</button>
+        <button class="vn-btn danger" onclick="vnConfirmDelete()"><i class="ti ti-trash"></i>Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── app-wide theme/accent, same keys index.html uses, so this page
+   matches whatever the user has set elsewhere in Canopus ── */
+(function(){
+  try{
+    var t=localStorage.getItem('dayplan_theme');
+    var a=localStorage.getItem('dayplan_accent');
+    var s=localStorage.getItem('dayplan_surface');
+    document.body.classList.toggle('light',t==='light');
+    document.body.classList.toggle('grey',t!=='light'&&s==='grey');
+    document.body.dataset.accent=(a&&['white','blue','green','amber','pink'].includes(a))?a:'white';
+  }catch(e){}
+})();
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   VIDEO NOTES — record short video clips and keep them on this device.
+   Clips are stored as Blobs in IndexedDB (localStorage can't hold
+   video data at any reasonable size), keyed by an id, alongside a
+   title, duration, created-at timestamp and a captured thumbnail
+   frame (small dataURL, cheap to keep in the same record).
+   ══════════════════════════════════════════════════════════════════ */
+const VN_DB_NAME='canopus_video_notes_db';
+const VN_STORE='notes';
+let vnDB=null;
+
+function vnOpenDB(){
+  return new Promise((resolve,reject)=>{
+    if(vnDB){resolve(vnDB);return;}
+    const req=indexedDB.open(VN_DB_NAME,1);
+    req.onupgradeneeded=function(e){
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains(VN_STORE)){
+        db.createObjectStore(VN_STORE,{keyPath:'id'});
+      }
+    };
+    req.onsuccess=function(e){ vnDB=e.target.result; resolve(vnDB); };
+    req.onerror=function(e){ reject(e.target.error); };
+  });
+}
+function vnPut(note){
+  return vnOpenDB().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction(VN_STORE,'readwrite');
+    tx.objectStore(VN_STORE).put(note);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=(e)=>reject(e.target.error);
+  }));
+}
+function vnGetAll(){
+  return vnOpenDB().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction(VN_STORE,'readonly');
+    const req=tx.objectStore(VN_STORE).getAll();
+    req.onsuccess=()=>resolve(req.result||[]);
+    req.onerror=(e)=>reject(e.target.error);
+  }));
+}
+function vnDelete(id){
+  return vnOpenDB().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction(VN_STORE,'readwrite');
+    tx.objectStore(VN_STORE).delete(id);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=(e)=>reject(e.target.error);
+  }));
+}
+
+function vnFormatDuration(sec){
+  sec=Math.round(sec||0);
+  const m=Math.floor(sec/60), s=sec%60;
+  return m+':'+String(s).padStart(2,'0');
+}
+function vnFormatDate(ts){
+  const d=new Date(ts);
+  return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+}
+function vnId(){
+  return (crypto.randomUUID?crypto.randomUUID():'vn-'+Date.now()+'-'+Math.random().toString(16).slice(2));
+}
+
+/* ── recorder state ── */
+let vnStream=null, vnRecorder=null, vnChunks=[], vnRecording=false;
+let vnPendingBlob=null, vnPendingThumb=null, vnPendingDuration=0;
+let vnTimerInt=null, vnTimerStart=0;
+
+async function vnInitCamera(){
+  const errBox=document.getElementById('vnCamError');
+  const placeholder=document.getElementById('vnPlaceholder');
+  try{
+    vnStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});
+    const live=document.getElementById('vnLiveVideo');
+    live.srcObject=vnStream;
+    placeholder.style.display='none';
+    errBox.classList.remove('on');
+    document.getElementById('vnRecBtn').disabled=false;
+  }catch(err){
+    document.getElementById('vnCamErrorText').textContent=
+      (err && err.name==='NotFoundError')
+        ? "No camera was found on this device."
+        : "Camera access is needed to record a video note. Allow camera & microphone permission and try again.";
+    errBox.classList.add('on');
+  }
+}
+
+function vnPickMimeType(){
+  const options=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4'];
+  for(const o of options){ if(window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(o)) return o; }
+  return '';
+}
+
+function vnToggleRecording(){
+  if(!vnStream){ vnInitCamera(); return; }
+  if(vnRecording){ vnStopRecording(); } else { vnStartRecording(); }
+}
+
+function vnStartRecording(){
+  vnChunks=[];
+  const mime=vnPickMimeType();
+  try{
+    vnRecorder=mime?new MediaRecorder(vnStream,{mimeType:mime}):new MediaRecorder(vnStream);
+  }catch(e){
+    vnRecorder=new MediaRecorder(vnStream);
+  }
+  vnRecorder.ondataavailable=(e)=>{ if(e.data && e.data.size>0) vnChunks.push(e.data); };
+  vnRecorder.onstop=vnHandleStopped;
+  vnRecorder.start();
+  vnRecording=true;
+  vnTimerStart=Date.now();
+  document.getElementById('vnRecBadge').classList.add('on');
+  document.getElementById('vnTimer').classList.add('on');
+  document.getElementById('vnRecBtn').classList.add('recording');
+  document.getElementById('vnRecBtn').title='Stop recording';
+  document.getElementById('vnHint').textContent='Recording — tap to stop';
+  vnTimerInt=setInterval(vnTickTimer,250);
+}
+
+function vnTickTimer(){
+  const sec=(Date.now()-vnTimerStart)/1000;
+  document.getElementById('vnTimer').textContent=vnFormatDuration(sec);
+}
+
+function vnCaptureThumb(){
+  try{
+    const video=document.getElementById('vnLiveVideo');
+    const canvas=document.createElement('canvas');
+    canvas.width=320; canvas.height=Math.round(320*(video.videoHeight/video.videoWidth||9/16));
+    const ctx=canvas.getContext('2d');
+    ctx.translate(canvas.width,0); ctx.scale(-1,1); // un-mirror for the stored thumbnail
+    ctx.drawImage(video,0,0,canvas.width,canvas.height);
+    return canvas.toDataURL('image/jpeg',0.7);
+  }catch(e){ return null; }
+}
+
+function vnStopRecording(){
+  vnPendingThumb=vnCaptureThumb();
+  vnPendingDuration=(Date.now()-vnTimerStart)/1000;
+  clearInterval(vnTimerInt);
+  document.getElementById('vnRecBadge').classList.remove('on');
+  document.getElementById('vnTimer').classList.remove('on');
+  document.getElementById('vnRecBtn').classList.remove('recording');
+  document.getElementById('vnRecBtn').title='Start recording';
+  vnRecording=false;
+  if(vnRecorder && vnRecorder.state!=='inactive') vnRecorder.stop();
+}
+
+function vnHandleStopped(){
+  const mime=vnRecorder.mimeType||'video/webm';
+  vnPendingBlob=new Blob(vnChunks,{type:mime});
+  const url=URL.createObjectURL(vnPendingBlob);
+  const live=document.getElementById('vnLiveVideo');
+  const review=document.getElementById('vnReviewVideo');
+  live.style.display='none';
+  review.src=url;
+  review.style.display='block';
+  document.getElementById('vnControls').style.display='none';
+  document.getElementById('vnHint').style.display='none';
+  document.getElementById('vnReview').classList.add('on');
+  const input=document.getElementById('vnTitleInput');
+  input.value='Video note — '+new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  input.focus(); input.select();
+}
+
+function vnResetStage(){
+  const live=document.getElementById('vnLiveVideo');
+  const review=document.getElementById('vnReviewVideo');
+  if(review.src){ URL.revokeObjectURL(review.src); review.src=''; }
+  review.style.display='none';
+  live.style.display='block';
+  document.getElementById('vnControls').style.display='flex';
+  document.getElementById('vnHint').style.display='inline';
+  document.getElementById('vnHint').textContent='Tap to start recording';
+  document.getElementById('vnReview').classList.remove('on');
+  vnPendingBlob=null; vnPendingThumb=null; vnPendingDuration=0;
+}
+
+function vnDiscard(){ vnResetStage(); }
+
+async function vnSave(){
+  if(!vnPendingBlob) return;
+  const titleInput=document.getElementById('vnTitleInput');
+  const title=(titleInput.value||'').trim()||'Untitled note';
+  const note={
+    id:vnId(),
+    title:title,
+    blob:vnPendingBlob,
+    mimeType:vnPendingBlob.type,
+    duration:vnPendingDuration,
+    thumb:vnPendingThumb,
+    createdAt:Date.now()
+  };
+  await vnPut(note);
+  vnResetStage();
+  vnRenderList();
+}
+
+/* ── list rendering ── */
+let vnNotesCache=[];
+let vnCurrentPlayingId=null;
+
+async function vnRenderList(){
+  const notes=await vnGetAll();
+  notes.sort((a,b)=>b.createdAt-a.createdAt);
+  vnNotesCache=notes;
+  const area=document.getElementById('vnListArea');
+  document.getElementById('vnCount').textContent=notes.length ? (notes.length+(notes.length===1?' note':' notes')) : '';
+  if(!notes.length){
+    area.innerHTML='<div class="vn-empty">No video notes yet — record your first one above.</div>';
+    return;
+  }
+  area.innerHTML='<div class="vn-grid" id="vnGrid"></div>';
+  const grid=document.getElementById('vnGrid');
+  notes.forEach(n=>{
+    const card=document.createElement('div');
+    card.className='vn-card';
+    card.onclick=()=>vnOpenPlayer(n.id);
+    const thumbHtml=n.thumb
+      ? '<img src="'+n.thumb+'" alt="">'
+      : '<div class="vn-thumb-fallback"><i class="ti ti-video"></i></div>';
+    card.innerHTML=
+      '<div class="vn-thumb">'+thumbHtml+
+        '<div class="vn-thumb-dur">'+vnFormatDuration(n.duration)+'</div>'+
+        '<div class="vn-thumb-play"><i class="ti ti-player-play-filled"></i></div>'+
+      '</div>'+
+      '<div class="vn-meta">'+
+        '<div class="vn-note-title">'+vnEscape(n.title)+'</div>'+
+        '<div class="vn-note-date">'+vnFormatDate(n.createdAt)+'</div>'+
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+function vnEscape(str){
+  const d=document.createElement('div'); d.textContent=str||''; return d.innerHTML;
+}
+
+/* ── player modal ── */
+function vnOpenPlayer(id){
+  const note=vnNotesCache.find(n=>n.id===id);
+  if(!note) return;
+  vnCurrentPlayingId=id;
+  const video=document.getElementById('vnPlayerVideo');
+  video.src=URL.createObjectURL(note.blob);
+  document.getElementById('vnPlayerTitle').textContent=note.title;
+  document.getElementById('vnPlayerBg').classList.add('open');
+  video.play().catch(()=>{});
+}
+function vnClosePlayer(){
+  const video=document.getElementById('vnPlayerVideo');
+  video.pause();
+  if(video.src){ URL.revokeObjectURL(video.src); video.src=''; }
+  document.getElementById('vnPlayerBg').classList.remove('open');
+  vnCurrentPlayingId=null;
+}
+function vnRenamePrompt(){
+  const note=vnNotesCache.find(n=>n.id===vnCurrentPlayingId);
+  if(!note) return;
+  const next=prompt('Rename this video note',note.title);
+  if(next===null) return;
+  const trimmed=next.trim();
+  if(!trimmed) return;
+  note.title=trimmed;
+  vnPut(note).then(()=>{
+    document.getElementById('vnPlayerTitle').textContent=trimmed;
+    vnRenderList();
+  });
+}
+function vnDownloadCurrent(){
+  const note=vnNotesCache.find(n=>n.id===vnCurrentPlayingId);
+  if(!note) return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(note.blob);
+  const ext=(note.mimeType||'').includes('mp4')?'mp4':'webm';
+  a.download=(note.title||'video-note').replace(/[^\w\- ]+/g,'').trim()+'.'+ext;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+
+/* ── delete confirm modal ── */
+function vnAskDelete(){
+  document.getElementById('vnConfirmBg').classList.add('open');
+}
+function vnCloseConfirm(){
+  document.getElementById('vnConfirmBg').classList.remove('open');
+}
+async function vnConfirmDelete(){
+  if(vnCurrentPlayingId){
+    await vnDelete(vnCurrentPlayingId);
+    vnCloseConfirm();
+    vnClosePlayer();
+    vnRenderList();
+  }
+}
+
+/* ── init ── */
+vnInitCamera();
+vnRenderList();
+</script>
+
+<script src="retro-theme.js"></script>
+<script src="vhs-theme.js"></script>
+<script src="harsh-mode.js"></script>
+</body>
+</html>

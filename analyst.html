@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Analyst · Canopus</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="retro-theme.css">
+<link rel="stylesheet" href="vhs-theme.css">
+<link rel="stylesheet" href="harsh-mode.css">
+<style>
+:root,body[data-accent="white"]{--accent:#fff;--accent-hover:#ddd;--accent-on:#000;--accent-muted:#2a2a2a;--accent-soft:rgba(255,255,255,.07);}
+body[data-accent="blue"]{--accent:#5a9fd4;--accent-hover:#4a8fc4;--accent-on:#000;--accent-muted:#2a4a6a;--accent-soft:rgba(90,159,212,.13);}
+body[data-accent="green"]{--accent:#4a9a6a;--accent-hover:#3a8a5a;--accent-on:#000;--accent-muted:#1a3a2a;--accent-soft:rgba(74,154,106,.13);}
+body[data-accent="amber"]{--accent:#c9952a;--accent-hover:#b8851a;--accent-on:#000;--accent-muted:#4a3a1a;--accent-soft:rgba(201,149,42,.13);}
+body[data-accent="pink"]{--accent:#e0629c;--accent-hover:#cf4f8a;--accent-on:#000;--accent-muted:#4a1a32;--accent-soft:rgba(224,98,156,.13);}
+body.light[data-accent="white"]{--accent:#111;--accent-hover:#333;--accent-on:#fff;--accent-muted:#aaa;--accent-soft:rgba(0,0,0,.05);}
+
+:root{--surf-bg:#050506;--surf-panel:#0c0d10;--surf-panel-hi:#131419;--surf-modal:#111217;--surf-line:#1d1f24;
+  --good:#4fa374;--good-soft:rgba(79,163,116,.14);--bad:#c9705a;--bad-soft:rgba(201,112,90,.14);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.55);
+  --shadow-2:0 2px 6px rgba(0,0,0,.45), 0 16px 40px -16px rgba(0,0,0,.6);
+  --r-lg:18px;--r-md:13px;--r-sm:9px;
+  --ease:cubic-bezier(.2,.7,.2,1);}
+body.grey{--surf-bg:#0A0A0C;--surf-panel:#121317;--surf-panel-hi:#191b20;--surf-modal:#141519;--surf-line:#23252b;}
+body.light{--surf-bg:#F4EFE4;--surf-panel:#FFFEFA;--surf-panel-hi:#F4EEE1;--surf-modal:#FFFEFA;--surf-line:#E1D9C8;
+  --good:#3c8a5e;--good-soft:rgba(60,138,94,.10);--bad:#b3543e;--bad-soft:rgba(179,84,62,.10);
+  --shadow-1:0 1px 2px rgba(60,50,30,.06), 0 8px 20px -14px rgba(60,50,30,.18);
+  --shadow-2:0 2px 8px rgba(60,50,30,.08), 0 20px 40px -20px rgba(60,50,30,.22);}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--surf-bg);color:#f4f3f1;font-family:'Inter',sans-serif;min-height:100%}
+body{
+  padding-bottom:70px;
+  background-image:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,255,255,.05), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 0%, var(--accent-soft), transparent 55%);
+  background-attachment:fixed;
+}
+body.light{color:#1c1a15}
+*{scrollbar-width:thin}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#26282e;border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+body.light ::-webkit-scrollbar-thumb{background:#ded3ba}
+::selection{background:var(--accent);color:var(--accent-on)}
+
+/* ── Header ── */
+html.chdr-hidden header{display:none!important}
+header{position:sticky;top:0;z-index:20;
+  background:linear-gradient(var(--surf-bg) 68%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  padding:calc(20px + env(safe-area-inset-top)) 24px 16px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  border-bottom:0.5px solid transparent;}
+.back-btn{width:36px;height:36px;border-radius:11px;border:0.5px solid var(--surf-line);background:var(--surf-panel);
+  color:rgba(255,255,255,.65);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;
+  transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+body.light .back-btn{color:rgba(0,0,0,.55)}
+.back-btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.hdr-title{font-family:'Fraunces',serif;font-size:22px;font-weight:500;letter-spacing:-.015em}
+.hdr-title span{color:var(--accent);font-style:italic}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.07em;margin-top:3px;text-transform:uppercase}
+body.light .hdr-sub{color:rgba(0,0,0,.42)}
+.hdr-spacer{flex:1}
+.hdr-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{width:34px;height:34px;border-radius:10px;border:0.5px solid var(--surf-line);background:var(--surf-panel);
+  color:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13.5px;
+  transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+body.light .icon-btn{color:rgba(0,0,0,.5)}
+.icon-btn:hover{color:var(--accent-on);border-color:var(--accent);background:var(--accent);transform:translateY(-1px)}
+.icon-btn.spinning i{animation:analyst-spin 1s linear infinite}
+@keyframes analyst-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* ── Stats ── */
+.stats-wrap{padding:4px 24px 18px;max-width:1120px;margin:0 auto}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:11px}
+.stat-card{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:var(--r-md);padding:16px 18px;
+  box-shadow:var(--shadow-1);transition:transform .2s var(--ease),box-shadow .2s var(--ease);position:relative;overflow:hidden}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-2)}
+.stat-num{font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:500;letter-spacing:-.01em}
+.stat-num.accent{color:var(--accent)}
+.stat-num.bad{color:var(--bad)}
+.stat-num.good{color:var(--good)}
+.stat-label{font-size:10px;color:rgba(255,255,255,.42);letter-spacing:.09em;text-transform:uppercase;margin-top:5px}
+body.light .stat-label{color:rgba(0,0,0,.42)}
+.stat-bar{height:4px;border-radius:3px;background:rgba(255,255,255,.07);margin-top:11px;overflow:hidden}
+body.light .stat-bar{background:rgba(0,0,0,.07)}
+.stat-bar-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s var(--ease)}
+
+/* ── Section shell ── */
+.sect-wrap{max-width:1120px;margin:0 auto;padding:0 24px 22px}
+.sect-head{font-family:'Fraunces',serif;font-size:16px;font-weight:500;margin-bottom:11px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;letter-spacing:-.01em}
+.sect-sub{font-size:11px;font-weight:400;color:rgba(255,255,255,.4);font-family:'IBM Plex Mono',monospace}
+body.light .sect-sub{color:rgba(0,0,0,.42)}
+.panel{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--shadow-1)}
+.empty-msg{text-align:center;padding:30px 20px;color:rgba(255,255,255,.32);font-size:13px;font-style:italic;font-family:'Fraunces',serif}
+body.light .empty-msg{color:rgba(0,0,0,.36)}
+
+/* ── AI Analysis panel ── */
+.analysis-status{display:flex;align-items:center;gap:9px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;
+  color:rgba(255,255,255,.45);margin-bottom:2px}
+body.light .analysis-status{color:rgba(0,0,0,.48)}
+.analysis-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:analyst-pulse 1.1s ease-in-out infinite}
+@keyframes analyst-pulse{0%,100%{opacity:.35}50%{opacity:1}}
+.analysis-body{font-family:'Fraunces',serif;font-size:14.5px;line-height:1.7;white-space:pre-wrap;color:rgba(255,255,255,.88);
+  margin-top:4px}
+body.light .analysis-body{color:rgba(0,0,0,.82)}
+.analysis-body.dim{color:rgba(255,255,255,.5);font-style:italic}
+body.light .analysis-body.dim{color:rgba(0,0,0,.5)}
+.analysis-badge{font-size:9.5px;font-family:'IBM Plex Mono',monospace;padding:2px 8px;border-radius:20px;
+  background:var(--accent-soft);color:var(--accent);border:0.5px solid var(--accent);white-space:nowrap}
+.analysis-badge.offline{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+.analysis-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:16px;
+  padding-top:13px;border-top:0.5px dashed var(--surf-line)}
+.analysis-note{font-size:10.5px;color:rgba(255,255,255,.38)}
+body.light .analysis-note{color:rgba(0,0,0,.42)}
+.regen-btn{background:var(--accent-soft);border:0.5px solid var(--accent);color:var(--accent);border-radius:9px;
+  padding:8px 15px;font-size:11.5px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .18s var(--ease);
+  white-space:nowrap;display:flex;align-items:center;gap:6px}
+.regen-btn:hover{background:var(--accent);color:var(--accent-on);transform:translateY(-1px)}
+.regen-btn:disabled{opacity:.5;cursor:default;transform:none}
+
+/* ── Ask-the-Analyst chat (grounded in the same computed facts) ── */
+.analyst-chat{margin-top:16px;padding-top:14px;border-top:0.5px dashed var(--surf-line)}
+.chat-log{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;margin-bottom:10px;padding-right:2px}
+.chat-empty{font-size:11px;color:rgba(255,255,255,.35);font-style:italic;text-align:center;padding:6px 4px}
+body.light .chat-empty{color:rgba(0,0,0,.4)}
+.chat-msg{font-size:12.5px;line-height:1.55;padding:8px 12px;border-radius:12px;max-width:88%;white-space:pre-wrap;word-break:break-word}
+.chat-msg.user{align-self:flex-end;background:var(--accent-soft);border:0.5px solid var(--accent);color:var(--accent)}
+.chat-msg.bot{align-self:flex-start;background:var(--surf-panel-hi);border:0.5px solid var(--surf-line);color:inherit}
+.chat-msg.bot.thinking{opacity:.55;font-style:italic}
+.chat-input-row{display:flex;gap:8px}
+.chat-input-row input{flex:1;background:var(--surf-panel);border:0.5px dashed var(--surf-line);border-radius:11px;
+  padding:10px 13px;color:inherit;font-size:12.5px;font-family:'Inter',sans-serif;transition:border-color .18s}
+.chat-input-row input:focus{outline:none;border-color:var(--accent);border-style:solid}
+.chat-input-row input:disabled{opacity:.6}
+.chat-input-row button{background:var(--accent-soft);border:0.5px solid var(--accent);color:var(--accent);border-radius:11px;
+  padding:0 16px;font-size:14px;cursor:pointer;transition:all .18s var(--ease);flex-shrink:0}
+.chat-input-row button:hover{background:var(--accent);color:var(--accent-on);transform:translateY(-1px)}
+.chat-input-row button:disabled{opacity:.5;cursor:default;transform:none}
+
+/* ── Subject readiness bars ── */
+.subj-list{display:flex;flex-direction:column;gap:14px}
+.subj-row-top{display:flex;align-items:baseline;gap:9px;margin-bottom:7px;flex-wrap:wrap}
+.subj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.subj-name{font-size:13px;font-weight:500;flex:1}
+.subj-meta{font-size:10.5px;color:rgba(255,255,255,.42);font-family:'IBM Plex Mono',monospace}
+body.light .subj-meta{color:rgba(0,0,0,.45)}
+.subj-pct{font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500}
+.subj-bar{height:7px;border-radius:5px;background:rgba(255,255,255,.07);overflow:hidden}
+body.light .subj-bar{background:rgba(0,0,0,.07)}
+.subj-bar-fill{height:100%;border-radius:5px;transition:width .4s var(--ease)}
+
+/* ── Priority focus (reuses goalrecord's focus-card look, read-only here) ── */
+.focus-list{display:flex;flex-direction:column;gap:7px;margin-top:2px}
+.focus-card{background:var(--surf-panel-hi);border:0.5px solid var(--surf-line);border-left:3px solid var(--bad);
+  border-radius:var(--r-sm);padding:11px 13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.focus-card.mid{border-left-color:#c9952a}
+.focus-card.high{border-left-color:var(--good)}
+.focus-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px currentColor;opacity:.95}
+.focus-name{flex:1;font-size:13px;min-width:120px}
+.focus-pct{font-size:10.5px;font-family:'IBM Plex Mono',monospace;padding:3px 9px;border-radius:20px;flex-shrink:0;font-weight:500}
+.focus-pct.low{background:var(--bad-soft);color:var(--bad)}
+.focus-pct.mid{background:rgba(201,149,42,.14);color:#c9952a}
+.focus-pct.high{background:var(--good-soft);color:var(--good)}
+.jj-jump{font-size:10.5px;color:var(--accent);text-decoration:none;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.jj-jump:hover{text-decoration:underline}
+
+/* ── Streak dots (reused from Goal Record) ── */
+.streak-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:2px}
+.streak-dot{width:15px;height:15px;border-radius:50%;border:1.3px solid var(--surf-line);display:flex;align-items:center;justify-content:center;
+  font-size:8px;flex-shrink:0;position:relative}
+.streak-dot.hit{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.streak-dot.miss{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.streak-dot .sd-tip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);white-space:nowrap;
+  background:var(--surf-modal);border:0.5px solid var(--surf-line);border-radius:7px;padding:5px 9px;font-size:10px;
+  font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.75);opacity:0;pointer-events:none;transition:opacity .15s;box-shadow:var(--shadow-2)}
+body.light .streak-dot .sd-tip{color:rgba(0,0,0,.75)}
+.streak-dot:hover .sd-tip{opacity:1}
+
+/* ── Mock score trend chart (reused from Goal Record) ── */
+.mock-chart-wrap svg{width:100%;height:auto;display:block}
+.mock-grid-line{stroke:rgba(255,255,255,.08);stroke-width:1}
+body.light .mock-grid-line{stroke:rgba(0,0,0,.09)}
+.mock-axis-lbl{font-size:9px;fill:rgba(255,255,255,.42);font-family:'IBM Plex Mono',monospace}
+body.light .mock-axis-lbl{fill:rgba(0,0,0,.45)}
+.mock-line{fill:none;stroke:var(--accent);stroke-width:2}
+.mock-dot{fill:var(--accent);stroke:var(--surf-panel);stroke-width:1.5}
+.mock-dot-label{font-size:9px;fill:rgba(255,255,255,.62);font-family:'IBM Plex Mono',monospace;text-anchor:middle}
+body.light .mock-dot-label{fill:rgba(0,0,0,.62)}
+
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surf-modal);
+  border:0.5px solid var(--surf-line);border-radius:var(--r-sm);padding:12px 19px;font-size:12px;color:#fff;opacity:0;pointer-events:none;
+  transition:all .3s var(--ease);z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.55);backdrop-filter:blur(10px)}
+body.light .toast{color:#1c1a15}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:640px){
+  header{padding:calc(16px + env(safe-area-inset-top)) 16px 12px}
+  .stats-wrap,.sect-wrap{padding-left:16px;padding-right:16px}
+}
+</style>
+</head>
+<body>
+<script src="retro-theme.js"></script>
+<script src="vhs-theme.js"></script>
+<script src="harsh-mode.js"></script>
+
+<header>
+  <button class="back-btn" onclick="window.location.href='goalrecord.html'" title="Back" aria-label="Back"><i class="ti ti-arrow-left"></i></button>
+  <div>
+    <div class="hdr-title"><span>Study</span> Analyst</div>
+    <div class="hdr-sub" id="hdr-sub">Goal Record · JEE Journal</div>
+  </div>
+  <div class="hdr-spacer"></div>
+  <div class="hdr-actions">
+    <button class="icon-btn" onclick="window.location.href='goalrecord.html'" title="Open Goal Record" aria-label="Open Goal Record"><i class="ti ti-target-arrow"></i></button>
+    <button class="icon-btn" onclick="window.location.href='jeejournal.html'" title="Open JEE Journal" aria-label="Open JEE Journal"><i class="ti ti-checklist"></i></button>
+    <button class="icon-btn" id="regen-icon-btn" onclick="runAnalysis(true)" title="Regenerate analysis" aria-label="Regenerate analysis"><i class="ti ti-refresh"></i></button>
+  </div>
+</header>
+
+<div class="stats-wrap">
+  <div class="stats-grid" id="stats-grid"></div>
+</div>
+
+<div class="sect-wrap">
+  <div class="sect-head">AI Analysis <span class="sect-sub" id="analysis-badge-wrap"></span></div>
+  <div class="panel">
+    <div class="analysis-status" id="analysis-status" style="display:none">
+      <span class="analysis-dot"></span><span id="analysis-status-text">Analyst is thinking</span>
+    </div>
+    <div class="analysis-body" id="analysis-text"></div>
+    <div class="analysis-foot">
+      <div class="analysis-note" id="analysis-note"></div>
+      <button class="regen-btn" id="regen-btn" onclick="runAnalysis(true)"><i class="ti ti-refresh"></i> Regenerate</button>
+    </div>
+    <div class="analyst-chat">
+      <div class="chat-log" id="chat-log">
+        <div class="chat-empty" id="chat-empty">Ask about your streak, JEE prep, or mock scores — answers are grounded in the stats above.</div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-inp" placeholder="e.g. why is my mock score dropping?" onkeydown="if(event.key==='Enter')sendChat()">
+        <button onclick="sendChat()" id="chat-send-btn" title="Send" aria-label="Send"><i class="ti ti-send"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sect-wrap">
+  <div class="sect-head">Subject Readiness <span class="sect-sub">from JEE Journal</span></div>
+  <div class="panel" id="subj-panel"></div>
+</div>
+
+<div class="sect-wrap">
+  <div class="sect-head">Priority Focus <span class="sect-sub" id="focus-sub">backlog &amp; weakest chapters</span></div>
+  <div class="panel" id="focus-panel"></div>
+</div>
+
+<div class="sect-wrap">
+  <div class="sect-head">Mock Score Trend <span class="sect-sub" id="mock-sub"></span></div>
+  <div class="panel" id="mock-panel"></div>
+</div>
+
+
+<div class="sect-wrap">
+  <div class="sect-head">Streak History <span class="sect-sub" id="streak-sub"></span></div>
+  <div class="panel">
+    <div class="streak-row" id="streak-row"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =================== KEYS / CONSTANTS (shared with Goal Record & JEE Journal) =================== */
+const GR_KEY='dayplan_goal_record';
+const JJ_KEY='dayplan_jee_journal';
+const SESSION_HISTORY_KEY='dayplan_session_history';
+const RES_KEYS=[
+  {k:'module',lbl:'Module',full:'Module',weight:40},
+  {k:'pyq',lbl:'PYQ',full:'Previous Year Questions',weight:40},
+  {k:'qb',lbl:'QB',full:'Question Bank',weight:5},
+  {k:'book',lbl:'External Book',full:'External Book',weight:15}
+];
+const SUBJECTS=['Physics','Chemistry','Maths'];
+
+/* =================== THEME SYNC =================== */
+(function syncTheme(){
+  try{
+    const t=localStorage.getItem('dayplan_theme');
+    const a=localStorage.getItem('dayplan_accent');
+    const s=localStorage.getItem('dayplan_surface');
+    if(t==='light') document.body.classList.add('light');
+    if(t==='dark'&&s==='grey') document.body.classList.add('grey');
+    if(a) document.body.dataset.accent=a;
+  }catch(e){}
+})();
+
+/* =================== TOAST =================== */
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+function escHtml(s){ return (s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+
+/* =================== DATE HELPERS =================== */
+function todayStr(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function fmtDateShort(s){
+  const [y,m,d]=s.split('-').map(Number);
+  return new Date(y,m-1,d).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
+
+/* =================== READ-ONLY DATA ACCESS (this page never writes gr/jj data) =================== */
+function grLoad(){
+  try{
+    const raw=localStorage.getItem(GR_KEY);
+    if(raw){
+      const data=JSON.parse(raw);
+      if(data && typeof data==='object'){
+        if(!Array.isArray(data.goals)) data.goals=[];
+        if(!Array.isArray(data.history)) data.history=[];
+        if(!data.goalsDate) data.goalsDate=todayStr();
+        if(!data.test) data.test={name:'',date:''};
+        if(!Array.isArray(data.mockScores)) data.mockScores=[];
+        return data;
+      }
+    }
+  }catch(e){}
+  return {goals:[],goalsDate:todayStr(),history:[],test:{name:'',date:''},mockScores:[]};
+}
+function jjChapters(){
+  try{
+    const raw=localStorage.getItem(JJ_KEY);
+    if(raw){
+      const data=JSON.parse(raw);
+      if(Array.isArray(data)) return data;
+    }
+  }catch(e){}
+  return null;
+}
+function chapterPrepScore(c){
+  if(c.status!=='thought') return 0;
+  const p=c.practiced||{};
+  const earned=RES_KEYS.reduce((a,r)=>a+r.weight*((p[r.k]||0)/100),0);
+  return Math.round(earned);
+}
+function chapterCleared(c){ return c.status==='thought' && RES_KEYS.every(r=>(c.practiced&&c.practiced[r.k])===100); }
+function prepTier(score){
+  if(score>=75) return 'high';
+  if(score>=40) return 'mid';
+  return 'low';
+}
+function subjColor(s){ return s==='Physics'?'#5a9fd4':s==='Chemistry'?'#4a9a6a':'#c9952a'; }
+function avgPracticed(list){
+  const out={};
+  RES_KEYS.forEach(r=>{
+    out[r.k]=list.length?Math.round(list.reduce((a,c)=>a+((c.practiced&&c.practiced[r.k])||0),0)/list.length):0;
+  });
+  return out;
+}
+
+function sessionDayMap(){
+  const map={};
+  try{
+    const raw=localStorage.getItem(SESSION_HISTORY_KEY);
+    if(raw){
+      const arr=JSON.parse(raw);
+      if(Array.isArray(arr)){
+        arr.forEach(e=>{
+          if(!e||!e.ts) return;
+          const d=new Date(e.ts);
+          if(isNaN(d)) return;
+          const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+          if(!map[key]) map[key]={count:0,sec:0};
+          map[key].count++;
+          map[key].sec+=(e.dur||0);
+        });
+      }
+    }
+  }catch(e){}
+  return map;
+}
+function mergedHistory(gr){
+  const sessDays=sessionDayMap();
+  const byDate={};
+  gr.history.forEach(h=>{ byDate[h.date]={...h}; });
+  Object.keys(sessDays).forEach(date=>{
+    const s=sessDays[date];
+    if(byDate[date]){
+      if(!byDate[date].allDone){
+        byDate[date]={...byDate[date], allDone:true, sessionCredit:true, sessionCount:s.count, sessionSec:s.sec};
+      }
+    } else {
+      byDate[date]={date, total:0, done:0, allDone:true, sessionOnly:true, sessionCount:s.count, sessionSec:s.sec};
+    }
+  });
+  return Object.values(byDate).sort((a,b)=>a.date<b.date?-1:1);
+}
+function streakStats(gr){
+  const h=mergedHistory(gr);
+  let current=0;
+  for(let i=h.length-1;i>=0;i--){
+    if(h[i].allDone) current++; else break;
+  }
+  let best=0, run=0;
+  h.forEach(e=>{
+    if(e.allDone){ run++; best=Math.max(best,run); } else run=0;
+  });
+  const totalDays=h.length;
+  const hitDays=h.filter(e=>e.allDone).length;
+  const rate=totalDays?Math.round(hitDays/totalDays*100):0;
+  return {current,best,totalDays,hitDays,rate,history:h};
+}
+
+/* =================== FACT BUILDING =================== */
+/* Every number the AI narration is allowed to reference gets computed here, once, in plain
+   JS — the model's only job later is to turn these verified facts into flowing prose, never
+   to calculate or invent anything itself. */
+function buildFacts(){
+  const gr=grLoad();
+  const chapters=jjChapters();
+  const streak=streakStats(gr);
+  const today=gr.goals;
+  const todayDone=today.filter(g=>g.done).length;
+
+  const counted=chapters?chapters.filter(c=>c.status!=='not_taught'):[];
+  const overallReadiness=counted.length?Math.round(counted.reduce((a,c)=>a+chapterPrepScore(c),0)/counted.length):null;
+  const mockChs=chapters?chapters.filter(c=>c.mock && c.status!=='not_taught'):[];
+  const mockReadiness=mockChs.length?Math.round(mockChs.reduce((a,c)=>a+chapterPrepScore(c),0)/mockChs.length):null;
+  const backlog=chapters?chapters.filter(c=>c.status==='backlog'):[];
+  const thought=chapters?chapters.filter(c=>c.status==='thought'):[];
+
+  const subjScores=SUBJECTS.map(s=>{
+    const list=chapters?chapters.filter(c=>c.subject===s && c.status!=='not_taught'):[];
+    const backlogCount=chapters?chapters.filter(c=>c.subject===s && c.status==='backlog').length:0;
+    if(!list.length && !backlogCount) return {s,avg:null,count:0,backlogCount:0};
+    return {s,avg:list.length?Math.round(list.reduce((a,c)=>a+chapterPrepScore(c),0)/list.length):null,count:list.length,backlogCount};
+  });
+
+  const sortedMocks=[...gr.mockScores].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+  const latestMock=sortedMocks.length?sortedMocks[sortedMocks.length-1]:null;
+  const latestMockPct=latestMock?Math.round(latestMock.score/latestMock.max*100):null;
+  let mockTrend=null;
+  if(sortedMocks.length>=2){
+    const last3=sortedMocks.slice(-3).map(e=>e.score/e.max*100);
+    const prevAvg=last3.length>1?last3.slice(0,-1).reduce((a,b)=>a+b,0)/(last3.length-1):last3[0];
+    const diff=Math.round(last3[last3.length-1]-prevAvg);
+    mockTrend=diff>3?'improving':diff<-3?'declining':'steady';
+  }
+
+  const weakestRes=thought.length?(()=>{
+    const avg=avgPracticed(thought);
+    return RES_KEYS.reduce((a,r)=>avg[r.k]<avg[a.k]?r:a, RES_KEYS[0]);
+  })():null;
+  const weakestResAvg=thought.length?avgPracticed(thought)[weakestRes.k]:null;
+
+  const validSubj=subjScores.filter(s=>s.avg!==null);
+  const weakestSubj=validSubj.length>1?validSubj.reduce((a,b)=>b.avg<a.avg?b:a):null;
+
+  const mockWeak=[...mockChs].sort((a,b)=>chapterPrepScore(a)-chapterPrepScore(b)).slice(0,3);
+
+  return {
+    gr, chapters, streak, todayDone, todayTotal:today.length,
+    overallReadiness, mockReadiness, backlog, thought, subjScores,
+    sortedMocks, latestMock, latestMockPct, mockTrend,
+    weakestRes, weakestResAvg, weakestSubj, mockWeak
+  };
+}
+
+/* Deterministic, always-correct sentences — used both as the fallback narration when Ollama
+   is unreachable, and as the "ground truth" fed to the LLM so it can only rephrase, not invent. */
+function buildFactBullets(f){
+  const bullets=[];
+  bullets.push(f.streak.totalDays
+    ? `Current goal-completion streak is ${f.streak.current} day${f.streak.current===1?'':'s'} (best ever: ${f.streak.best}), with a ${f.streak.rate}% hit rate across ${f.streak.totalDays} logged days.`
+    : `No days have been logged in Goal Record yet, so there is no streak data.`);
+  bullets.push(f.todayTotal
+    ? `Today's goal list is ${f.todayDone}/${f.todayTotal} complete.`
+    : `No goals have been added for today yet.`);
+  if(f.overallReadiness!==null){
+    bullets.push(`Overall JEE chapter readiness across all started chapters is ${f.overallReadiness}%.`);
+  } else {
+    bullets.push(`No chapters have been started in JEE Journal yet.`);
+  }
+  if(f.mockReadiness!==null){
+    bullets.push(`Readiness specifically for chapters flagged for the upcoming mock test is ${f.mockReadiness}%.`);
+  }
+  if(f.backlog.length){
+    bullets.push(`${f.backlog.length} chapter${f.backlog.length===1?'':'s'} ${f.backlog.length===1?'is':'are'} sitting in Backlog status.`);
+  }
+  if(f.weakestSubj){
+    bullets.push(`${f.weakestSubj.s} is the weakest subject at ${f.weakestSubj.avg}% average readiness across ${f.weakestSubj.count} started chapter${f.weakestSubj.count===1?'':'s'}.`);
+  }
+  if(f.weakestRes){
+    bullets.push(`Among started chapters, ${f.weakestRes.full} is the least-practiced resource type at ${f.weakestResAvg}% average (it is worth ${f.weakestRes.weight}% of a chapter's readiness score).`);
+  }
+  if(f.sortedMocks.length){
+    const entries=f.sortedMocks;
+    const pcts=entries.map(e=>Math.round(e.score/e.max*100));
+    const avgPct=Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length);
+    bullets.push(`${entries.length} mock test${entries.length===1?'':'s'} logged, from ${fmtDateShort(entries[0].date)} to ${fmtDateShort(entries[entries.length-1].date)}, averaging ${avgPct}%.`);
+  } else {
+    bullets.push(`No mock test scores have been logged yet.`);
+  }
+  if(f.latestMockPct!==null){
+    bullets.push(`Latest mock score was ${f.latestMockPct}% (${f.latestMock.score}/${f.latestMock.max}${f.latestMock.name?', "'+f.latestMock.name+'"':''}).`);
+  }
+  if(f.sortedMocks.length>1){
+    const entries=f.sortedMocks;
+    const pcts=entries.map(e=>Math.round(e.score/e.max*100));
+    let bestIdx=0,worstIdx=0;
+    pcts.forEach((p,i)=>{ if(p>pcts[bestIdx])bestIdx=i; if(p<pcts[worstIdx])worstIdx=i; });
+    const best=entries[bestIdx], worst=entries[worstIdx];
+    bullets.push(`Best mock: ${pcts[bestIdx]}% (${best.score}/${best.max}${best.name?', "'+best.name+'"':''}) on ${fmtDateShort(best.date)}. Worst mock: ${pcts[worstIdx]}% (${worst.score}/${worst.max}${worst.name?', "'+worst.name+'"':''}) on ${fmtDateShort(worst.date)}.`);
+  }
+  if(f.mockTrend){
+    bullets.push(`Mock score trend over the last few tests is ${f.mockTrend}.`);
+  }
+  if(f.mockReadiness!==null && f.sortedMocks.length){
+    const avgPct=Math.round(f.sortedMocks.map(e=>e.score/e.max*100).reduce((a,b)=>a+b,0)/f.sortedMocks.length);
+    bullets.push(`Chapters flagged for the mock test average ${f.mockReadiness}% prep readiness in JEE Journal, versus the ${avgPct}% average actual mock score.`);
+  }
+  if(f.mockWeak.length){
+    bullets.push(`Weakest chapters currently flagged for the mock test: ${f.mockWeak.map(c=>`${c.name} (${chapterPrepScore(c)}%)`).join(', ')}.`);
+  }
+  return bullets;
+}
+
+/* =================== RENDER: STATS GRID =================== */
+function renderStatsGrid(f){
+  const grid=document.getElementById('stats-grid');
+  let html='';
+  html+=`<div class="stat-card">
+    <div class="stat-num accent">${f.streak.current}</div>
+    <div class="stat-label">Current streak (days)</div>
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num" style="color:#c9952a">${f.streak.best}</div>
+    <div class="stat-label">Best streak (days)</div>
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num">${f.streak.hitDays}<span style="font-size:13px;color:rgba(255,255,255,.3)"> / ${f.streak.totalDays}</span></div>
+    <div class="stat-label">Full days logged</div>
+    ${f.streak.totalDays?`<div class="stat-bar"><div class="stat-bar-fill" style="width:${f.streak.rate}%"></div></div>`:''}
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num ${f.todayTotal && f.todayDone===f.todayTotal?'good':''}">${f.todayTotal?f.todayDone+' / '+f.todayTotal:'—'}</div>
+    <div class="stat-label">Today's goals</div>
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num" style="color:${f.overallReadiness!==null?(f.overallReadiness>=75?'var(--good)':f.overallReadiness>=40?'#c9952a':'var(--bad)'):'inherit'}">${f.overallReadiness!==null?f.overallReadiness+'%':'—'}</div>
+    <div class="stat-label">JEE readiness</div>
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num" style="color:${f.mockReadiness!==null?(f.mockReadiness>=75?'var(--good)':f.mockReadiness>=40?'#c9952a':'var(--bad)'):'inherit'}">${f.mockReadiness!==null?f.mockReadiness+'%':'—'}</div>
+    <div class="stat-label">Mock test readiness</div>
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num" style="color:${f.latestMockPct!==null?(f.latestMockPct>=75?'var(--good)':f.latestMockPct>=40?'#c9952a':'var(--bad)'):'inherit'}">${f.latestMockPct!==null?f.latestMockPct+'%':'—'}</div>
+    <div class="stat-label">Latest mock score</div>
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num ${f.backlog.length?'bad':''}">${f.backlog.length}</div>
+    <div class="stat-label">Backlog chapters</div>
+  </div>`;
+  grid.innerHTML=html;
+}
+
+/* =================== RENDER: SUBJECT READINESS =================== */
+function renderSubjectReadiness(f){
+  const panel=document.getElementById('subj-panel');
+  if(!f.chapters){
+    panel.innerHTML=`<div class="empty-msg">No JEE Journal data found on this device yet.</div>`;
+    return;
+  }
+  panel.innerHTML=`<div class="subj-list">${f.subjScores.map(s=>{
+    const pct=s.avg===null?0:s.avg;
+    const color=subjColor(s.s);
+    return `<div class="subj-row">
+      <div class="subj-row-top">
+        <span class="subj-dot" style="background:${color}"></span>
+        <span class="subj-name">${s.s}</span>
+        <span class="subj-meta">${s.count} started${s.backlogCount?` · ${s.backlogCount} backlog`:''}</span>
+        <span class="subj-pct" style="color:${color}">${s.avg===null?'—':s.avg+'%'}</span>
+      </div>
+      <div class="subj-bar"><div class="subj-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* =================== RENDER: PRIORITY FOCUS =================== */
+function renderPriorityFocus(f){
+  const panel=document.getElementById('focus-panel');
+  if(!f.chapters){
+    panel.innerHTML=`<div class="empty-msg">No JEE Journal data found on this device yet.</div>`;
+    return;
+  }
+  const unfinished=f.thought.filter(c=>!chapterCleared(c));
+  const items=[...f.backlog, ...unfinished]
+    .sort((a,b)=>chapterPrepScore(a)-chapterPrepScore(b))
+    .slice(0,6);
+  if(!items.length){
+    panel.innerHTML=`<div class="empty-msg">Nothing in backlog and every started chapter is fully practiced. Great shape.</div>`;
+    return;
+  }
+  panel.innerHTML=`<div class="focus-list">${items.map(c=>{
+    const isBacklog=c.status==='backlog';
+    const score=isBacklog?0:chapterPrepScore(c);
+    const tier=isBacklog?'low':prepTier(score);
+    return `<div class="focus-card ${tier}">
+      <span class="focus-dot" style="background:${subjColor(c.subject)};color:${subjColor(c.subject)}"></span>
+      <span class="focus-name">${escHtml(c.name)}</span>
+      <span class="focus-pct ${tier}">${isBacklog?'backlog':score+'% ready'}</span>
+    </div>`;
+  }).join('')}
+  <a class="jj-jump" style="display:inline-block;margin-top:8px" onclick="window.location.href='jeejournal.html'">Manage chapters in JEE Journal &rarr;</a>`;
+}
+
+/* =================== RENDER: MOCK CHART (ported from Goal Record) =================== */
+function mockScoreChart(entries){
+  const w=680,h=200,padL=30,padR=16,padT=16,padB=26;
+  const innerW=w-padL-padR, innerH=h-padT-padB;
+  const n=entries.length;
+  const pts=entries.map((e,i)=>{
+    const pct=Math.max(0,Math.min(100,e.score/e.max*100));
+    const x = n===1 ? padL+innerW/2 : padL + (i/(n-1))*innerW;
+    const y = padT + innerH - (pct/100)*innerH;
+    return {x,y,pct,e};
+  });
+  let grid='';
+  [0,25,50,75,100].forEach(pct=>{
+    const y=padT+innerH-(pct/100)*innerH;
+    grid+=`<line class="mock-grid-line" x1="${padL}" y1="${y.toFixed(1)}" x2="${w-padR}" y2="${y.toFixed(1)}"/>`;
+    grid+=`<text class="mock-axis-lbl" x="${padL-6}" y="${(y+3).toFixed(1)}" text-anchor="end">${pct}</text>`;
+  });
+  const linePts=pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const dots=pts.map(p=>`
+    <circle class="mock-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4">
+      <title>${fmtDateShort(p.e.date)} \u00b7 ${p.e.score}/${p.e.max} (${Math.round(p.pct)}%)</title>
+    </circle>
+    <text class="mock-dot-label" x="${p.x.toFixed(1)}" y="${(p.y-10).toFixed(1)}">${Math.round(p.pct)}%</text>`).join('');
+  const step = n>10 ? Math.ceil(n/10) : 1;
+  const xLabels=pts.map((p,i)=>{
+    if(i%step!==0 && i!==n-1) return '';
+    return `<text class="mock-axis-lbl" x="${p.x.toFixed(1)}" y="${h-6}" text-anchor="middle">${fmtDateShort(p.e.date)}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+    ${grid}
+    ${n>1?`<polyline class="mock-line" points="${linePts}"/>`:''}
+    ${dots}
+    ${xLabels}
+  </svg>`;
+}
+function renderMockPanel(f){
+  const panel=document.getElementById('mock-panel');
+  const subEl=document.getElementById('mock-sub');
+  if(!f.sortedMocks.length){
+    subEl.textContent='';
+    panel.innerHTML=`<div class="empty-msg">No mock scores logged yet — add some in Goal Record.</div>`;
+    return;
+  }
+  subEl.textContent=`${f.sortedMocks.length} logged \u00b7 latest ${f.latestMockPct}%${f.mockTrend?' \u00b7 '+f.mockTrend:''}`;
+  panel.innerHTML=mockScoreChart(f.sortedMocks);
+}
+
+/* =================== RENDER: STREAK DOTS =================== */
+function renderStreakDots(f){
+  document.getElementById('streak-sub').textContent = f.streak.totalDays ? `${f.streak.rate}% of logged days completed` : 'No days logged yet';
+  const wrap=document.getElementById('streak-row');
+  const recent=f.streak.history.slice(-21);
+  if(!recent.length){
+    wrap.innerHTML=`<div class="empty-msg" style="padding:14px 6px">Log your first day in Goal Record to start a streak.</div>`;
+    return;
+  }
+  wrap.innerHTML=recent.map(e=>{
+    let tip;
+    if(e.sessionOnly){
+      tip=`${fmtDateShort(e.date)} \u00b7 ${e.sessionCount} session${e.sessionCount===1?'':'s'} logged`;
+    } else if(e.sessionCredit){
+      tip=`${fmtDateShort(e.date)} \u00b7 ${e.done}/${e.total} goals \u00b7 ${e.sessionCount} session${e.sessionCount===1?'':'s'}`;
+    } else {
+      tip=`${fmtDateShort(e.date)} \u00b7 ${e.done}/${e.total}`;
+    }
+    return `
+    <div class="streak-dot ${e.allDone?'hit':'miss'}">
+      ${e.allDone?'<i class="ti ti-check"></i>':'<i class="ti ti-x"></i>'}
+      <span class="sd-tip">${tip}</span>
+    </div>`;
+  }).join('');
+}
+
+/* =================== AI ANALYSIS (hybrid: rules compute facts, local LLM narrates them) =================== */
+const OLLAMA_URL='http://localhost:11434/api/chat';
+const OLLAMA_DEFAULT_MODEL='llama3.2:1b';
+function getOllamaModel(){ return localStorage.getItem('canopus_alfred_model')||OLLAMA_DEFAULT_MODEL; }
+
+const ANALYST_SYSTEM=`You are a narrow AI study analyst embedded in a JEE-prep app called Canopus. You are given a list of pre-computed, verified facts covering three areas: daily goal-completion streaks, JEE Journal chapter/subject readiness, and mock test score history and trend. Cover all three areas that have data — do not skip the mock test facts if they are present. Your ONLY job is to weave these exact facts into 3-4 short, honest, encouraging-but-not-fluffy paragraphs of analysis (one of which should specifically address mock test performance and trend when mock data exists), ending with a clear single recommendation for what to focus on next. Rules: never invent a number, chapter name, test name, or fact that was not given to you; never restate the facts as a list, write connected prose; keep the whole reply under 220 words; do not use markdown formatting.`;
+
+let currentFacts=null;
+
+function setAnalysisBadge(state,modelName){
+  const wrap=document.getElementById('analysis-badge-wrap');
+  if(state==='offline'){
+    wrap.innerHTML=`<span class="analysis-badge offline">offline · showing computed insights</span>`;
+  } else if(state==='live'){
+    wrap.innerHTML=`<span class="analysis-badge">via ${escHtml(modelName)} (Ollama)</span>`;
+  } else {
+    wrap.innerHTML='';
+  }
+}
+
+function renderFallbackAnalysis(f){
+  const bullets=buildFactBullets(f);
+  document.getElementById('analysis-text').className='analysis-body dim';
+  document.getElementById('analysis-text').textContent=bullets.join(' ');
+  document.getElementById('analysis-note').textContent='Ollama not reachable — showing computed insights directly. Run "ollama serve" for a narrated version.';
+  setAnalysisBadge('offline');
+}
+
+async function runAnalysis(manual){
+  const f=currentFacts||buildFacts();
+  currentFacts=f;
+  const bullets=buildFactBullets(f);
+  if(!bullets.length){
+    document.getElementById('analysis-text').className='analysis-body dim';
+    document.getElementById('analysis-text').textContent='Log some goals and JEE Journal chapters first, then check back here for analysis.';
+    setAnalysisBadge(null);
+    return;
+  }
+
+  const statusEl=document.getElementById('analysis-status');
+  const statusText=document.getElementById('analysis-status-text');
+  const textEl=document.getElementById('analysis-text');
+  const regenBtn=document.getElementById('regen-btn');
+  const regenIcon=document.getElementById('regen-icon-btn');
+  document.getElementById('analysis-note').textContent='';
+  textEl.className='analysis-body';
+  textEl.textContent='';
+  statusEl.style.display='flex';
+  regenBtn.disabled=true;
+  regenIcon.classList.add('spinning');
+  const startTime=performance.now();
+  const thinkTimer=setInterval(()=>{
+    const elapsed=((performance.now()-startTime)/1000).toFixed(1);
+    statusText.textContent=`Analyst is thinking (${elapsed}s)`;
+  },100);
+
+  const model=getOllamaModel();
+  let res;
+  try{
+    res=await fetch(OLLAMA_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:model,
+        stream:true,
+        options:{num_predict:380},
+        messages:[
+          {role:'system',content:ANALYST_SYSTEM},
+          {role:'user',content:'Facts:\\n- '+bullets.join('\\n- ')}
+        ]
+      })
+    });
+  }catch(e){
+    clearInterval(thinkTimer);
+    statusEl.style.display='none';
+    regenBtn.disabled=false;
+    regenIcon.classList.remove('spinning');
+    renderFallbackAnalysis(f);
+    return;
+  }
+  if(!res.ok||!res.body){
+    clearInterval(thinkTimer);
+    statusEl.style.display='none';
+    regenBtn.disabled=false;
+    regenIcon.classList.remove('spinning');
+    renderFallbackAnalysis(f);
+    return;
+  }
+
+  const reader=res.body.getReader();
+  const decoder=new TextDecoder();
+  let full='';
+  let started=false;
+  try{
+    while(true){
+      const {done,value}=await reader.read();
+      if(done)break;
+      const chunk=decoder.decode(value,{stream:true});
+      chunk.split('\\n').filter(Boolean).forEach(line=>{
+        try{
+          const json=JSON.parse(line);
+          if(json.message&&json.message.content){
+            if(!started){
+              started=true;
+              clearInterval(thinkTimer);
+              statusEl.style.display='none';
+            }
+            full+=json.message.content;
+            textEl.textContent=full;
+          }
+        }catch(e){/* ignore partial JSON lines */}
+      });
+    }
+  }catch(e){}
+  clearInterval(thinkTimer);
+  statusEl.style.display='none';
+  regenBtn.disabled=false;
+  regenIcon.classList.remove('spinning');
+  if(!full.trim()){
+    renderFallbackAnalysis(f);
+    return;
+  }
+  setAnalysisBadge('live',model);
+  document.getElementById('analysis-note').textContent=manual?'Regenerated just now.':'';
+}
+
+/* =================== ASK-THE-ANALYST CHAT (grounded in the same computed facts) =================== */
+let chatHistory=[];
+
+function chatSystemPrompt(f){
+  const bullets=buildFactBullets(f);
+  return `You are a narrow AI assistant embedded in a JEE-prep app called Canopus, answering the user's questions about their own study data. You may ONLY use the verified facts listed below — never invent numbers, chapter names, test names, dates, or facts not listed. If the user asks about something not covered by these facts, say plainly that you don't have that data rather than guessing. Keep answers short (2-4 sentences), direct, plain prose, no markdown.
+
+Facts:
+- ${bullets.join('\\n- ')}`;
+}
+
+function appendChatMsg(role,text,thinking){
+  const log=document.getElementById('chat-log');
+  const empty=document.getElementById('chat-empty');
+  if(empty)empty.remove();
+  const el=document.createElement('div');
+  el.className='chat-msg '+role+(thinking?' thinking':'');
+  el.textContent=thinking?'thinking\u2026':text;
+  log.appendChild(el);
+  log.scrollTop=log.scrollHeight;
+  return el;
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-inp');
+  const text=(inp.value||'').trim();
+  if(!text) return;
+  const sendBtn=document.getElementById('chat-send-btn');
+  inp.value='';
+  inp.disabled=true;
+  sendBtn.disabled=true;
+  appendChatMsg('user',text);
+  chatHistory.push({role:'user',content:text});
+  const botEl=appendChatMsg('bot','',true);
+
+  const f=currentFacts||buildFacts();
+  const model=getOllamaModel();
+  let res;
+  try{
+    res=await fetch(OLLAMA_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:model,
+        stream:true,
+        options:{num_predict:220},
+        messages:[
+          {role:'system',content:chatSystemPrompt(f)},
+          ...chatHistory
+        ]
+      })
+    });
+  }catch(e){
+    botEl.textContent='Ollama unreachable — is it running? (ollama serve)';
+    botEl.classList.remove('thinking');
+    inp.disabled=false; sendBtn.disabled=false; inp.focus();
+    return;
+  }
+  if(!res.ok||!res.body){
+    botEl.textContent='Ollama error — check the model is installed (ollama pull '+model+').';
+    botEl.classList.remove('thinking');
+    inp.disabled=false; sendBtn.disabled=false; inp.focus();
+    return;
+  }
+
+  const reader=res.body.getReader();
+  const decoder=new TextDecoder();
+  let full='';
+  try{
+    while(true){
+      const {done,value}=await reader.read();
+      if(done)break;
+      const chunk=decoder.decode(value,{stream:true});
+      chunk.split('\\n').filter(Boolean).forEach(line=>{
+        try{
+          const json=JSON.parse(line);
+          if(json.message&&json.message.content){
+            if(botEl.classList.contains('thinking'))botEl.classList.remove('thinking');
+            full+=json.message.content;
+            botEl.textContent=full;
+            document.getElementById('chat-log').scrollTop=document.getElementById('chat-log').scrollHeight;
+          }
+        }catch(e){/* ignore partial JSON lines */}
+      });
+    }
+  }catch(e){}
+  if(!full.trim()){
+    botEl.textContent='(no response)';
+    botEl.classList.remove('thinking');
+  } else {
+    chatHistory.push({role:'assistant',content:full});
+  }
+  inp.disabled=false;
+  sendBtn.disabled=false;
+  inp.focus();
+}
+
+/* =================== RENDER ALL =================== */
+function render(){
+  const f=buildFacts();
+  currentFacts=f;
+  document.getElementById('hdr-sub').textContent = f.backlog.length
+    ? `${f.backlog.length} chapter${f.backlog.length===1?'':'s'} in backlog \u00b7 streak ${f.streak.current}`
+    : `streak ${f.streak.current} \u00b7 readiness ${f.overallReadiness!==null?f.overallReadiness+'%':'—'}`;
+  renderStatsGrid(f);
+  renderSubjectReadiness(f);
+  renderPriorityFocus(f);
+  renderMockPanel(f);
+  renderStreakDots(f);
+}
+
+render();
+runAnalysis(false);
+
+/* Live cross-tab sync: if Goal Record or JEE Journal edits data in another tab, refresh. */
+window.addEventListener('storage', function(e){
+  if(e.key===GR_KEY || e.key===JJ_KEY || e.key===SESSION_HISTORY_KEY){
+    render();
+  }
+});
+</script>
+<script>
+/* ---- Canopus global terminal shortcut: redirects into index.html's Terminal page ---- */
+(function(){
+  var SC_KEY='canopus_term_shortcut';
+  function getShortcut(){
+    try{var raw=localStorage.getItem(SC_KEY);if(raw)return JSON.parse(raw);}catch(e){}
+    return {alt:true,ctrl:false,shift:false,meta:false,key:'`'};
+  }
+  function matches(e,sc){
+    if(!sc||!sc.key)return false;
+    return !!sc.ctrl===e.ctrlKey&&!!sc.alt===e.altKey&&!!sc.shift===e.shiftKey&&!!sc.meta===e.metaKey&&(e.key||'').toLowerCase()===sc.key.toLowerCase();
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(matches(e,getShortcut())){
+      e.preventDefault();
+      window.location.href='index.html?openTerminal=1';
+    }
+  },true);
+})();
+</script>
+<script>
+/* ---- Canopus: local keyboard shortcut to hide/show this page's header (persists across all Canopus pages) ---- */
+(function(){
+  var nav=document.getElementById('app-nav')||document.querySelector('header');
+  if(!nav)return;
+  function setHidden(hidden){
+    document.documentElement.classList.toggle('chdr-hidden',hidden);
+    try{localStorage.setItem('canopusHeaderHidden',hidden?'1':'0');}catch(e){}
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key||'').toLowerCase()==='h'){
+      e.preventDefault();
+      setHidden(!document.documentElement.classList.contains('chdr-hidden'));
+    }
+  },true);
+})();
+</script>
+<script>
+/* Auto-fullscreen on first interaction (matches index.html behavior) */
+(function(){
+  try{ if(localStorage.getItem('canopus_autofs_disabled')==='1') return; }catch(e){}
+  function armAutoFullscreen(){
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+    document.removeEventListener('click',armAutoFullscreen,true);
+    document.removeEventListener('touchend',armAutoFullscreen,true);
+    document.removeEventListener('keydown',armAutoFullscreen,true);
+  }
+  document.addEventListener('click',armAutoFullscreen,true);
+  document.addEventListener('touchend',armAutoFullscreen,true);
+  document.addEventListener('keydown',armAutoFullscreen,true);
+})();
+</script>
+</body>
+</html>

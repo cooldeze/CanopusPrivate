@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════════════════════════════
    CANOPUS — GLOBAL RETRO CRT PHOSPHOR THEME
-   Shared across index.html, jeejournal.html, library.html, sirius.html
-   and vault.html. Activated app-wide by running `theme retro` in the
+   Shared across index.html, jeejournal.html, library.html, sirius.html,
+   vault.html and videonotes.html. Activated app-wide by running `theme retro` in the
    Terminal (persisted in localStorage under 'canopus_term_theme').
    Every page checks that key on load and toggles html.crt-retro.
 
@@ -175,6 +175,35 @@ html.crt-retro img, html.crt-retro video, html.crt-retro svg, html.crt-retro can
   opacity:.9;
 }
 
+/* Exception: the webcam preview panel — the live <video> feed
+   (#flight-presence-preview-video) and the person-detection box drawn on
+   top of it in its own <canvas> (#flight-presence-preview-canvas). Both
+   are functional "what your webcam sees" diagnostic UI, not decorative
+   photographic content — running the feed through the same
+   grayscale→sepia→hue-rotate→saturate chain as ordinary images makes it
+   hard to tell what the camera is actually seeing, and shifts the
+   detection box's stroke colour into the same tint as the (already-tinted)
+   video behind it so the box disappears. Keep both unfiltered and fully
+   opaque so the preview stays true-to-camera and the box stays visible in
+   every phosphor colour. Higher specificity (ID) + !important beats the
+   rule above regardless of source order.
+
+   Same reasoning applies to Video Notes (videonotes.html): its live
+   recording preview (#vnLiveVideo), the reviewed-clip playback
+   (#vnReviewVideo) and the saved-note player (#vnPlayerVideo) are all
+   "what the camera/clip actually looks like" content the person is
+   actively recording or reviewing, not decorative media — tinting them
+   would make it impossible to judge exposure/framing while recording,
+   or to recognise faces/detail when reviewing a saved note. */
+html.crt-retro #flight-presence-preview-canvas,
+html.crt-retro #flight-presence-preview-video,
+html.crt-retro #vnLiveVideo,
+html.crt-retro #vnReviewVideo,
+html.crt-retro #vnPlayerVideo{
+  filter:none !important;
+  opacity:1 !important;
+}
+
 /* scrollbars */
 html.crt-retro{ scrollbar-color:var(--phos-text) var(--phos-scroll-track); }
 html.crt-retro ::-webkit-scrollbar{ background:#000; }
@@ -192,3 +221,53 @@ html.crt-retro ::-webkit-scrollbar-thumb{ background:var(--phos-scroll-thumb); }
   animation:crtGlobalFlicker 6s infinite;
 }
 @keyframes crtGlobalFlicker{0%,96%,100%{opacity:1}97%{opacity:.94}98%{opacity:1}99%{opacity:.97}}
+
+/* ══════════════════════════════════════════════════════════════════
+   EXCEPTION: GRIND (case-log page)
+   Grind has its own fixed black/red/white "Gotham" identity that
+   isn't meant to shift with the phosphor colour (green/amber/blue).
+   These rules re-assert red/white/neutral regardless of which
+   phosphor is active. Selector specificity (two classes + one
+   element beats the blanket "html.crt-retro body *" rule's one
+   class + two elements) plus !important wins over the rules above
+   regardless of source order, same pattern used for the webcam
+   preview and overlay exceptions further up this file.
+   ══════════════════════════════════════════════════════════════════ */
+html.crt-retro .grind-wrap,
+html.crt-retro .grind-wrap *{
+  color:#d8d8d8 !important;
+  border-color:#E2231A !important;
+  text-shadow:none !important;
+  filter:none !important;
+}
+html.crt-retro .grind-title,
+html.crt-retro .grind-title *{
+  color:#fff !important;
+}
+html.crt-retro .grind-entry-tag,
+html.crt-retro .grind-day-label,
+html.crt-retro .grind-empty span,
+html.crt-retro .grind-back-btn:hover,
+html.crt-retro .grind-entry-actions button:hover,
+html.crt-retro .grind-add-btn{
+  color:#E2231A !important;
+}
+html.crt-retro .grind-composer,
+html.crt-retro .grind-wrap [class*="overlay"],
+html.crt-retro .grind-wrap [class*="modal"]{
+  background-color:#050505 !important;
+}
+html.crt-retro .grind-add-btn{
+  background-color:transparent !important;
+}
+html.crt-retro .grind-add-btn:hover{
+  background-color:#E2231A !important;
+  color:#000 !important;
+}
+html.crt-retro .grind-entry:hover{
+  background-color:rgba(226,35,26,.06) !important;
+  border-left-color:#E2231A !important;
+}
+html.crt-retro .grind-wrap::before{
+  filter:none !important;
+}

@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){try{if(localStorage.getItem('canopusHeaderHidden')==='1')document.documentElement.classList.add('chdr-hidden');}catch(e){}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Goal Record · Canopus</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="stylesheet" href="retro-theme.css">
+<link rel="stylesheet" href="vhs-theme.css">
+<link rel="stylesheet" href="harsh-mode.css">
+<style>
+:root,body[data-accent="white"]{--accent:#fff;--accent-hover:#ddd;--accent-on:#000;--accent-muted:#2a2a2a;--accent-soft:rgba(255,255,255,.07);}
+body[data-accent="blue"]{--accent:#5a9fd4;--accent-hover:#4a8fc4;--accent-on:#000;--accent-muted:#2a4a6a;--accent-soft:rgba(90,159,212,.13);}
+body[data-accent="green"]{--accent:#4a9a6a;--accent-hover:#3a8a5a;--accent-on:#000;--accent-muted:#1a3a2a;--accent-soft:rgba(74,154,106,.13);}
+body[data-accent="amber"]{--accent:#c9952a;--accent-hover:#b8851a;--accent-on:#000;--accent-muted:#4a3a1a;--accent-soft:rgba(201,149,42,.13);}
+body[data-accent="pink"]{--accent:#e0629c;--accent-hover:#cf4f8a;--accent-on:#000;--accent-muted:#4a1a32;--accent-soft:rgba(224,98,156,.13);}
+body.light[data-accent="white"]{--accent:#111;--accent-hover:#333;--accent-on:#fff;--accent-muted:#aaa;--accent-soft:rgba(0,0,0,.05);}
+
+:root{--surf-bg:#050506;--surf-panel:#0c0d10;--surf-panel-hi:#131419;--surf-modal:#111217;--surf-line:#1d1f24;
+  --good:#4fa374;--good-soft:rgba(79,163,116,.14);--bad:#c9705a;--bad-soft:rgba(201,112,90,.14);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.55);
+  --shadow-2:0 2px 6px rgba(0,0,0,.45), 0 16px 40px -16px rgba(0,0,0,.6);
+  --r-lg:18px;--r-md:13px;--r-sm:9px;
+  --ease:cubic-bezier(.2,.7,.2,1);}
+body.grey{--surf-bg:#0A0A0C;--surf-panel:#121317;--surf-panel-hi:#191b20;--surf-modal:#141519;--surf-line:#23252b;}
+body.light{--surf-bg:#F4EFE4;--surf-panel:#FFFEFA;--surf-panel-hi:#F4EEE1;--surf-modal:#FFFEFA;--surf-line:#E1D9C8;
+  --good:#3c8a5e;--good-soft:rgba(60,138,94,.10);--bad:#b3543e;--bad-soft:rgba(179,84,62,.10);
+  --shadow-1:0 1px 2px rgba(60,50,30,.06), 0 8px 20px -14px rgba(60,50,30,.18);
+  --shadow-2:0 2px 8px rgba(60,50,30,.08), 0 20px 40px -20px rgba(60,50,30,.22);}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--surf-bg);color:#f4f3f1;font-family:'Inter',sans-serif;min-height:100%}
+body{
+  padding-bottom:70px;
+  background-image:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,255,255,.05), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 0%, var(--accent-soft), transparent 55%);
+  background-attachment:fixed;
+}
+body.light{color:#1c1a15}
+*{scrollbar-width:thin}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#26282e;border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+body.light ::-webkit-scrollbar-thumb{background:#ded3ba}
+::selection{background:var(--accent);color:var(--accent-on)}
+
+/* ── Header ── */
+html.chdr-hidden header{display:none!important}
+header{position:sticky;top:0;z-index:20;
+  background:linear-gradient(var(--surf-bg) 68%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  padding:calc(20px + env(safe-area-inset-top)) 24px 16px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  border-bottom:0.5px solid transparent;}
+.back-btn{width:36px;height:36px;border-radius:11px;border:0.5px solid var(--surf-line);background:var(--surf-panel);
+  color:rgba(255,255,255,.65);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;
+  transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+body.light .back-btn{color:rgba(0,0,0,.55)}
+.back-btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.hdr-title{font-family:'Fraunces',serif;font-size:22px;font-weight:500;letter-spacing:-.015em}
+.hdr-title span{color:var(--accent);font-style:italic}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.07em;margin-top:3px;text-transform:uppercase}
+body.light .hdr-sub{color:rgba(0,0,0,.42)}
+.hdr-spacer{flex:1}
+.hdr-actions{display:flex;gap:8px;align-items:center}
+.icon-btn{width:34px;height:34px;border-radius:10px;border:0.5px solid var(--surf-line);background:var(--surf-panel);
+  color:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13.5px;
+  transition:all .18s var(--ease);box-shadow:var(--shadow-1)}
+body.light .icon-btn{color:rgba(0,0,0,.5)}
+.icon-btn:hover{color:var(--accent-on);border-color:var(--accent);background:var(--accent);transform:translateY(-1px)}
+
+/* ── Stats ── */
+.stats-wrap{padding:4px 24px 18px;max-width:1120px;margin:0 auto}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:11px}
+.stat-card{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:var(--r-md);padding:16px 18px;
+  box-shadow:var(--shadow-1);transition:transform .2s var(--ease),box-shadow .2s var(--ease);position:relative;overflow:hidden}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-2)}
+.stat-num{font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:500;letter-spacing:-.01em}
+.stat-num.accent{color:var(--accent)}
+.stat-num.bad{color:var(--bad)}
+.stat-num.good{color:var(--good)}
+.stat-label{font-size:10px;color:rgba(255,255,255,.42);letter-spacing:.09em;text-transform:uppercase;margin-top:5px}
+body.light .stat-label{color:rgba(0,0,0,.42)}
+.stat-bar{height:4px;border-radius:3px;background:rgba(255,255,255,.07);margin-top:11px;overflow:hidden}
+body.light .stat-bar{background:rgba(0,0,0,.07)}
+.stat-bar-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s var(--ease)}
+
+/* ── Section shell ── */
+.sect-wrap{max-width:1120px;margin:0 auto;padding:0 24px 22px}
+.sect-head{font-family:'Fraunces',serif;font-size:16px;font-weight:500;margin-bottom:11px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;letter-spacing:-.01em}
+.sect-sub{font-size:11px;font-weight:400;color:rgba(255,255,255,.4);font-family:'IBM Plex Mono',monospace}
+body.light .sect-sub{color:rgba(0,0,0,.42)}
+.panel{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--shadow-1)}
+
+/* ── Streak dots ── */
+.streak-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:2px}
+.streak-dot{width:15px;height:15px;border-radius:50%;border:1.3px solid var(--surf-line);display:flex;align-items:center;justify-content:center;
+  font-size:8px;flex-shrink:0;position:relative}
+.streak-dot.hit{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.streak-dot.miss{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.streak-dot.empty{opacity:.28}
+.streak-dot .sd-tip{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);white-space:nowrap;
+  background:var(--surf-modal);border:0.5px solid var(--surf-line);border-radius:7px;padding:5px 9px;font-size:10px;
+  font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.75);opacity:0;pointer-events:none;transition:opacity .15s;box-shadow:var(--shadow-2)}
+body.light .streak-dot .sd-tip{color:rgba(0,0,0,.75)}
+.streak-dot:hover .sd-tip{opacity:1}
+.streak-legend{font-size:10.5px;color:rgba(255,255,255,.38);margin-top:10px}
+body.light .streak-legend{color:rgba(0,0,0,.4)}
+
+/* ── Goals checklist ── */
+.goal-list{display:flex;flex-direction:column;gap:7px;margin-bottom:4px}
+.goal-row{display:flex;align-items:center;gap:10px;background:var(--surf-panel-hi);border:0.5px solid var(--surf-line);
+  border-radius:var(--r-sm);padding:10px 12px;transition:all .18s var(--ease)}
+.goal-check{width:19px;height:19px;flex-shrink:0;border-radius:50%;border:1.4px solid rgba(255,255,255,.3);background:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--good);font-size:11px;padding:0;transition:all .15s}
+body.light .goal-check{border-color:rgba(0,0,0,.3)}
+.goal-row.done .goal-check{background:var(--good);border-color:var(--good);color:#fff}
+.goal-text{flex:1;font-size:13px;min-width:0}
+.goal-row.done .goal-text{color:rgba(255,255,255,.4);text-decoration:line-through}
+body.light .goal-row.done .goal-text{color:rgba(0,0,0,.4)}
+.goal-del{width:24px;height:24px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;flex-shrink:0;transition:all .18s}
+.goal-del:hover{color:var(--bad);background:var(--bad-soft)}
+body.light .goal-del{color:rgba(0,0,0,.25)}
+.goal-carried{font-size:9px;font-family:'IBM Plex Mono',monospace;padding:2px 7px;border-radius:10px;background:var(--bad-soft);color:var(--bad);flex-shrink:0}
+
+.add-row{display:flex;gap:8px;margin-top:10px}
+.add-row input{flex:1;background:var(--surf-panel);border:0.5px dashed var(--surf-line);border-radius:11px;
+  padding:10px 13px;color:inherit;font-size:12.5px;font-family:'Inter',sans-serif;transition:border-color .18s}
+.add-row input:focus{outline:none;border-color:var(--accent);border-style:solid}
+.add-row button{background:var(--accent-soft);border:0.5px solid var(--accent);color:var(--accent);border-radius:11px;
+  padding:0 17px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .18s var(--ease)}
+.add-row button:hover{background:var(--accent);color:var(--accent-on);transform:translateY(-1px)}
+
+.day-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:13px;border-top:0.5px dashed var(--surf-line)}
+.day-status{font-size:11px;color:rgba(255,255,255,.45);font-style:italic}
+body.light .day-status{color:rgba(0,0,0,.5)}
+.close-day-btn{background:var(--good-soft);border:0.5px solid var(--good);color:var(--good);border-radius:9px;
+  padding:8px 15px;font-size:11.5px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .18s var(--ease);white-space:nowrap}
+.close-day-btn:hover{background:var(--good);color:#08120d;transform:translateY(-1px)}
+
+.empty-msg{text-align:center;padding:30px 20px;color:rgba(255,255,255,.32);font-size:13px;font-style:italic;font-family:'Fraunces',serif}
+body.light .empty-msg{color:rgba(0,0,0,.36)}
+
+/* ── Test card ── */
+.test-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+@media(max-width:520px){.test-grid{grid-template-columns:1fr}}
+.test-field label{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
+body.light .test-field label{color:rgba(0,0,0,.42)}
+.test-field input{width:100%;background:var(--surf-panel-hi);border:0.5px solid var(--surf-line);border-radius:10px;
+  padding:9px 12px;color:inherit;font-size:12.5px;font-family:'Inter',sans-serif}
+.test-field input:focus{outline:none;border-color:var(--accent)}
+.test-countdown{display:flex;align-items:baseline;gap:9px;margin-top:2px}
+.test-count-num{font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:500;color:var(--accent);letter-spacing:-.01em}
+.test-count-lbl{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.02em}
+body.light .test-count-lbl{color:rgba(0,0,0,.52)}
+.test-count-name{font-family:'Fraunces',serif;font-size:15px;margin-top:2px;font-style:italic;color:rgba(255,255,255,.75)}
+body.light .test-count-name{color:rgba(0,0,0,.72)}
+
+/* ── Focus list (weakest mock chapters) ── */
+.focus-list{display:flex;flex-direction:column;gap:7px;margin-top:2px}
+.focus-card{background:var(--surf-panel-hi);border:0.5px solid var(--surf-line);border-left:3px solid var(--bad);
+  border-radius:var(--r-sm);padding:11px 13px;transition:all .18s var(--ease)}
+.focus-card.mid{border-left-color:#c9952a}
+.focus-card.high{border-left-color:var(--good)}
+.focus-card .chap-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.focus-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px currentColor;opacity:.95}
+.focus-name{flex:1;font-size:13px;min-width:120px}
+.focus-pct{font-size:10.5px;font-family:'IBM Plex Mono',monospace;padding:3px 9px;border-radius:20px;flex-shrink:0;font-weight:500}
+.focus-pct.low{background:var(--bad-soft);color:var(--bad)}
+.focus-pct.mid{background:rgba(201,149,42,.14);color:#c9952a}
+.focus-pct.high{background:var(--good-soft);color:var(--good)}
+.jj-jump{font-size:10.5px;color:var(--accent);text-decoration:none;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.jj-jump:hover{text-decoration:underline}
+
+/* ── Status buttons / practice-percentage editing (mirrors JEE Journal) ── */
+.status-row{display:flex;gap:6px;flex-wrap:wrap}
+.status-opt{background:var(--surf-panel);border:0.5px solid var(--surf-line);border-radius:8px;padding:7px 12px;
+  font-size:11.5px;color:rgba(255,255,255,.55);cursor:pointer;font-family:'Inter',sans-serif;transition:all .18s var(--ease);letter-spacing:.01em}
+body.light .status-opt{color:rgba(0,0,0,.55)}
+.status-opt:hover{border-color:rgba(255,255,255,.32);transform:translateY(-1px)}
+body.light .status-opt:hover{border-color:rgba(0,0,0,.3)}
+.status-opt.active{text-decoration:line-through;text-decoration-thickness:1.5px}
+.status-opt[data-k="backlog"].active{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.status-opt[data-k="not_taught"].active{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.35);color:rgba(255,255,255,.85)}
+body.light .status-opt[data-k="not_taught"].active{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.35);color:rgba(0,0,0,.75)}
+.status-opt[data-k="thought"].active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.sub-opts{display:flex;flex-direction:column;gap:7px;margin-top:9px;padding-top:10px;border-top:0.5px dashed var(--surf-line)}
+.pct-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pct-label{font-size:10.5px;color:rgba(255,255,255,.45);min-width:100px;letter-spacing:.01em}
+body.light .pct-label{color:rgba(0,0,0,.5)}
+.pct-btns{display:flex;gap:4px}
+.pct-opt{background:transparent;border:0.5px solid var(--surf-line);border-radius:6px;padding:4px 9px;
+  font-size:10px;color:rgba(255,255,255,.4);cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all .18s var(--ease)}
+body.light .pct-opt{color:rgba(0,0,0,.45)}
+.pct-opt:hover{border-color:rgba(255,255,255,.38);transform:translateY(-1px)}
+body.light .pct-opt:hover{border-color:rgba(0,0,0,.35)}
+.pct-opt.active{background:var(--good-soft);border-color:var(--good);color:var(--good);font-weight:500}
+.pct-val{font-size:10px;font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.32);min-width:30px}
+body.light .pct-val{color:rgba(0,0,0,.35)}
+.chap-mock-btn{width:26px;height:26px;border-radius:8px;border:0.5px solid var(--surf-line);background:var(--accent-soft);
+  color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;
+  transition:all .18s var(--ease);flex-shrink:0}
+.chap-mock-btn:hover{border-color:var(--bad);color:var(--bad);background:var(--bad-soft);transform:scale(1.06)}
+
+/* ── Mock test scores ── */
+.mock-add-row{display:grid;grid-template-columns:1.4fr 130px 90px 90px 40px;gap:8px;margin-bottom:14px}
+@media(max-width:640px){.mock-add-row{grid-template-columns:1fr 1fr}}
+.mock-add-row input{width:100%;background:var(--surf-panel);border:0.5px dashed var(--surf-line);border-radius:11px;
+  padding:10px 12px;color:inherit;font-size:12.5px;font-family:'Inter',sans-serif;transition:border-color .18s}
+.mock-add-row input:focus{outline:none;border-color:var(--accent);border-style:solid}
+.mock-add-row button{background:var(--accent-soft);border:0.5px solid var(--accent);color:var(--accent);border-radius:11px;
+  font-size:14px;cursor:pointer;transition:all .18s var(--ease)}
+.mock-add-row button:hover{background:var(--accent);color:var(--accent-on);transform:translateY(-1px)}
+
+.mock-list{display:flex;flex-direction:column;gap:7px;margin-bottom:4px}
+.mock-row{display:flex;align-items:center;gap:10px;background:var(--surf-panel-hi);border:0.5px solid var(--surf-line);
+  border-radius:var(--r-sm);padding:10px 12px}
+.mock-name{flex:1;font-size:13px;min-width:100px}
+.mock-date{font-size:10.5px;color:rgba(255,255,255,.4);font-family:'IBM Plex Mono',monospace;flex-shrink:0}
+body.light .mock-date{color:rgba(0,0,0,.42)}
+.mock-score{font-size:11.5px;font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.6);flex-shrink:0}
+body.light .mock-score{color:rgba(0,0,0,.6)}
+.mock-pct{font-size:10.5px;font-family:'IBM Plex Mono',monospace;padding:3px 9px;border-radius:20px;flex-shrink:0;font-weight:500}
+.mock-pct.low{background:var(--bad-soft);color:var(--bad)}
+.mock-pct.mid{background:rgba(201,149,42,.14);color:#c9952a}
+.mock-pct.high{background:var(--good-soft);color:var(--good)}
+.mock-del{width:24px;height:24px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;flex-shrink:0;transition:all .18s}
+.mock-del:hover{color:var(--bad);background:var(--bad-soft)}
+body.light .mock-del{color:rgba(0,0,0,.25)}
+
+.mock-chart-wrap{margin-top:16px;padding-top:16px;border-top:0.5px dashed var(--surf-line)}
+.mock-chart-wrap svg{width:100%;height:auto;display:block}
+.mock-grid-line{stroke:rgba(255,255,255,.08);stroke-width:1}
+body.light .mock-grid-line{stroke:rgba(0,0,0,.09)}
+.mock-axis-lbl{font-size:9px;fill:rgba(255,255,255,.42);font-family:'IBM Plex Mono',monospace}
+body.light .mock-axis-lbl{fill:rgba(0,0,0,.45)}
+.mock-line{fill:none;stroke:var(--accent);stroke-width:2}
+.mock-dot{fill:var(--accent);stroke:var(--surf-panel);stroke-width:1.5}
+.mock-dot-label{font-size:9px;fill:rgba(255,255,255,.62);font-family:'IBM Plex Mono',monospace;text-anchor:middle}
+body.light .mock-dot-label{fill:rgba(0,0,0,.62)}
+
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surf-modal);
+  border:0.5px solid var(--surf-line);border-radius:var(--r-sm);padding:12px 19px;font-size:12px;color:#fff;opacity:0;pointer-events:none;
+  transition:all .3s var(--ease);z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.55);backdrop-filter:blur(10px)}
+body.light .toast{color:#1c1a15}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:640px){
+  header{padding:calc(16px + env(safe-area-inset-top)) 16px 12px}
+  .stats-wrap,.sect-wrap{padding-left:16px;padding-right:16px}
+}
+</style>
+</head>
+<body>
+<script src="retro-theme.js"></script>
+<script src="vhs-theme.js"></script>
+<script src="harsh-mode.js"></script>
+
+<header>
+  <button class="back-btn" onclick="window.location.href='index.html'" title="Back" aria-label="Back"><i class="ti ti-arrow-left"></i></button>
+  <div>
+    <div class="hdr-title"><span>Goal</span> &amp; Test Record</div>
+    <div class="hdr-sub" id="hdr-sub">Daily goals · Mock test prep</div>
+  </div>
+  <div class="hdr-spacer"></div>
+  <div class="hdr-actions">
+    <button class="icon-btn" onclick="window.location.href='jeejournal.html'" title="Open JEE Journal" aria-label="Open JEE Journal"><i class="ti ti-checklist"></i></button>
+    <button class="icon-btn" onclick="window.location.href='analyst.html'" title="Open Study Analyst" aria-label="Open Study Analyst"><i class="ti ti-report-analytics"></i></button>
+    <button class="icon-btn" onclick="resetRecord()" title="Reset goal record" aria-label="Reset goal record"><i class="ti ti-refresh"></i></button>
+  </div>
+</header>
+
+<div class="stats-wrap">
+  <div class="stats-grid" id="stats-grid"></div>
+</div>
+
+<div class="sect-wrap">
+  <div class="sect-head">Today's Goals <span class="sect-sub" id="today-date-lbl"></span></div>
+  <div class="panel">
+    <div class="goal-list" id="goal-list"></div>
+    <div class="add-row">
+      <input type="text" id="goal-inp" placeholder="Add a goal for today…" onkeydown="if(event.key==='Enter')addGoal()">
+      <button onclick="addGoal()"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="day-foot">
+      <div class="day-status" id="day-status"></div>
+      <button class="close-day-btn" onclick="closeDayManually()"><i class="ti ti-flag-check"></i> Log day &amp; carry unfinished forward</button>
+    </div>
+  </div>
+</div>
+
+<div class="sect-wrap">
+  <div class="sect-head">Streak <span class="sect-sub" id="streak-sub"></span></div>
+  <div class="panel">
+    <div class="streak-row" id="streak-row"></div>
+    <div class="streak-legend">Each dot is a logged day &mdash; green means every goal was finished or a study session was logged that day, red means neither happened. Hover a dot for details.</div>
+  </div>
+</div>
+
+<div class="sect-wrap">
+  <div class="sect-head">Upcoming Test</div>
+  <div class="panel">
+    <div class="test-grid">
+      <div class="test-field">
+        <label>Test name</label>
+        <input type="text" id="test-name-inp" placeholder="e.g. JEE Main Mock #4" oninput="updateTest()">
+      </div>
+      <div class="test-field">
+        <label>Test date</label>
+        <input type="date" id="test-date-inp" oninput="updateTest()">
+      </div>
+    </div>
+    <div id="test-countdown-wrap"></div>
+  </div>
+</div>
+
+<div class="sect-wrap">
+  <div class="sect-head">Mock Test Scores <span class="sect-sub" id="mock-sub"></span></div>
+  <div class="panel">
+    <div class="mock-add-row">
+      <input type="text" id="mock-name-inp" placeholder="Test name (optional)">
+      <input type="date" id="mock-date-inp">
+      <input type="number" id="mock-score-inp" placeholder="Score" min="0" step="any">
+      <input type="number" id="mock-max-inp" placeholder="Out of" min="1" step="any" value="300">
+      <button onclick="addMockScore()" title="Add score"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="mock-list" id="mock-list"></div>
+    <div class="mock-chart-wrap" id="mock-chart-wrap"></div>
+  </div>
+</div>
+
+<div class="sect-wrap">
+  <div class="sect-head">Prep Focus <span class="sect-sub" id="focus-sub">from JEE Journal's mock-flagged chapters</span></div>
+  <div class="panel" id="focus-panel"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =================== KEYS =================== */
+const GR_KEY='dayplan_goal_record';
+const JJ_KEY='dayplan_jee_journal';
+/* Completed focus-timer / pomodoro sessions logged on the main Canopus page (index.html),
+   read here so days you studied — even without checking off goals — count toward the streak. */
+const SESSION_HISTORY_KEY='dayplan_session_history';
+const RES_KEYS=[
+  {k:'module',lbl:'Module',weight:40},
+  {k:'pyq',lbl:'PYQ',weight:40},
+  {k:'qb',lbl:'QB',weight:5},
+  {k:'book',lbl:'External Book',weight:15}
+];
+const STATUS_OPTS=[
+  {k:'backlog',lbl:'Backlog'},
+  {k:'not_taught',lbl:'Not thought in class yet'},
+  {k:'thought',lbl:'Thought'}
+];
+
+/* =================== DATE HELPERS =================== */
+function todayStr(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(s){
+  const [y,m,d]=s.split('-').map(Number);
+  return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+}
+function fmtDateShort(s){
+  const [y,m,d]=s.split('-').map(Number);
+  return new Date(y,m-1,d).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
+function daysBetween(a,b){
+  const [ay,am,ad]=a.split('-').map(Number), [by,bm,bd]=b.split('-').map(Number);
+  const A=Date.UTC(ay,am-1,ad), B=Date.UTC(by,bm-1,bd);
+  return Math.round((B-A)/86400000);
+}
+
+/* =================== STORAGE =================== */
+function grLoad(){
+  try{
+    const raw=localStorage.getItem(GR_KEY);
+    if(raw){
+      const data=JSON.parse(raw);
+      if(data && typeof data==='object'){
+        if(!Array.isArray(data.goals)) data.goals=[];
+        if(!Array.isArray(data.history)) data.history=[];
+        if(!data.goalsDate) data.goalsDate=todayStr();
+        if(!data.test) data.test={name:'',date:''};
+        if(!Array.isArray(data.mockScores)) data.mockScores=[];
+        return data;
+      }
+    }
+  }catch(e){}
+  return {goals:[],goalsDate:todayStr(),history:[],test:{name:'',date:''},mockScores:[]};
+}
+function grSave(){ try{ localStorage.setItem(GR_KEY, JSON.stringify(gr)); }catch(e){} }
+
+let gr=grLoad();
+
+/* Roll the day forward: if the stored goal list belongs to an earlier date, close it into
+   history (unless it was empty) and carry any unfinished goals into today, reset to undone. */
+function rollDayIfNeeded(){
+  const today=todayStr();
+  if(gr.goalsDate===today) return;
+  if(gr.goals.length){
+    closeDay(gr.goalsDate);
+    gr.goals=gr.goals.filter(g=>!g.done).map(g=>({...g,done:false,carried:true}));
+  }
+  gr.goalsDate=today;
+  grSave();
+}
+function closeDay(dateStr){
+  const total=gr.goals.length;
+  const done=gr.goals.filter(g=>g.done).length;
+  if(!total) return;
+  // Replace any existing entry for this date (manual re-close) rather than duplicating it.
+  gr.history=gr.history.filter(h=>h.date!==dateStr);
+  gr.history.push({date:dateStr, total, done, allDone: done===total});
+  gr.history.sort((a,b)=>a.date<b.date?-1:1);
+}
+
+/* =================== THEME SYNC =================== */
+(function syncTheme(){
+  try{
+    const t=localStorage.getItem('dayplan_theme');
+    const a=localStorage.getItem('dayplan_accent');
+    const s=localStorage.getItem('dayplan_surface');
+    if(t==='light') document.body.classList.add('light');
+    if(t==='dark'&&s==='grey') document.body.classList.add('grey');
+    if(a) document.body.dataset.accent=a;
+  }catch(e){}
+})();
+
+/* =================== TOAST =================== */
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function escHtml(s){ return (s||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+
+/* =================== GOAL MUTATIONS =================== */
+function addGoal(){
+  const inp=document.getElementById('goal-inp');
+  const text=(inp.value||'').trim();
+  if(!text) return;
+  gr.goals.push({id:'g'+Date.now()+Math.floor(Math.random()*1000),text,done:false});
+  inp.value='';
+  grSave();
+  render();
+}
+function toggleGoal(id){
+  const g=gr.goals.find(x=>x.id===id); if(!g) return;
+  g.done=!g.done;
+  grSave();
+  render();
+}
+function deleteGoal(id){
+  gr.goals=gr.goals.filter(x=>x.id!==id);
+  grSave();
+  render();
+}
+function closeDayManually(){
+  if(!gr.goals.length){ toast('Add at least one goal before logging the day'); return; }
+  const total=gr.goals.length, done=gr.goals.filter(g=>g.done).length;
+  if(!confirm(`Log today as ${done}/${total} goals done, then carry the ${total-done} unfinished one${total-done===1?'':'s'} forward to a fresh list?`)) return;
+  closeDay(gr.goalsDate);
+  gr.goals=gr.goals.filter(g=>!g.done).map(g=>({...g,done:false,carried:true}));
+  grSave();
+  render();
+  toast(done===total?'Full day logged — nice work':'Day logged, unfinished goals carried forward');
+}
+
+/* =================== MOCK SCORE MUTATIONS =================== */
+function addMockScore(){
+  const nameInp=document.getElementById('mock-name-inp');
+  const dateInp=document.getElementById('mock-date-inp');
+  const scoreInp=document.getElementById('mock-score-inp');
+  const maxInp=document.getElementById('mock-max-inp');
+  const score=parseFloat(scoreInp.value);
+  const max=parseFloat(maxInp.value);
+  if(isNaN(score)||isNaN(max)||max<=0){ toast('Enter a score and a valid "out of" total'); return; }
+  gr.mockScores.push({
+    id:'m'+Date.now()+Math.floor(Math.random()*1000),
+    name:(nameInp.value||'').trim(),
+    date:dateInp.value||todayStr(),
+    score, max
+  });
+  nameInp.value=''; scoreInp.value=''; dateInp.value='';
+  grSave();
+  render();
+  toast('Mock score added');
+}
+function deleteMockScore(id){
+  gr.mockScores=gr.mockScores.filter(x=>x.id!==id);
+  grSave();
+  render();
+}
+function resetRecord(){
+  if(!confirm('Reset the goal record? This clears today\'s goals, your whole history, the test countdown, and your mock score log.')) return;
+  localStorage.removeItem(GR_KEY);
+  gr=grLoad();
+  render();
+  toast('Goal record reset');
+}
+
+/* =================== TEST COUNTDOWN =================== */
+function updateTest(){
+  gr.test.name=document.getElementById('test-name-inp').value;
+  gr.test.date=document.getElementById('test-date-inp').value;
+  grSave();
+  renderTest();
+}
+
+/* =================== SESSION LOG (from index.html) =================== */
+/* Maps 'YYYY-MM-DD' -> {count, sec} for every day that has at least one completed
+   focus/study session logged on the main page. */
+function sessionDayMap(){
+  const map={};
+  try{
+    const raw=localStorage.getItem(SESSION_HISTORY_KEY);
+    if(raw){
+      const arr=JSON.parse(raw);
+      if(Array.isArray(arr)){
+        arr.forEach(e=>{
+          if(!e||!e.ts) return;
+          const d=new Date(e.ts);
+          if(isNaN(d)) return;
+          const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+          if(!map[key]) map[key]={count:0,sec:0};
+          map[key].count++;
+          map[key].sec+=(e.dur||0);
+        });
+      }
+    }
+  }catch(e){}
+  return map;
+}
+/* Merges gr.history (goal-log entries) with logged study-session days: a day counts as
+   "hit" if either every goal was finished OR at least one session was logged that day —
+   showing up and studying credits the streak even without a full goal sweep. */
+function mergedHistory(){
+  const sessDays=sessionDayMap();
+  const byDate={};
+  gr.history.forEach(h=>{ byDate[h.date]={...h}; });
+  Object.keys(sessDays).forEach(date=>{
+    const s=sessDays[date];
+    if(byDate[date]){
+      if(!byDate[date].allDone){
+        byDate[date]={...byDate[date], allDone:true, sessionCredit:true, sessionCount:s.count, sessionSec:s.sec};
+      }
+    } else {
+      byDate[date]={date, total:0, done:0, allDone:true, sessionOnly:true, sessionCount:s.count, sessionSec:s.sec};
+    }
+  });
+  return Object.values(byDate).sort((a,b)=>a.date<b.date?-1:1);
+}
+
+/* =================== STREAK CALC =================== */
+function streakStats(){
+  const h=mergedHistory();
+  let current=0;
+  for(let i=h.length-1;i>=0;i--){
+    if(h[i].allDone) current++; else break;
+  }
+  let best=0, run=0;
+  h.forEach(e=>{
+    if(e.allDone){ run++; best=Math.max(best,run); } else run=0;
+  });
+  const totalDays=h.length;
+  const hitDays=h.filter(e=>e.allDone).length;
+  const rate=totalDays?Math.round(hitDays/totalDays*100):0;
+  return {current,best,totalDays,hitDays,rate};
+}
+
+/* =================== JJ (JEE Journal) READ =================== */
+function jjChapters(){
+  try{
+    const raw=localStorage.getItem(JJ_KEY);
+    if(raw){
+      const data=JSON.parse(raw);
+      if(Array.isArray(data)) return data;
+    }
+  }catch(e){}
+  return null;
+}
+function jjChaptersSave(data){ try{ localStorage.setItem(JJ_KEY, JSON.stringify(data)); }catch(e){} }
+function chapterPrepScore(c){
+  if(c.status!=='thought') return 0;
+  const earned=RES_KEYS.reduce((a,r)=>a+r.weight*((c.practiced&&c.practiced[r.k]||0)/100),0);
+  return Math.round(earned);
+}
+function prepTier(score){
+  if(score>=75) return 'high';
+  if(score>=40) return 'mid';
+  return 'low';
+}
+function subjColor(s){ return s==='Physics'?'#5a9fd4':s==='Chemistry'?'#4a9a6a':'#c9952a'; }
+
+/* =================== RENDER =================== */
+function renderStats(){
+  const s=streakStats();
+  const today=gr.goals;
+  const todayDone=today.filter(g=>g.done).length;
+  const grid=document.getElementById('stats-grid');
+  let html='';
+  html+=`<div class="stat-card">
+    <div class="stat-num accent">${s.current}</div>
+    <div class="stat-label">Current streak (days)</div>
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num" style="color:#c9952a">${s.best}</div>
+    <div class="stat-label">Best streak (days)</div>
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num">${s.hitDays}<span style="font-size:13px;color:rgba(255,255,255,.3)"> / ${s.totalDays}</span></div>
+    <div class="stat-label">Full days logged</div>
+    ${s.totalDays?`<div class="stat-bar"><div class="stat-bar-fill" style="width:${s.rate}%"></div></div>`:''}
+  </div>`;
+  html+=`<div class="stat-card">
+    <div class="stat-num ${today.length && todayDone===today.length?'good':''}">${today.length?todayDone+' / '+today.length:'—'}</div>
+    <div class="stat-label">Today's goals</div>
+  </div>`;
+  const chapters=jjChapters();
+  if(chapters){
+    const counted=chapters.filter(c=>c.status!=='not_taught');
+    const overallAvg=counted.length?Math.round(counted.reduce((a,c)=>a+chapterPrepScore(c),0)/counted.length):0;
+    const mockChs=chapters.filter(c=>c.mock).filter(c=>c.status!=='not_taught');
+    const mockAvg=mockChs.length?Math.round(mockChs.reduce((a,c)=>a+chapterPrepScore(c),0)/mockChs.length):0;
+    html+=`<div class="stat-card">
+      <div class="stat-num" style="color:${counted.length?(overallAvg>=75?'var(--good)':overallAvg>=40?'#c9952a':'var(--bad)'):'inherit'}">${counted.length?overallAvg+'%':'—'}</div>
+      <div class="stat-label">JEE readiness</div>
+    </div>`;
+    html+=`<div class="stat-card">
+      <div class="stat-num" style="color:${mockChs.length?(mockAvg>=75?'var(--good)':mockAvg>=40?'#c9952a':'var(--bad)'):'inherit'}">${mockChs.length?mockAvg+'%':'—'}</div>
+      <div class="stat-label">Mock test readiness</div>
+    </div>`;
+  }
+  if(gr.mockScores.length){
+    const sortedMocks=[...gr.mockScores].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+    const latest=sortedMocks[sortedMocks.length-1];
+    const latestPct=Math.round(latest.score/latest.max*100);
+    html+=`<div class="stat-card">
+      <div class="stat-num" style="color:${latestPct>=75?'var(--good)':latestPct>=40?'#c9952a':'var(--bad)'}">${latestPct}%</div>
+      <div class="stat-label">Latest mock score</div>
+    </div>`;
+  }
+  grid.innerHTML=html;
+}
+
+function renderGoals(){
+  document.getElementById('today-date-lbl').textContent=fmtDate(gr.goalsDate);
+  const wrap=document.getElementById('goal-list');
+  if(!gr.goals.length){
+    wrap.innerHTML=`<div class="empty-msg">No goals added yet today. What do you want to get done?</div>`;
+  } else {
+    wrap.innerHTML=gr.goals.map(g=>`
+      <div class="goal-row${g.done?' done':''}">
+        <button class="goal-check" onclick="toggleGoal('${g.id}')">${g.done?'<i class="ti ti-check"></i>':''}</button>
+        <div class="goal-text">${escHtml(g.text)}</div>
+        ${g.carried?'<span class="goal-carried">carried over</span>':''}
+        <button class="goal-del" onclick="deleteGoal('${g.id}')"><i class="ti ti-x"></i></button>
+      </div>`).join('');
+  }
+  const total=gr.goals.length, done=gr.goals.filter(g=>g.done).length;
+  const statusEl=document.getElementById('day-status');
+  if(!total) statusEl.textContent='';
+  else if(done===total) statusEl.textContent='All goals done — log the day whenever you\'re ready.';
+  else statusEl.textContent=`${total-done} goal${total-done===1?'':'s'} still open.`;
+}
+
+function renderStreak(){
+  const s=streakStats();
+  document.getElementById('streak-sub').textContent = s.totalDays ? `${s.rate}% of logged days completed` : 'No days logged yet';
+  const wrap=document.getElementById('streak-row');
+  const recent=mergedHistory().slice(-21);
+  if(!recent.length){
+    wrap.innerHTML=`<div class="empty-msg" style="padding:14px 6px">Log your first day to start a streak.</div>`;
+    return;
+  }
+  wrap.innerHTML=recent.map(e=>{
+    let tip;
+    if(e.sessionOnly){
+      tip=`${fmtDate(e.date)} · ${e.sessionCount} session${e.sessionCount===1?'':'s'} logged`;
+    } else if(e.sessionCredit){
+      tip=`${fmtDate(e.date)} · ${e.done}/${e.total} goals · ${e.sessionCount} session${e.sessionCount===1?'':'s'}`;
+    } else {
+      tip=`${fmtDate(e.date)} · ${e.done}/${e.total}`;
+    }
+    return `
+    <div class="streak-dot ${e.allDone?'hit':'miss'}">
+      ${e.allDone?'<i class="ti ti-check"></i>':'<i class="ti ti-x"></i>'}
+      <span class="sd-tip">${tip}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderTest(){
+  document.getElementById('test-name-inp').value=gr.test.name||'';
+  document.getElementById('test-date-inp').value=gr.test.date||'';
+  const wrap=document.getElementById('test-countdown-wrap');
+  if(!gr.test.date){
+    wrap.innerHTML=`<div class="empty-msg" style="padding:18px 6px">Set a test date to see a countdown here.</div>`;
+    return;
+  }
+  const days=daysBetween(todayStr(),gr.test.date);
+  let lbl;
+  if(days>0) lbl=`day${days===1?'':'s'} to go`;
+  else if(days===0) lbl='it\'s today';
+  else lbl=`day${days===-1?'':'s'} ago`;
+  wrap.innerHTML=`
+    <div class="test-countdown">
+      <div class="test-count-num">${Math.abs(days)}</div>
+      <div class="test-count-lbl">${lbl}</div>
+    </div>
+    ${gr.test.name?`<div class="test-count-name">${escHtml(gr.test.name)}</div>`:''}
+  `;
+}
+
+/* =================== MOCK SCORES =================== */
+function renderMockScores(){
+  const listWrap=document.getElementById('mock-list');
+  const chartWrap=document.getElementById('mock-chart-wrap');
+  const subEl=document.getElementById('mock-sub');
+  const entries=[...gr.mockScores].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+  if(!entries.length){
+    subEl.textContent='';
+    listWrap.innerHTML=`<div class="empty-msg" style="padding:18px 6px">No mock scores logged yet — add one above.</div>`;
+    chartWrap.innerHTML='';
+    return;
+  }
+  const latestPct=Math.round(entries[entries.length-1].score/entries[entries.length-1].max*100);
+  subEl.textContent=`${entries.length} logged \u00b7 latest ${latestPct}%`;
+  listWrap.innerHTML=entries.slice().reverse().map(e=>{
+    const pct=Math.round(e.score/e.max*100);
+    const tier=prepTier(pct);
+    return `<div class="mock-row">
+      <span class="mock-name">${escHtml(e.name)||'Mock test'}</span>
+      <span class="mock-date">${fmtDateShort(e.date)}</span>
+      <span class="mock-score">${e.score}/${e.max}</span>
+      <span class="mock-pct ${tier}">${pct}%</span>
+      <button class="mock-del" title="Delete this score" onclick="deleteMockScore('${e.id}')"><i class="ti ti-x"></i></button>
+    </div>`;
+  }).join('');
+  chartWrap.innerHTML = mockScoreChart(entries);
+}
+
+/* Line chart of mock score % over time. Handles a single point (dot only, no line)
+   and thins out x-axis date labels once there are many entries so they don't overlap. */
+function mockScoreChart(entries){
+  const w=680,h=200,padL=30,padR=16,padT=16,padB=26;
+  const innerW=w-padL-padR, innerH=h-padT-padB;
+  const n=entries.length;
+  const pts=entries.map((e,i)=>{
+    const pct=Math.max(0,Math.min(100,e.score/e.max*100));
+    const x = n===1 ? padL+innerW/2 : padL + (i/(n-1))*innerW;
+    const y = padT + innerH - (pct/100)*innerH;
+    return {x,y,pct,e};
+  });
+  let grid='';
+  [0,25,50,75,100].forEach(pct=>{
+    const y=padT+innerH-(pct/100)*innerH;
+    grid+=`<line class="mock-grid-line" x1="${padL}" y1="${y.toFixed(1)}" x2="${w-padR}" y2="${y.toFixed(1)}"/>`;
+    grid+=`<text class="mock-axis-lbl" x="${padL-6}" y="${(y+3).toFixed(1)}" text-anchor="end">${pct}</text>`;
+  });
+  const linePts=pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const dots=pts.map(p=>`
+    <circle class="mock-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4">
+      <title>${fmtDateShort(p.e.date)} \u00b7 ${p.e.score}/${p.e.max} (${Math.round(p.pct)}%)</title>
+    </circle>
+    <text class="mock-dot-label" x="${p.x.toFixed(1)}" y="${(p.y-10).toFixed(1)}">${Math.round(p.pct)}%</text>`).join('');
+  const step = n>10 ? Math.ceil(n/10) : 1;
+  const xLabels=pts.map((p,i)=>{
+    if(i%step!==0 && i!==n-1) return '';
+    return `<text class="mock-axis-lbl" x="${p.x.toFixed(1)}" y="${h-6}" text-anchor="middle">${fmtDateShort(p.e.date)}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+    ${grid}
+    ${n>1?`<polyline class="mock-line" points="${linePts}"/>`:''}
+    ${dots}
+    ${xLabels}
+  </svg>`;
+}
+
+function renderFocus(){
+  const panel=document.getElementById('focus-panel');
+  const chapters=jjChapters();
+  if(!chapters){
+    panel.innerHTML=`<div class="empty-msg">No JEE Journal data found on this device yet — open JEE Journal and flag some chapters for a mock test.</div>`;
+    return;
+  }
+  const mockChs=chapters.filter(c=>c.mock);
+  if(!mockChs.length){
+    panel.innerHTML=`<div class="empty-msg">Nothing flagged for a mock test yet — open JEE Journal and tap the target icon on chapters you want tracked here.</div>`;
+    return;
+  }
+  const sorted=[...mockChs].sort((a,b)=>chapterPrepScore(a)-chapterPrepScore(b));
+  panel.innerHTML=`<div class="focus-list">${sorted.map(renderFocusCard).join('')}</div>
+  <a class="jj-jump" style="display:inline-block;margin-top:12px" onclick="window.location.href='jeejournal.html'">Manage chapters in JEE Journal &rarr;</a>`;
+}
+
+function renderFocusCard(c){
+  const score=chapterPrepScore(c);
+  const tier=prepTier(score);
+  const statusBtns=STATUS_OPTS.map(s=>`
+    <button class="status-opt${c.status===s.k?' active':''}" data-k="${s.k}"
+      title="${c.status===s.k?'Click to unmark':'Mark chapter as '+s.lbl.toLowerCase()}"
+      onclick="focusSetStatus('${c.id}','${s.k}')">${s.lbl}</button>`).join('');
+  const subOpts = c.status==='thought' ? `
+    <div class="sub-opts">
+      ${RES_KEYS.map(r=>{
+        const val=(c.practiced&&c.practiced[r.k])||0;
+        const btns=[25,50,75,100].map(p=>`
+          <button class="pct-opt${val===p?' active':''}"
+            title="Rate ${r.lbl} at ${p}%${val===p?' (tap again to clear)':''}"
+            onclick="focusSetPracticedPct('${c.id}','${r.k}',${p})">${p}</button>`).join('');
+        return `<div class="pct-row">
+          <span class="pct-label" title="${r.weight}% of mock-test readiness">${r.lbl}</span>
+          <div class="pct-btns">${btns}</div>
+          <span class="pct-val">${val}%</span>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+  return `<div class="focus-card ${tier}">
+    <div class="chap-top">
+      <span class="focus-dot" style="background:${subjColor(c.subject)};color:${subjColor(c.subject)}"></span>
+      <span class="focus-name">${escHtml(c.name)}</span>
+      <span class="focus-pct ${tier}">${c.status==='thought'?score+'% ready':'not thought yet'}</span>
+      <button class="chap-mock-btn" title="Remove from upcoming mock test" onclick="focusToggleMock('${c.id}')"><i class="ti ti-target-arrow"></i></button>
+    </div>
+    <div class="status-row">${statusBtns}</div>
+    ${subOpts}
+  </div>`;
+}
+
+function focusSetStatus(id,status){
+  const chapters=jjChapters(); if(!chapters) return;
+  const c=chapters.find(x=>x.id===id); if(!c) return;
+  c.status = (c.status===status) ? 'not_taught' : status;
+  jjChaptersSave(chapters);
+  render();
+}
+function focusSetPracticedPct(id,key,pct){
+  const chapters=jjChapters(); if(!chapters) return;
+  const c=chapters.find(x=>x.id===id); if(!c) return;
+  if(!c.practiced) c.practiced={module:0,pyq:0,qb:0,book:0};
+  c.practiced[key] = (c.practiced[key]===pct) ? 0 : pct;
+  jjChaptersSave(chapters);
+  render();
+}
+function focusToggleMock(id){
+  const chapters=jjChapters(); if(!chapters) return;
+  const c=chapters.find(x=>x.id===id); if(!c) return;
+  c.mock=false;
+  jjChaptersSave(chapters);
+  render();
+  toast('Removed from mock test');
+}
+
+function render(){
+  renderStats();
+  renderGoals();
+  renderStreak();
+  renderTest();
+  renderMockScores();
+  renderFocus();
+}
+
+rollDayIfNeeded();
+render();
+
+/* Live cross-tab sync: if JEE Journal (or another Goal Record tab) edits chapter or goal
+   data, pick up the change immediately instead of waiting for a manual reload. */
+window.addEventListener('storage', function(e){
+  if(e.key===GR_KEY){
+    gr=grLoad();
+    render();
+  } else if(e.key===JJ_KEY || e.key===SESSION_HISTORY_KEY){
+    render();
+  }
+});
+</script>
+<script>
+/* ---- Canopus global terminal shortcut: redirects into index.html's Terminal page ---- */
+(function(){
+  var SC_KEY='canopus_term_shortcut';
+  function getShortcut(){
+    try{var raw=localStorage.getItem(SC_KEY);if(raw)return JSON.parse(raw);}catch(e){}
+    return {alt:true,ctrl:false,shift:false,meta:false,key:'`'};
+  }
+  function matches(e,sc){
+    if(!sc||!sc.key)return false;
+    return !!sc.ctrl===e.ctrlKey&&!!sc.alt===e.altKey&&!!sc.shift===e.shiftKey&&!!sc.meta===e.metaKey&&(e.key||'').toLowerCase()===sc.key.toLowerCase();
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(matches(e,getShortcut())){
+      e.preventDefault();
+      window.location.href='index.html?openTerminal=1';
+    }
+  },true);
+})();
+</script>
+<script>
+/* ---- Canopus: local keyboard shortcut to hide/show this page's header (persists across all Canopus pages) ---- */
+(function(){
+  var nav=document.getElementById('app-nav')||document.querySelector('header');
+  if(!nav)return;
+  function setHidden(hidden){
+    document.documentElement.classList.toggle('chdr-hidden',hidden);
+    try{localStorage.setItem('canopusHeaderHidden',hidden?'1':'0');}catch(e){}
+  }
+  document.addEventListener('keydown',function(e){
+    var el=document.activeElement;
+    var typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+    if(typing)return;
+    if(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.metaKey&&(e.key||'').toLowerCase()==='h'){
+      e.preventDefault();
+      setHidden(!document.documentElement.classList.contains('chdr-hidden'));
+    }
+  },true);
+})();
+</script>
+<script>
+/* Auto-fullscreen on first interaction (matches index.html behavior) */
+(function(){
+  try{ if(localStorage.getItem('canopus_autofs_disabled')==='1') return; }catch(e){}
+  function armAutoFullscreen(){
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(function(){});
+    }
+    document.removeEventListener('click',armAutoFullscreen,true);
+    document.removeEventListener('touchend',armAutoFullscreen,true);
+    document.removeEventListener('keydown',armAutoFullscreen,true);
+  }
+  document.addEventListener('click',armAutoFullscreen,true);
+  document.addEventListener('touchend',armAutoFullscreen,true);
+  document.addEventListener('keydown',armAutoFullscreen,true);
+})();
+</script>
+</body>
+</html>

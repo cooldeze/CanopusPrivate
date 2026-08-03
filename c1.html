@@ -198,6 +198,10 @@ body.light .page-name-tag{color:rgba(0,0,0,.4)}
 .sky-name-tag{pointer-events:auto;font-size:11px;color:rgba(255,255,255,.55);flex-shrink:0}
 body.light .sky-name-tag{color:rgba(0,0,0,.4)}
 .sky-name-tag .nm-info-btn{width:18px;height:18px;font-size:10px}
+.founder-note-btn{position:fixed;bottom:16px;left:16px;z-index:90;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:all .2s;backdrop-filter:blur(6px)}
+.founder-note-btn:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.1)}
+body.light .founder-note-btn{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.2);color:rgba(0,0,0,.5)}
+body.light .founder-note-btn:hover{color:#000;border-color:#000;background:rgba(0,0,0,.06)}
 .nm-modal-note-text{font-size:13.5px;color:#C7C8CB;line-height:1.85;white-space:pre-line;margin-bottom:16px}
 .nm-modal-signoff{font-size:12.5px;color:#888;font-style:italic;text-align:right}
 body.light .nm-modal-note-text{color:#3A382F}
@@ -427,52 +431,6 @@ body.light .nm-modal-signoff{color:#8a8578}
 .stat-l{font-size:10px;color:#2a2a2a;letter-spacing:.12em;text-transform:uppercase;margin-top:4px}
 
 /* ── MODALS ── */
-#cmdk-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(2px);z-index:99997;display:flex;align-items:flex-start;justify-content:center;padding-top:12vh;opacity:0;pointer-events:none;transition:opacity .15s}
-#cmdk-overlay.open{opacity:1;pointer-events:auto}
-#cmdk-box{width:min(560px,90vw);max-height:60vh;background:var(--surf-modal,var(--surf-panel));border:0.5px solid var(--surf-line);border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden;transform:translateY(-8px);transition:transform .15s}
-#cmdk-overlay.open #cmdk-box{transform:translateY(0)}
-#cmdk-input-row{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:0.5px solid var(--surf-line);flex:0 0 auto}
-#cmdk-input-row i{font-size:16px;color:#666}
-#cmdk-input{flex:1;background:none;border:none;outline:none;color:#fff;font-family:'Inter',sans-serif;font-size:14px;letter-spacing:.01em}
-#cmdk-input::placeholder{color:#555}
-#cmdk-esc{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#666;border:0.5px solid var(--surf-line);border-radius:4px;padding:2px 6px;flex:0 0 auto}
-#cmdk-list{overflow-y:auto;padding:6px;flex:1 1 auto}
-.cmdk-group-label{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#555;padding:10px 10px 4px}
-.cmdk-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:8px;cursor:pointer;color:#ccc}
-.cmdk-item i{font-size:15px;color:#777;flex:0 0 auto;width:16px;text-align:center}
-.cmdk-item .cmdk-item-title{font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cmdk-item .cmdk-item-sub{font-size:11px;color:#666;flex:0 0 auto;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cmdk-item.active{background:var(--accent-soft,rgba(255,255,255,.06))}
-.cmdk-item.active i,.cmdk-item.active .cmdk-item-title{color:#fff}
-#cmdk-empty{padding:28px 16px;text-align:center;color:#555;font-size:12.5px}
-.cmdk-flash{animation:cmdkFlash 1.4s ease}
-@keyframes cmdkFlash{0%{background:var(--accent-soft,rgba(255,255,255,.12))}100%{background:transparent}}
-
-/* ── ALFRED CHAT (Ctrl+Q quick-open) ── */
-#alfred-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(2px);z-index:99998;display:flex;align-items:center;justify-content:center;padding:6vh 16px;opacity:0;pointer-events:none;transition:opacity .15s}
-#alfred-overlay.open{opacity:1;pointer-events:auto}
-#alfred-box{width:min(480px,92vw);height:min(600px,80vh);background:var(--surf-modal,var(--surf-panel));border:0.5px solid var(--surf-line);border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden;transform:translateY(-8px);transition:transform .15s}
-#alfred-overlay.open #alfred-box{transform:translateY(0)}
-#alfred-head{display:flex;align-items:center;gap:9px;padding:13px 16px;border-bottom:0.5px solid var(--surf-line);flex:0 0 auto}
-#alfred-head i{font-size:15px;color:var(--accent,#c0392b)}
-#alfred-head-title{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#eee;flex:1}
-.alfred-head-sub{font-size:10px;color:#666;font-family:'IBM Plex Mono',monospace}
-#alfred-close{background:none;border:none;color:#666;cursor:pointer;font-size:15px;padding:2px;line-height:1}
-#alfred-close:hover{color:#ccc}
-#alfred-log{flex:1 1 auto;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
-.alfred-msg{max-width:86%;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.55;padding:9px 11px;border-radius:10px;white-space:pre-wrap;word-break:break-word}
-.alfred-msg.user{align-self:flex-end;background:var(--accent-soft,rgba(255,255,255,.08));color:#eee;border-bottom-right-radius:2px}
-.alfred-msg.bot{align-self:flex-start;background:rgba(255,255,255,.04);color:#ccc;border:0.5px solid var(--surf-line);border-bottom-left-radius:2px}
-.alfred-msg.bot.thinking{color:#666;font-style:italic}
-.alfred-msg.bot.error{color:#e2645a;border-color:rgba(226,100,90,.3)}
-#alfred-empty{margin:auto;text-align:center;color:#555;font-size:12px;font-family:'IBM Plex Mono',monospace;padding:0 20px}
-#alfred-input-row{display:flex;align-items:flex-end;gap:8px;padding:10px 12px;border-top:0.5px solid var(--surf-line);flex:0 0 auto}
-#alfred-input{flex:1;background:transparent;border:0.5px solid var(--surf-line);border-radius:8px;outline:none;resize:none;color:#eee;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.5;padding:8px 10px;max-height:110px}
-#alfred-input::placeholder{color:#555}
-#alfred-input:focus{border-color:var(--accent,#c0392b)}
-#alfred-send{flex:0 0 auto;background:var(--accent,#c0392b);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:opacity .15s}
-#alfred-send:disabled{opacity:.35;cursor:default}
-#alfred-esc{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#666;border:0.5px solid var(--surf-line);border-radius:4px;padding:2px 6px;flex:0 0 auto}
 .modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-bg.open{opacity:1;pointer-events:auto}
 .modal{background:#080808;border:0.5px solid var(--surf-line);border-radius:14px;padding:28px;width:340px}
@@ -750,22 +708,6 @@ html.crt-retro .flight-hud.hud-idle .flight-hud-grip span{
 .presence-review .m-btn{flex:none;padding:9px 20px}
 /* This is diagnostic camera output, not decorative — never phosphor-tint it. */
 html.crt-retro .presence-review-frame img{filter:none !important;opacity:1 !important}
-/* ── "Are you there?" chime alert: opens at 4 minutes of continuous no-person
-   reads, stays open (with a repeating chime — see playPresenceChime) until the
-   person taps "I'm here", or the camera finds them again on its own. Same
-   fixed-overlay pattern as .presence-review-bg and for the same reason: it
-   must stay visible regardless of ancestor opacity/close state. Deliberately
-   has NO backdrop-click-to-dismiss — unlike the review modal, this one is
-   only ever closed by an explicit confirmation (button or camera hit), never
-   by an accidental click, since the whole point is to force acknowledgement. */
-.presence-alert-bg{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9700;opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
-.presence-alert-bg.open{opacity:1;pointer-events:auto}
-.presence-alert{background:#080808;border:0.5px solid rgba(220,150,90,0.4);border-radius:16px;padding:28px;width:360px;max-width:92vw;text-align:center}
-.presence-alert-icon{width:52px;height:52px;border-radius:50%;background:rgba(220,150,90,0.12);border:0.5px solid rgba(220,150,90,0.5);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;color:#e0a25a;animation:presenceAlertPulse 1.4s ease-in-out infinite}
-@keyframes presenceAlertPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,150,90,0.35)}50%{box-shadow:0 0 0 10px rgba(220,150,90,0)}}
-.presence-alert h3{font-size:15px;font-weight:500;color:#eee;margin-bottom:8px;letter-spacing:.02em}
-.presence-alert p{font-size:12px;color:#999;line-height:1.6;margin-bottom:20px}
-.presence-alert .m-btn{flex:none;padding:10px 28px;font-size:13px}
 /* ── Webcam preview: button + floating panel showing exactly what presence
    strict mode's detector sees. The button only appears while a webcam session
    is actually active (shown/hidden alongside flight-presence-badge). ── */
@@ -1963,6 +1905,7 @@ html,body{overflow-x:hidden}
   .nm-modal-title-all,.nm-modal-heading{font-size:17px}
   .page-name-tag,.sky-name-tag{font-size:10px}
   .page-name-tag{left:16px}
+  .founder-note-btn{width:26px;height:26px;font-size:11px;bottom:12px;left:12px}
 }
 @media(max-width:420px){
   .nm-paren{display:block;margin-left:0}
@@ -2493,63 +2436,6 @@ body.light .sys-toast{background:#fff;border-color:#ddd;color:#333;box-shadow:0 
 /* ── 13. SKIP LINK ── */
 .skip-link{position:absolute;top:-40px;left:0;background:var(--accent);color:var(--accent-on);padding:8px 16px;font-size:12px;font-weight:500;z-index:99999;transition:top .2s;border-radius:0 0 8px 0;font-family:'Inter',sans-serif}
 .skip-link:focus{top:0;outline:none}
-
-/* ── 14. GRIND (experience journal — Gotham case-file style) ── */
-.grind-wrap{
-  --gy:#E2231A;--gy-dim:rgba(226,35,26,.32);--gy-faint:rgba(226,35,26,.1);
-  max-width:none;margin:0;padding:calc(80px + env(safe-area-inset-top)) 40px 120px;width:100%;
-  font-family:'IBM Plex Mono',monospace;text-align:left;position:relative;isolation:isolate;
-}
-.grind-wrap::before{
-  content:'';position:absolute;top:60px;right:-40px;width:340px;height:340px;z-index:-1;pointer-events:none;
-  opacity:.06;
-  background-repeat:no-repeat;background-size:contain;
-  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60'%3E%3Cpath fill='%23E2231A' d='M50 8c-2-4-6-6-10-6 2 3 3 6 3 9-6-6-14-9-23-9 4 4 6 9 6 14C16 12 6 10 0 12c8 4 13 10 15 17-6-2-11 0-15 4 6 0 11 2 14 6-4 0-8 2-10 5 5-1 10 0 13 3-3 2-5 5-6 8 4-2 8-3 12-3 1 4 4 7 7 8-1-4-1-8 1-11 3 5 8 8 14 8-3-3-5-7-5-11 4 3 9 4 14 3-4-2-7-5-8-9 5 2 10 1 14-2-4-1-8-4-10-8 5 0 9-2 12-6-4 0-8-1-11-4 4-2 7-6 8-10-4 2-8 3-12 2 2-4 2-9 0-13-2 4-5 7-9 8 1-5 0-10-3-14-1 5-4 9-8 11 0-5-2-9-5-12z'/%3E%3C/svg%3E");
-}
-.grind-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;position:relative}
-.grind-back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:#666;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:0 0 12px;font-family:'IBM Plex Mono',monospace;transition:color .15s}
-.grind-back-btn:hover{color:var(--gy)}
-.grind-title{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:16px;letter-spacing:.22em;color:#f2f2f2;margin:0;text-transform:uppercase;border-left:3px solid var(--gy);padding-left:10px}
-.grind-title::before{content:none}
-.grind-sub{font-size:10.5px;color:#666;letter-spacing:.08em;text-transform:uppercase;margin-top:6px;padding-left:13px;display:block}
-.grind-composer{background:#050505;border:1px solid var(--gy-dim);border-radius:0;padding:12px;margin-bottom:30px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.6)}
-.grind-textarea{width:100%;min-height:64px;background:transparent;border:none;outline:none;resize:vertical;color:#ddd;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.6;padding:2px}
-.grind-textarea::placeholder{color:#444}
-.grind-composer-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:10px;flex-wrap:wrap;border-top:0.5px solid var(--gy-faint);padding-top:9px}
-.grind-tag-input{flex:1;min-width:120px;background:transparent;border:0.5px solid var(--gy-faint);border-radius:0;padding:6px 9px;font-size:11px;color:#999;font-family:'IBM Plex Mono',monospace;outline:none}
-.grind-tag-input::placeholder{color:#444}
-.grind-tag-input:focus{border-color:var(--gy)}
-.grind-add-btn{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:0;background:transparent;color:var(--gy);border:1px solid var(--gy);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:background .15s,color .15s;white-space:nowrap}
-.grind-add-btn:hover{background:var(--gy);color:#000}
-.grind-add-btn:disabled{opacity:.3;cursor:default}
-.grind-list{display:flex;flex-direction:column}
-.grind-day{margin-bottom:24px}
-.grind-day-label{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gy);padding-bottom:7px;margin-bottom:10px;border-bottom:2px solid var(--gy-dim)}
-.grind-day-label span{color:#555;text-transform:none;letter-spacing:.02em;margin-left:8px}
-.grind-entry{display:flex;gap:12px;padding:8px 0 8px 10px;border-bottom:0.5px solid rgba(255,255,255,.05);border-left:2px solid transparent;position:relative;transition:border-color .15s,background .15s}
-.grind-entry:hover{border-left-color:var(--gy);background:rgba(245,197,24,.03)}
-.grind-entry:last-child{border-bottom:none}
-.grind-entry-time{flex-shrink:0;color:#555;font-size:11px;padding-top:1px;min-width:44px;letter-spacing:.02em}
-.grind-entry-body{flex:1;min-width:0}
-.grind-entry-line{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.grind-entry-tag{color:var(--gy);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase}
-.grind-entry-tag::before{content:'#'}
-.grind-entry-text{font-size:12.5px;line-height:1.6;color:#c9c9c9;white-space:pre-wrap;word-break:break-word;text-align:left}
-.grind-entry-actions{display:flex;gap:12px;margin-top:5px;opacity:0;transition:opacity .15s;font-size:10.5px}
-.grind-entry:hover .grind-entry-actions{opacity:1}
-.grind-entry-actions button{background:none;border:none;color:#555;cursor:pointer;padding:0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;transition:color .15s}
-.grind-entry-actions button:hover{color:var(--gy)}
-.grind-empty{padding:60px 10px 40px;color:#4a4a4a;font-size:12px;text-align:left;border-left:2px solid var(--gy-faint);padding-left:14px}
-.grind-empty span{color:var(--gy);letter-spacing:.06em}
-body.light .grind-title{color:#111;border-left-color:#b8930f}
-body.light .grind-sub{color:#777}
-body.light .grind-textarea{color:#191919}
-body.light .grind-entry-text{color:#2a2a2a}
-body.light .grind-entry-time,body.light .grind-day-label{color:#8a6f0f}
-@media (max-width:640px){
-  .grind-wrap{padding:calc(84px + env(safe-area-inset-top)) 16px 100px}
-  .grind-wrap::before{display:none}
-}
 </style>
 <script>
 (function(){try{
@@ -2814,6 +2700,9 @@ window.AccessGate={ hashCode:aqgHash };
   <div class="nm-modal" id="nm-modal-content"></div>
 </div>
 
+<!-- FOUNDER'S NOTE (quiet corner button, always present) -->
+<button class="founder-note-btn" onclick="openFounderNote()" title="A note" aria-label="A note from the creator"><i class="ti ti-feather"></i></button>
+
 <!-- FOCUS PAGE -->
 <div class="page active" id="page-focus">
   <div class="page-name-tag">
@@ -3070,7 +2959,6 @@ window.AccessGate={ hashCode:aqgHash };
       <div class="cap-header-actions">
         <button class="cap-lock-btn" id="capReelsBtn" title="Watch your videos as Reels"><i class="ti ti-movie"></i></button>
         <button class="cap-lock-btn" id="capLockOpenBtn" title="Locked capsule"><i class="ti ti-lock"></i></button>
-        <button class="cap-lock-btn" onclick="showPage('grind')" title="Grind — your experience journal"><i class="ti ti-flame"></i></button>
         <button class="cap-new" id="capComposeBtn"><i class="ti ti-plus"></i>New entry</button>
       </div>
     </div>
@@ -3089,31 +2977,6 @@ window.AccessGate={ hashCode:aqgHash };
       </div>
       <div id="capFeed" style="display:none"></div>
     </main>
-  </div>
-</div>
-
-<div class="page" id="page-grind">
-  <div class="grind-wrap" id="grindWrap">
-    <div class="grind-header">
-      <div>
-        <button class="grind-back-btn" onclick="showPage('capsule')" title="Back to Capsule"><i class="ti ti-arrow-left"></i> Capsule</button>
-        <h1 class="grind-title">Grind</h1>
-        <span class="grind-sub">personal case log</span>
-      </div>
-    </div>
-
-    <div class="grind-composer">
-      <textarea class="grind-textarea" id="grindEntryText" placeholder="> log an entry..."></textarea>
-      <div class="grind-composer-row">
-        <input type="text" class="grind-tag-input" id="grindTagInput" placeholder="tag (optional)">
-        <button class="grind-add-btn" id="grindAddBtn" onclick="grindAddEntry()">+ add</button>
-      </div>
-    </div>
-
-    <div class="grind-empty" id="grindEmptyState">
-      <span>[ log empty ]</span> nothing recorded yet — start with today.
-    </div>
-    <div class="grind-list" id="grindList" style="display:none"></div>
   </div>
 </div>
 
@@ -4114,23 +3977,6 @@ window.AccessGate={ hashCode:aqgHash };
     <div class="modal-btns"><button class="m-btn save" onclick="closePresenceReview()">Got it</button></div>
   </div>
 </div>
-<!-- "Are you there?" chime alert — every confirmed sighting gives the session a
-     rolling 10-minute grace window (PRESENCE_GRACE_MS); this opens once that
-     window has under a minute left (PRESENCE_WARN_MS) without a fresh sighting,
-     see openPresenceAlert in the script. Chimes repeat every few seconds
-     (playPresenceChime) until the button below is tapped or the camera finds
-     the person again on its own — either one pushes the window another full
-     10 minutes out. If neither happens before the window runs out, the
-     session is cancelled. No backdrop-click dismissal on purpose — confirming
-     presence has to be an explicit act, not an accidental tap outside the box. -->
-<div class="presence-alert-bg" id="presence-alert-bg">
-  <div class="presence-alert">
-    <div class="presence-alert-icon"><i class="ti ti-camera-off"></i></div>
-    <h3>Are you there?</h3>
-    <p>We haven't been able to see you for a few minutes. If you're still studying, just under the lamp or looking down, tap below to keep the session going.</p>
-    <div class="modal-btns"><button class="m-btn save" onclick="confirmPresenceHere()">I'm here</button></div>
-  </div>
-</div>
 <!-- Floating pill shown while on a flight break but the flight overlay is minimized
      (e.g. the user hopped into Capsule). Lets them jump straight back to the flight;
      resumeFromBreak() also auto re-opens the flight overlay on its own. -->
@@ -4308,6 +4154,20 @@ function openAllNamingInfo(){
   document.getElementById('nm-modal-bg').classList.add('open');
 }
 function closeNamingInfo(){document.getElementById('nm-modal-bg').classList.remove('open');}
+function openFounderNote(){
+  const el=document.getElementById('nm-modal-content');
+  const note=`The Canopus is a tool to bring peace to our ever troubled lives. Through this project, I wish to help people, and even if I cheer up just one person, I would be more than delighted to have undertaken this project. Each name assigned and each feature available on this website is very close to my heart.
+
+Through this website, I also wish to apologize to a person I never had the chance to apologize to. I hope that, wherever they are, they may one day find it in their heart to forgive me.
+
+I hope the stranger on the other side, reading this text, lives a happy life free from regret and sorrow.`;
+  el.innerHTML=`<button class="nm-modal-close" onclick="closeNamingInfo()"><i class="ti ti-x"></i></button>
+    <div class="nm-modal-title-all">A note</div>
+    <div class="nm-modal-note-text">${note}</div>
+    <div class="nm-modal-signoff">With regards,<br>Abhigyan Chaubey</div>`;
+  document.getElementById('nm-modal-bg').classList.add('open');
+}
+
 // =================== CORE APP ===================
 const SEG={study:'#2d6e2d',work:'#6e2d2d',break:'#2d2d6e',exercise:'#6e5e2d',custom:'#2a2a2a'};
 const BADGE={study:'b-study',work:'b-work',break:'b-break',exercise:'b-exercise',custom:'b-custom'};
@@ -4924,7 +4784,7 @@ function showPage(p){
   if(p!=='terminal'&&typeof termFlightDocked!=='undefined'&&termFlightDocked&&typeof termCloseFlightDock==='function'){
     termCloseFlightDock();
   }
-  const pages=['page-focus','page-schedule','page-progress','page-sky','page-capsule','page-grind','page-literature','page-features','page-terminal'];
+  const pages=['page-focus','page-schedule','page-progress','page-sky','page-capsule','page-literature','page-features','page-terminal'];
   const target='page-'+p;
   pages.forEach(id=>{
     const el=document.getElementById(id);
@@ -4943,7 +4803,6 @@ function showPage(p){
   document.getElementById('page-progress').classList.toggle('active',p==='progress');
   document.getElementById('page-sky').classList.toggle('active',p==='sky');
   document.getElementById('page-capsule').classList.toggle('active',p==='capsule');
-  document.getElementById('page-grind').classList.toggle('active',p==='grind');
   document.getElementById('page-literature').classList.toggle('active',p==='literature');
   document.getElementById('page-features').classList.toggle('active',p==='features');
   document.getElementById('page-terminal').classList.toggle('active',p==='terminal');
@@ -4951,7 +4810,6 @@ function showPage(p){
   if(p==='progress')renderProgress();
   if(p==='sky'&&window.skyInit)window.skyInit();
   if(p==='capsule'&&window.capRender)window.capRender();
-  if(p==='grind'&&window.grindRender)window.grindRender();
   if(p==='literature'&&window.ltRender)window.ltRender();
   if(p==='terminal'&&window.termInit)window.termInit();
   document.querySelectorAll('.nav-link[data-page]').forEach(b=>{
@@ -5434,16 +5292,9 @@ let flightBreakStartTime=null; // wall-clock timestamp (ms) when current break b
 // Shared across all three timed modes (Track My Flight, Pomodoro, PomoMix) —
 // one flag, one webcam session, with a toggle in each mode's setup form.
 // When enabled, a hidden webcam feed is periodically checked with a COCO-SSD
-// object-detection model. Detection alone is unreliable for someone studying
-// under a dim desk lamp while looking down at a book — that's a hard case for
-// any object detector (dark, tightly-framed, no clear body pose) — so instead
-// of cancelling on a short miss streak, a longer grace window is given and the
-// person is looped in directly: at 4 minutes of continuous no-person reads, an
-// "are you there?" alert opens with a repeating chime, and the session only
-// keeps running if they confirm with the "I'm here" button, or the camera
-// picks them up again on its own. If neither happens by 5 minutes, the
-// session is cancelled and quit immediately — discarded on the spot rather
-// than left to run out unlogged.
+// object-detection model; if no person is detected for too many consecutive
+// checks, the in-progress session is cancelled and quit immediately — it
+// is discarded on the spot rather than being left to run out unlogged.
 let presenceStrict=(function(){ try{ return localStorage.getItem('flightPresenceStrict')==='1'; }catch(e){ return false; } })();
 let presenceLibsLoaded=false;   // true once tfjs + coco-ssd scripts have finished loading
 let presenceModel=null;         // loaded coco-ssd model (cached across sessions)
@@ -5453,37 +5304,55 @@ let presenceVideoEl=null;       // hidden <video> element fed by the webcam
 // boosted) before each detection pass — see presenceCheckTick(). Reused every
 // tick rather than recreated, so no allocation overhead on the hot path.
 let presenceDetectCanvas=null;
+// Fallback presence signal alongside coco-ssd's person detection: a tiny
+// (48px-wide) downsampled canvas compared frame-to-frame. Some poses —
+// looking straight down at a phone, mostly just the top of the head visible
+// — score at or near zero on the person detector no matter how low the
+// confidence threshold goes, since there's essentially no "person" shape
+// for it to recognise. But someone in that pose is still moving slightly
+// (head bob, scrolling, typing), which this catches independently. Either
+// signal counts as a hit — see presenceDetectMotion() and presenceCheckTick().
+let presenceMotionCanvas=null;
+let presencePrevFrameData=null; // Uint8ClampedArray from the previous tick's downsampled frame
+const PRESENCE_MOTION_DIM=48;   // width of the downsampled motion-diff frame, in px
+const PRESENCE_MOTION_THRESHOLD=6; // average per-channel 0-255 diff needed to count as motion
 let presenceCheckTimer=null;    // setInterval handle for periodic detection
-let presenceValid=true;         // false once the full no-person window elapses unconfirmed this session
-let presenceConsecutiveMisses=0;    // consecutive miss *ticks* — used only for the review filmstrip, not for cancelling
-const PRESENCE_CHECK_MS=10000;      // how often to run detection
+// Separate, much faster timer purely for elapsed-time checks (the "look up"
+// warning and the cancel itself) — decoupled from presenceCheckTimer because
+// actual detection (coco-ssd inference) is comparatively expensive, but with
+// only a 5s total window there isn't room to wait for a full detection tick
+// to land near the 4.3s warning mark or the 5s cancel mark. See
+// presenceWatchdogTick().
+let presenceWatchdogTimer=null;
+const PRESENCE_WATCHDOG_MS=200;     // how often the watchdog checks elapsed time
+let presenceValid=true;         // false once too many consecutive misses happen this session
+// Timestamp presence (person OR motion) was last confirmed. Replaces the old
+// consecutive-miss counter — with only a 5s total window, counting whole
+// detection ticks is too coarse to land the warning at exactly ~4.3s and the
+// cancel at exactly 5s; measuring elapsed wall-clock time since last seen
+// does that precisely regardless of how the detection ticks happen to fall.
+let presenceLastSeenAt=null;
+const PRESENCE_CHECK_MS=1000;       // how often to run actual detection (1s)
+// How long someone can go unseen before the session is cancelled, and how
+// long before that cancel to start nagging with a "look up" notification.
 // coco-ssd's 'person' class is trained mostly on full/partial-body photos —
 // a webcam framed tight on just a face + shoulders (the normal case for
 // someone sitting at a desk) regularly scores below 0.5 even with the
-// person clearly there, especially when they're looking down at a book or
-// phone under dim lighting (dark subject, little contrast — a hard case for
-// any detector; see the brightening step added to presenceCheckTick()).
-// Rather than cancelling off a fixed miss streak, strict mode now runs on a
-// rolling grace window: every time a person IS seen (or the person manually
-// confirms via "I'm here"), the session becomes safe from cancellation for
-// PRESENCE_GRACE_MS from that moment — presenceGraceUntil is pushed forward
-// to now+PRESENCE_GRACE_MS. Being missed in between doesn't shrink that
-// window early; it just fails to extend it further. So a person who gets
-// pinged and detected again 3 minutes into a 10-minute window resets the
-// clock to a fresh 10 minutes from that point, and so on indefinitely as
-// long as they keep getting seen periodically. Only once the window actually
-// runs out (no successful detection or confirmation before presenceGraceUntil)
-// does the session cancel — see the warn/cancel handling in presenceCheckTick().
-const PRESENCE_GRACE_MS=10*60*1000; // safe window after each confirmed sighting before the session can cancel
-const PRESENCE_WARN_MS=60*1000;     // show the "are you there?" chime alert once this close to the window running out
-let presenceGraceUntil=null;    // Date.now() timestamp the session is safe until; extended on every confirmed sighting
-let presenceAlertShown=false;   // true while the "are you there?" chime alert is open, waiting on the person
-let presenceChimeTimer=null;    // setInterval handle repeating the chime while the alert is open
-let presenceAudioCtx=null;      // shared AudioContext for the chime, created lazily on first use
+// person clearly there, especially when they're looking down at a phone and
+// backlit by its screen (dark subject, blown-out background — a hard case
+// for any detector; see the brightening step and the motion-diff fallback,
+// both in presenceCheckTick()/presenceDetectMotion()). Those cover most of
+// that gap, but the window itself is intentionally short here — 5s total —
+// so PRESENCE_WARNING_MS gives a person a last chance to look up and be seen
+// before PRESENCE_CANCEL_MS actually ends the session.
+const PRESENCE_CANCEL_MS=5000;      // total time unseen before cancelling — the "wait time"
+const PRESENCE_WARNING_MS=4300;     // start nagging once this many ms unseen have passed
+const PRESENCE_WARNING_REPEAT_MS=400; // minimum gap between repeated "look up" nags
+let presenceLastWarningAt=0;    // Date.now() of the last "look up" nag fired this streak
 let presenceStatusNoted=false;  // whether the "presence lost" notice has been shown this session
 // Rolling buffer of {dataURL, ts} frames captured on each consecutive miss —
 // reset to [] the moment a hit comes in, so at any point it only holds the
-// frames from the *current* miss streak. Shown to the person afterward via
+// frames from the *current* unseen streak. Shown to the person afterward via
 // openPresenceReview() so they can see what the camera actually saw, rather
 // than just being told "presence lost" with no way to judge why.
 let presenceMissSnapshots=[];
@@ -6078,11 +5947,11 @@ function loadPresenceLibs(){
 // decide whether to proceed or fall back gracefully.
 function startPresenceCheck(){
   presenceValid=true;
-  presenceConsecutiveMisses=0;
-  presenceGraceUntil=Date.now()+PRESENCE_GRACE_MS; // fresh 10-minute grace window from the moment the session starts
+  presenceLastSeenAt=Date.now(); // start the 5s clock as of right now, not as of the first tick
+  presenceLastWarningAt=0;
   presenceStatusNoted=false;
   presenceMissSnapshots=[];
-  closePresenceAlert();
+  presencePrevFrameData=null; // fresh session — no baseline frame to diff against yet
   const badge=document.getElementById('flight-presence-badge');
   if(badge){ badge.style.display='flex'; badge.textContent='📷 checking for you…'; badge.className='flight-presence-badge checking'; }
   return loadPresenceLibs()
@@ -6101,8 +5970,11 @@ function startPresenceCheck(){
     .then(()=>presenceModel?Promise.resolve(presenceModel):cocoSsd.load())
     .then(model=>{
       presenceModel=model;
+      presenceLastSeenAt=Date.now(); // reset again post-load — model load can itself take a few seconds
       if(presenceCheckTimer) clearInterval(presenceCheckTimer);
+      if(presenceWatchdogTimer) clearInterval(presenceWatchdogTimer);
       presenceCheckTimer=setInterval(presenceCheckTick,PRESENCE_CHECK_MS);
+      presenceWatchdogTimer=setInterval(presenceWatchdogTick,PRESENCE_WATCHDOG_MS);
       presenceCheckTick(); // run one check immediately
     })
     .catch(err=>{
@@ -6113,8 +5985,42 @@ function startPresenceCheck(){
     });
 }
 
+// Downsamples the current frame to a tiny (48px-wide) canvas and compares it
+// against the previous tick's downsampled frame. Returns true if enough
+// pixels changed to suggest someone moved — a fallback for poses the person
+// detector can't classify (looking straight down at a phone leaves mostly a
+// static-looking mass of hair, which regularly scores near zero no matter
+// how low the confidence threshold goes) but where the person is plainly
+// still there and shifting slightly (head bob, scrolling, typing).
+// Deliberately cheap: 48px-wide means ~1700 pixels to diff, negligible cost
+// on a 10s tick cadence.
+function presenceDetectMotion(){
+  try{
+    if(!presenceVideoEl) return false;
+    const vw=presenceVideoEl.videoWidth||320, vh=presenceVideoEl.videoHeight||240;
+    if(!vw||!vh) return false;
+    if(!presenceMotionCanvas) presenceMotionCanvas=document.createElement('canvas');
+    const w=PRESENCE_MOTION_DIM, h=Math.round(PRESENCE_MOTION_DIM*(vh/vw));
+    presenceMotionCanvas.width=w; presenceMotionCanvas.height=h;
+    const mctx=presenceMotionCanvas.getContext('2d');
+    mctx.drawImage(presenceVideoEl,0,0,w,h);
+    const cur=mctx.getImageData(0,0,w,h).data;
+    if(!presencePrevFrameData || presencePrevFrameData.length!==cur.length){
+      presencePrevFrameData=cur;
+      return false; // no baseline yet — nothing to diff against this tick
+    }
+    let total=0;
+    for(let i=0;i<cur.length;i+=4){ // step over RGBA, skip alpha
+      total+=Math.abs(cur[i]-presencePrevFrameData[i])+Math.abs(cur[i+1]-presencePrevFrameData[i+1])+Math.abs(cur[i+2]-presencePrevFrameData[i+2]);
+    }
+    const avgDiff=total/((cur.length/4)*3);
+    presencePrevFrameData=cur;
+    return avgDiff>PRESENCE_MOTION_THRESHOLD;
+  }catch(e){ return false; }
+}
+
 function presenceCheckTick(){
-  if(!presenceModel||!presenceVideoEl) return;
+  if(!presenceModel||!presenceVideoEl||!presenceValid) return;
   // Detect against a brightened/contrast-boosted copy of the frame rather
   // than the raw video. Sitting normally lit is usually fine either way,
   // but looking down at a phone — lit mostly by the phone's screen, with
@@ -6133,106 +6039,59 @@ function presenceCheckTick(){
   presenceModel.detect(presenceDetectCanvas).then(preds=>{
     const personPreds=preds.filter(p=>p.class==='person'&&p.score>0.15);
     const sawPerson=personPreds.length>0;
+    const sawMotion=presenceDetectMotion();
+    const present=sawPerson||sawMotion;
     drawPresenceBoxes(personPreds);
-    const badge=document.getElementById('flight-presence-badge');
-    if(sawPerson){
-      presenceConsecutiveMisses=0;
-      presenceMissSnapshots=[]; // presence confirmed — any frames captured since the last sighting are moot now
-      // Confirmed sighting — push the safe window another full PRESENCE_GRACE_MS
-      // out from right now. If this ping lands 3 minutes into the previous
-      // window, the session is now safe for a fresh 10 minutes from this
-      // moment, and so on for every sighting that follows.
-      presenceGraceUntil=Date.now()+PRESENCE_GRACE_MS;
-      if(presenceAlertShown) closePresenceAlert(); // camera picked you back up mid-alert — no need to wait on the button
-      if(badge&&presenceValid){ badge.textContent='📷 you\'re here'; badge.className='flight-presence-badge ok'; }
+    if(present){
+      presenceLastSeenAt=Date.now();
+      presenceLastWarningAt=0;         // next unseen streak's nags should start fresh
+      presenceMissSnapshots=[];        // presence confirmed — the previous unseen streak (if any) is moot now
     } else {
-      presenceConsecutiveMisses++;
       // Raw (unbrightened) frame — this is what review should show, since it's
       // what the camera actually saw, not the boosted copy fed to the detector.
       const snap=presenceCaptureRawFrame();
       if(snap) presenceMissSnapshots.push({dataURL:snap,ts:Date.now()});
-      if(presenceGraceUntil==null) presenceGraceUntil=Date.now()+PRESENCE_GRACE_MS; // safety net — shouldn't normally happen, grace is seeded on start
-      const remainingMs=presenceGraceUntil-Date.now();
-      if(remainingMs<=0 && presenceValid){
-        presenceValid=false;
-        closePresenceAlert();
-        if(badge){ badge.textContent='📷 presence lost — cancelling session'; badge.className='flight-presence-badge missing'; }
-        presenceStrictCancel('Presence lost — session cancelled and ended.');
-      } else if(remainingMs<=PRESENCE_WARN_MS && presenceValid){
-        if(!presenceAlertShown) openPresenceAlert();
-        if(badge){ badge.textContent='📷 are you there? — tap "I\'m here"'; badge.className='flight-presence-badge missing'; }
-      } else if(badge&&presenceValid){
-        badge.textContent='📷 checking for you…';
-        badge.className='flight-presence-badge checking';
-      }
     }
+    // Cancel timing and badge state are handled by presenceWatchdogTick(), on
+    // its own 200ms cadence — it reads presenceLastSeenAt directly, so it
+    // doesn't need to wait on this async detect() call to know what to show.
   }).catch(err=>console.error('Presence detection error:',err));
 }
 
-// Fired once the rolling grace window (presenceGraceUntil) has under
-// PRESENCE_WARN_MS left without a fresh sighting. Opens the fixed "are you
-// there?" overlay and starts a repeating chime that keeps sounding —
-// independent of the 10s detection cadence — until the person either taps
-// "I'm here" (confirmPresenceHere) or the camera finds them again on its own
-// (the hit branch above); both push the window a fresh PRESENCE_GRACE_MS out.
-// A system notification is also fired once so the alert isn't missed if the
-// tab isn't focused.
-function openPresenceAlert(){
-  if(presenceAlertShown) return;
-  presenceAlertShown=true;
-  notifySafe('Canopus ✈','We can\'t see you — tap "I\'m here" or the session cancels in a minute.');
-  const bg=document.getElementById('presence-alert-bg');
-  if(bg) bg.classList.add('open');
-  playPresenceChime();
-  if(presenceChimeTimer) clearInterval(presenceChimeTimer);
-  presenceChimeTimer=setInterval(playPresenceChime,3500);
-}
-
-// Closes the "are you there?" overlay and stops the chime — called both when
-// the person confirms via the button and when the camera reconfirms them on
-// its own, so the alert never lingers once presence is no longer in doubt.
-function closePresenceAlert(){
-  presenceAlertShown=false;
-  const bg=document.getElementById('presence-alert-bg');
-  if(bg) bg.classList.remove('open');
-  if(presenceChimeTimer){ clearInterval(presenceChimeTimer); presenceChimeTimer=null; }
-}
-
-// Bound to the "I'm here" button. Manually vouches for presence exactly like
-// a successful detection would: resets the miss clock/streak, clears the
-// captured miss frames (a manual confirmation means there's nothing to
-// review), and closes the alert + chime.
-function confirmPresenceHere(){
-  presenceConsecutiveMisses=0;
-  presenceGraceUntil=Date.now()+PRESENCE_GRACE_MS; // manual confirmation counts as a sighting — fresh 10-minute window
-  presenceMissSnapshots=[];
-  closePresenceAlert();
+// Runs independently of the (comparatively slow, async) detection tick above,
+// on a fast 200ms cadence, purely to check elapsed time since presenceLastSeenAt
+// and drive the badge / "look up" nag / actual cancel precisely off real wall-clock
+// time. With only a 5s total window this precision matters — a single detection
+// tick lands roughly once a second, which isn't fine-grained enough to reliably
+// catch the exact ~4.3s warning mark or the 5s cancel mark.
+function presenceWatchdogTick(){
+  if(!presenceValid||!presenceLastSeenAt) return;
+  const elapsed=Date.now()-presenceLastSeenAt;
   const badge=document.getElementById('flight-presence-badge');
-  if(badge&&presenceValid){ badge.textContent='📷 you\'re here'; badge.className='flight-presence-badge ok'; }
-  showToastSafe('Thanks — session continues.','ti-camera');
-}
-window.confirmPresenceHere=confirmPresenceHere;
-
-// Plays a short two-tone chime via the Web Audio API — no audio file needed,
-// and it works even if the tab was opened without any <audio> element ready.
-// The AudioContext is created lazily (browsers block autoplay until a user
-// gesture) and reused across chimes rather than recreated each time.
-function playPresenceChime(){
-  try{
-    if(!presenceAudioCtx) presenceAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    const ctx=presenceAudioCtx;
-    if(ctx.state==='suspended') ctx.resume();
-    const now=ctx.currentTime;
-    [{t:0,f:880},{t:0.22,f:660},{t:0.44,f:880}].forEach(note=>{
-      const osc=ctx.createOscillator(), gain=ctx.createGain();
-      osc.type='sine'; osc.frequency.value=note.f;
-      gain.gain.setValueAtTime(0,now+note.t);
-      gain.gain.linearRampToValueAtTime(0.22,now+note.t+0.03);
-      gain.gain.linearRampToValueAtTime(0,now+note.t+0.2);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(now+note.t); osc.stop(now+note.t+0.22);
-    });
-  }catch(e){ console.error('Presence chime failed (ignored):',e); }
+  if(elapsed>=PRESENCE_CANCEL_MS){
+    presenceValid=false;
+    if(badge){ badge.textContent='📷 presence lost — cancelling session'; badge.className='flight-presence-badge missing'; }
+    presenceStrictCancel('Presence lost — session cancelled and ended.');
+    return;
+  }
+  if(elapsed>=PRESENCE_WARNING_MS){
+    const secsLeft=Math.max(0,((PRESENCE_CANCEL_MS-elapsed)/1000)).toFixed(1);
+    if(badge){ badge.textContent='📷 look up! cancelling in '+secsLeft+'s'; badge.className='flight-presence-badge missing'; }
+    // "Constant" nag while in this window, throttled so it's a steady drumbeat
+    // rather than firing every single 200ms watchdog tick.
+    const now=Date.now();
+    if(now-presenceLastWarningAt>=PRESENCE_WARNING_REPEAT_MS){
+      presenceLastWarningAt=now;
+      notifySafe('Canopus ✈','Look up! 👀 Camera can\'t see you — session cancels in a moment.');
+      showToastSafe('Look up! 👀 — camera can\'t see you','ti-camera-off');
+    }
+  } else if(badge){
+    // Recently-confirmed presence still reads as a clean "you're here" for a
+    // beat before falling back to the neutral "checking" state, so a normal
+    // ~1s gap between detection ticks doesn't flicker the badge.
+    badge.textContent=elapsed<1500?'📷 you\'re here':'📷 checking for you…';
+    badge.className='flight-presence-badge '+(elapsed<1500?'ok':'checking');
+  }
 }
 
 // Draws a box around each detected person on the preview canvas, in the same
@@ -6240,7 +6099,7 @@ function playPresenceChime(){
 // size). The canvas is mirrored with the same CSS transform as the preview
 // video, so a box drawn at raw (unmirrored) coordinates lines up correctly
 // with what the person sees on screen. Boxes only refresh once per detection
-// tick (~10s) since that's how often presenceModel.detect() actually runs.
+// tick (~1s) since that's how often presenceModel.detect() actually runs.
 function drawPresenceBoxes(personPreds){
   const canvas=document.getElementById('flight-presence-preview-canvas');
   if(!canvas||!presenceVideoEl) return;
@@ -6264,9 +6123,8 @@ function drawPresenceBoxes(personPreds){
 // frame — deliberately NOT the brightened copy used for detection, since
 // this is shown back to the person afterward as "what the camera saw" and
 // should match what they'd have seen themselves, not an enhanced version.
-// Kept small/compressed since one of these is captured per miss tick and a
-// miss run can now last up to PRESENCE_GRACE_MS (up to ~60 ticks) before
-// it's resolved one way or the other.
+// Kept small/compressed since several of these can be
+// held in memory at once during a miss streak.
 function presenceCaptureRawFrame(){
   try{
     if(!presenceVideoEl) return null;
@@ -6359,7 +6217,7 @@ function showToastSafe(msg,icon){
 
 function stopPresenceCheck(){
   if(presenceCheckTimer){ clearInterval(presenceCheckTimer); presenceCheckTimer=null; }
-  closePresenceAlert();
+  if(presenceWatchdogTimer){ clearInterval(presenceWatchdogTimer); presenceWatchdogTimer=null; }
   if(presenceStream){ presenceStream.getTracks().forEach(t=>t.stop()); presenceStream=null; }
   if(presenceVideoEl){ presenceVideoEl.remove(); presenceVideoEl=null; }
   const badge=document.getElementById('flight-presence-badge');
@@ -6394,24 +6252,27 @@ function togglePresenceView(){
 
 // Suspends detection while the flight is paused or on a break, without tearing down
 // the webcam stream/model (so resuming doesn't have to re-prompt for camera access or
-// reload coco-ssd). Consecutive misses stop accumulating the moment this is called —
-// stepping away during an intentional pause/break should never cost the flight.
+// reload coco-ssd). The elapsed-since-last-seen clock stops advancing the moment this
+// is called — stepping away during an intentional pause/break should never cost the
+// flight, and should never trigger the "look up" nag either.
 function pausePresenceCheck(){
   if(presenceCheckTimer){ clearInterval(presenceCheckTimer); presenceCheckTimer=null; }
-  closePresenceAlert(); // an intentional pause/break shouldn't leave the chime alert open behind it
+  if(presenceWatchdogTimer){ clearInterval(presenceWatchdogTimer); presenceWatchdogTimer=null; }
   const badge=document.getElementById('flight-presence-badge');
   if(badge&&presenceStrict&&presenceValid){ badge.textContent='📷 paused'; badge.className='flight-presence-badge checking'; }
 }
 
-// Resumes detection after a pause/break. Consecutive misses (and the miss-streak
-// clock) reset so a stale frame captured right as the camera comes back doesn't
-// immediately count against you.
+// Resumes detection after a pause/break. presenceLastSeenAt resets to right now so a
+// stale gap from the pause itself doesn't immediately count as unseen time once
+// detection restarts.
 function resumePresenceCheck(){
   if(!presenceStrict||!presenceModel||!presenceVideoEl) return; // never started this session (or camera failed) — nothing to resume
-  presenceConsecutiveMisses=0;
-  presenceGraceUntil=Date.now()+PRESENCE_GRACE_MS; // fresh 10-minute window on resume, same as a confirmed sighting
+  presenceLastSeenAt=Date.now();
+  presenceLastWarningAt=0;
   if(presenceCheckTimer) clearInterval(presenceCheckTimer);
+  if(presenceWatchdogTimer) clearInterval(presenceWatchdogTimer);
   presenceCheckTimer=setInterval(presenceCheckTick,PRESENCE_CHECK_MS);
+  presenceWatchdogTimer=setInterval(presenceWatchdogTick,PRESENCE_WATCHDOG_MS);
   presenceCheckTick();
 }
 
@@ -15050,33 +14911,14 @@ function termInit(){
 }
 function termWarmAlfred(){
   // Silently pings Ollama so the model is already loaded into memory by the
-  // time the user types a real question — avoids the ~10s+ cold-start wait.
-  // Returns the in-flight promise so callers (e.g. the Alfred quick-chat) can
-  // await it instead of racing a real request against this warm-up ping.
-  if(window._alfredWarmed)return window._alfredWarmPromise||Promise.resolve();
+  // time the user types a real question — avoids the ~10s cold-start wait.
+  if(window._alfredWarmed)return;
   window._alfredWarmed=true;
-  window._alfredWarmPromise=fetch('http://localhost:11434/api/chat',{
+  fetch('http://localhost:11434/api/chat',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:TERM_OLLAMA_MODEL,stream:false,messages:[{role:'user',content:'hi'}]})
-  }).then(()=>{ window._alfredLastWarm=Date.now(); })
-    .catch(()=>{ window._alfredWarmed=false; });
-  return window._alfredWarmPromise;
-}
-// Warm the model as soon as Canopus itself loads — not only once the Terminal
-// page or the Ctrl+Q chat is opened. This is what actually makes the
-// difference feel "instant": the load happens in the background while the
-// user is still looking around, rather than at the moment they hit send.
-if(typeof window!=='undefined'){
-  setTimeout(()=>{ if(typeof termWarmAlfred==='function')termWarmAlfred(); },300);
-  // Ollama unloads an idle model after ~5 minutes, so re-warm every 4 minutes
-  // while the tab is actually open/visible, to keep it resident.
-  setInterval(()=>{
-    if(document.visibilityState==='visible'){
-      window._alfredWarmed=false; // allow a fresh re-warm ping
-      if(typeof termWarmAlfred==='function')termWarmAlfred();
-    }
-  },240000);
+  }).catch(()=>{ window._alfredWarmed=false; });
 }
 
 let termCapture=null; // when set to an array, termAppendLine buffers into it instead of the DOM (used by piping)
@@ -15186,89 +15028,6 @@ async function termRenderModelBar(){
 }
 const TERM_ALFRED_SYSTEM='You are Alfred, a calm, dry-witted, unfailingly polite personal assistant embedded in a terminal inside a productivity app called Canopus. Reply in 1-2 short sentences, never more, unless the user explicitly asks for detail.';
 const TERM_ALFRED_SYSTEM_DETAIL='You are Alfred, a calm, dry-witted, unfailingly polite personal assistant embedded in a terminal inside a productivity app called Canopus. The user has explicitly asked for a detailed, in-depth answer — take the space you need to explain thoroughly and clearly, with structure (short paragraphs or a numbered list) where it helps, rather than compressing everything into one or two sentences.';
-
-// Give Alfred read-only awareness of the rest of Canopus (everything except
-// Capsule, which is intentionally kept off-limits — it's a privacy-partitioned
-// reel viewer, not something an assistant should see or summarize). Each
-// section is capped hard since local models (llama3.2:1b etc.) have limited
-// context and get noticeably worse at following instructions when the prompt
-// gets cluttered.
-
-function grindSectionForAlfred(limit){
-  limit=limit||15;
-  let list;
-  try{ list=(typeof grindLoad==='function'?grindLoad():[]).slice().sort((a,b)=>b.ts-a.ts).slice(0,limit); }
-  catch(e){ return ''; }
-  if(!list.length)return '';
-  const lines=list.map(e=>{
-    const d=new Date(e.ts);
-    const when=d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+
-      d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit',hour12:false});
-    const tag=e.tag?('#'+e.tag+' '):'';
-    const text=(e.text||'').replace(/\s+/g,' ').slice(0,140);
-    return '- ['+when+'] '+tag+text;
-  }).join('\n');
-  return 'GRIND journal — '+list.length+' most recent entries (personal log, newest first):\n'+lines;
-}
-
-function scheduleSectionForAlfred(){
-  try{
-    const today=(typeof todayStr==='function')?todayStr():null;
-    const all=(typeof sessions!=='undefined'&&Array.isArray(sessions))?sessions:[];
-    const todays=today?all.filter(s=>s.date===today):[];
-    if(!todays.length)return '';
-    const lines=todays.map(s=>'- '+s.start+'-'+s.end+' ['+s.type+'] '+s.name+(s.notes?(' — '+s.notes.slice(0,60)):'')).join('\n');
-    return 'Today\'s SCHEDULE ('+todays.length+' blocks):\n'+lines;
-  }catch(e){ return ''; }
-}
-
-function historySectionForAlfred(limit){
-  limit=limit||8;
-  try{
-    const hist=(typeof loadHistory==='function'?loadHistory():[]).slice(0,limit);
-    if(!hist.length)return '';
-    const lines=hist.map(h=>{
-      const mins=Math.max(1,Math.round((h.dur||0)/60));
-      const when=h.ts?new Date(h.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'}):'?';
-      return '- ['+when+'] '+(h.name||'Session')+' — '+mins+'m ('+(h.type||'timer')+')';
-    }).join('\n');
-    return 'Recent completed FOCUS SESSIONS (newest first):\n'+lines;
-  }catch(e){ return ''; }
-}
-
-function studyGoalSectionForAlfred(){
-  try{
-    const goal=parseFloat(localStorage.getItem(STUDY_GOAL_KEY));
-    if(!goal||typeof loadHistory!=='function')return '';
-    const today=(typeof todayStr==='function')?todayStr():'';
-    const tools=(typeof STUDY_GOAL_TOOLS!=='undefined')?STUDY_GOAL_TOOLS:['timer','pomodoro'];
-    const secsToday=loadHistory().filter(h=>h.ts&&h.ts.slice(0,10)===today&&tools.includes(h.tool)).reduce((a,h)=>a+(h.dur||0),0);
-    const hrsToday=(secsToday/3600).toFixed(1);
-    return 'STUDY GOAL: '+hrsToday+'h logged today, out of a '+goal+'h daily goal.';
-  }catch(e){ return ''; }
-}
-
-function termNotesSectionForAlfred(limit){
-  limit=limit||5;
-  try{
-    const notes=(typeof termNotesLoad==='function'?termNotesLoad():[]).slice(-limit);
-    if(!notes.length)return '';
-    return 'Recent TERMINAL NOTES (newest last):\n'+notes.map(n=>'- '+String(n).replace(/\s+/g,' ').slice(0,140)).join('\n');
-  }catch(e){ return ''; }
-}
-
-// Assembled snapshot passed to Alfred as extra system context on every question.
-function canopusContextForAlfred(){
-  const parts=[
-    grindSectionForAlfred(),
-    scheduleSectionForAlfred(),
-    historySectionForAlfred(),
-    studyGoalSectionForAlfred(),
-    termNotesSectionForAlfred()
-  ].filter(Boolean);
-  if(!parts.length)return '';
-  return '\n\nFor context, here is a snapshot of the user\'s Canopus data (Capsule is intentionally excluded and never shared with you). Only reference a section if the user\'s question is actually about it — otherwise ignore this entire block and answer normally:\n\n'+parts.join('\n\n');
-}
 async function termAsk(question,detail){
   if(!question){termErr('PLEASE TYPE YOUR PROMPT AFTER "ask" OR "alfred" IN THE COMMAND PANEL — e.g. ask how are you');return;}
   const startTime=performance.now();
@@ -15290,7 +15049,7 @@ async function termAsk(question,detail){
         stream:true,
         options:{num_predict:detail?600:100},
         messages:[
-          {role:'system',content:(detail?TERM_ALFRED_SYSTEM_DETAIL:TERM_ALFRED_SYSTEM)+canopusContextForAlfred()},
+          {role:'system',content:detail?TERM_ALFRED_SYSTEM_DETAIL:TERM_ALFRED_SYSTEM},
           {role:'user',content:question}
         ]
       })
@@ -18092,134 +17851,6 @@ if(jlIsLocked()) jlShow();
 </script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   GRIND — a simple experience journal, separate from Capsule.
-   Stores entries as {id, text, tag, ts} in localStorage.
-   ═══════════════════════════════════════════════════════════════ */
-(function(){
-const GRIND_KEY='canopus_grind_entries';
-
-function grindLoad(){
-  try{ return JSON.parse(localStorage.getItem(GRIND_KEY)||'[]'); }
-  catch(e){ return []; }
-}
-function grindSave(list){
-  try{ localStorage.setItem(GRIND_KEY, JSON.stringify(list)); }catch(e){}
-}
-function grindDayKey(ts){
-  const d=new Date(ts);
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-function grindDayLabel(ts){
-  const d=new Date(ts);
-  const today=new Date(); const yest=new Date(); yest.setDate(today.getDate()-1);
-  const dayKey=grindDayKey(ts);
-  if(dayKey===grindDayKey(today.getTime())) return 'TODAY';
-  if(dayKey===grindDayKey(yest.getTime())) return 'YESTERDAY';
-  return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
-}
-function grindFmtTime(ts){
-  return new Date(ts).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit',hour12:false});
-}
-function grindEscape(str){
-  const div=document.createElement('div');
-  div.textContent=str;
-  return div.innerHTML;
-}
-
-function grindRender(){
-  const list=grindLoad().sort((a,b)=>b.ts-a.ts);
-  const emptyEl=document.getElementById('grindEmptyState');
-  const listEl=document.getElementById('grindList');
-  if(!emptyEl||!listEl) return;
-  if(!list.length){
-    emptyEl.style.display='';
-    listEl.style.display='none';
-    listEl.innerHTML='';
-    return;
-  }
-  emptyEl.style.display='none';
-  listEl.style.display='';
-
-  // group entries by calendar day, most recent day first
-  const groups=[];
-  const groupMap={};
-  list.forEach(e=>{
-    const key=grindDayKey(e.ts);
-    if(!groupMap[key]){
-      groupMap[key]={key,label:grindDayLabel(e.ts),count:0,entries:[]};
-      groups.push(groupMap[key]);
-    }
-    groupMap[key].entries.push(e);
-    groupMap[key].count++;
-  });
-
-  listEl.innerHTML=groups.map(g=>`
-    <div class="grind-day">
-      <div class="grind-day-label">${g.label}<span>(${g.count} ${g.count===1?'entry':'entries'})</span></div>
-      ${g.entries.map(e=>`
-        <div class="grind-entry" data-id="${e.id}">
-          <span class="grind-entry-time">${grindFmtTime(e.ts)}</span>
-          <div class="grind-entry-body">
-            <div class="grind-entry-line">
-              ${e.tag?`<span class="grind-entry-tag">${grindEscape(e.tag)}</span>`:''}
-              <span class="grind-entry-text">${grindEscape(e.text)}</span>
-            </div>
-            <div class="grind-entry-actions">
-              <button onclick="grindEditEntry('${e.id}')">[edit]</button>
-              <button onclick="grindDeleteEntry('${e.id}')">[delete]</button>
-            </div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
-}
-
-window.grindAddEntry=function(){
-  const textEl=document.getElementById('grindEntryText');
-  const tagEl=document.getElementById('grindTagInput');
-  const text=(textEl.value||'').trim();
-  if(!text) return;
-  const list=grindLoad();
-  list.push({
-    id: 'g'+Date.now()+Math.random().toString(36).slice(2,7),
-    text,
-    tag:(tagEl.value||'').trim(),
-    ts: Date.now()
-  });
-  grindSave(list);
-  textEl.value='';
-  tagEl.value='';
-  grindRender();
-  if(window.showToast) showToast('Entry added','ti-flame');
-};
-
-window.grindEditEntry=function(id){
-  const list=grindLoad();
-  const entry=list.find(e=>e.id===id);
-  if(!entry) return;
-  const updated=prompt('Edit entry:', entry.text);
-  if(updated===null) return;
-  const trimmed=updated.trim();
-  if(!trimmed) return;
-  entry.text=trimmed;
-  grindSave(list);
-  grindRender();
-};
-
-window.grindDeleteEntry=function(id){
-  if(!confirm('Delete this entry?')) return;
-  const list=grindLoad().filter(e=>e.id!==id);
-  grindSave(list);
-  grindRender();
-  if(window.showToast) showToast('Entry deleted','ti-trash');
-};
-
-window.grindRender=grindRender;
-})();
-</script>
-<script>
-/* ═══════════════════════════════════════════════════════════════
    ENHANCEMENT SCRIPTS — UX polish, accessibility, performance
    ═══════════════════════════════════════════════════════════════ */
 
@@ -18260,7 +17891,7 @@ window.addEventListener('load',()=>{
     });
   },{threshold:.08,rootMargin:'0px 0px -30px 0px'});
   function refreshReveals(){
-    document.querySelectorAll('.scard,.ft-card,.cap-card,.cap-echo-card,.prog-stat-card,.stat-box,.lt-card,.grind-entry').forEach(el=>{
+    document.querySelectorAll('.scard,.ft-card,.cap-card,.cap-echo-card,.prog-stat-card,.stat-box,.lt-card').forEach(el=>{
       el.classList.add('reveal');
       obs.observe(el);
     });
@@ -18354,352 +17985,6 @@ if(_origSaveSessions){
       updateGreeting();
     };
   }
-})();
-</script>
-
-<div id="alfred-overlay" onclick="if(event.target===this)alfredClose()">
-  <div id="alfred-box">
-    <div id="alfred-head">
-      <i class="ti ti-terminal-2"></i>
-      <span id="alfred-head-title">Alfred</span>
-      <span id="alfred-model-label" class="alfred-head-sub"></span>
-      <button id="alfred-close" onclick="alfredClose()" title="Close (Esc)"><i class="ti ti-x"></i></button>
-    </div>
-    <div id="alfred-log"><div id="alfred-empty">Ask Alfred anything — he can see your Grind log, schedule, focus history, study goal and terminal notes. Capsule stays private.</div></div>
-    <div id="alfred-input-row">
-      <textarea id="alfred-input" rows="1" placeholder="Ask Alfred…" spellcheck="false"></textarea>
-      <button id="alfred-send" onclick="alfredSend()">Send</button>
-      <span id="alfred-esc">ESC</span>
-    </div>
-  </div>
-</div>
-<script>
-/* ---- Alfred quick-chat modal (Ctrl+Q) ----
-   A lightweight multi-turn chat window over the same local Ollama endpoint
-   Alfred already uses in the Terminal. Kept separate from the Terminal's
-   ask/alfred command so it can be opened instantly from any page. */
-let alfredChatOpen=false;
-let alfredChatHistory=[]; // [{role:'user'|'assistant', content:'...'}], capped below
-let alfredSending=false;
-
-function alfredIsOpen(){ return alfredChatOpen; }
-
-function alfredOpen(){
-  const overlay=document.getElementById('alfred-overlay');
-  if(!overlay)return;
-  alfredChatOpen=true;
-  overlay.classList.add('open');
-  const label=document.getElementById('alfred-model-label');
-  if(label)label.textContent=(typeof TERM_OLLAMA_MODEL!=='undefined'?TERM_OLLAMA_MODEL:'');
-  const input=document.getElementById('alfred-input');
-  if(input)setTimeout(()=>input.focus(),10);
-  if(typeof termWarmAlfred==='function')termWarmAlfred();
-}
-function alfredClose(){
-  const overlay=document.getElementById('alfred-overlay');
-  if(!overlay)return;
-  alfredChatOpen=false;
-  overlay.classList.remove('open');
-}
-function alfredToggle(){ alfredChatOpen?alfredClose():alfredOpen(); }
-
-function alfredAppendMsg(role,text,extraClass){
-  const log=document.getElementById('alfred-log');
-  if(!log)return null;
-  const empty=document.getElementById('alfred-empty');
-  if(empty)empty.remove();
-  const div=document.createElement('div');
-  div.className='alfred-msg '+(role==='user'?'user':'bot')+(extraClass?(' '+extraClass):'');
-  div.textContent=text;
-  log.appendChild(div);
-  log.scrollTop=log.scrollHeight;
-  return div;
-}
-
-function alfredAutoResize(){
-  const input=document.getElementById('alfred-input');
-  if(!input)return;
-  input.style.height='auto';
-  input.style.height=Math.min(110,input.scrollHeight)+'px';
-}
-
-async function alfredSend(){
-  if(alfredSending)return;
-  const input=document.getElementById('alfred-input');
-  if(!input)return;
-  const question=input.value.trim();
-  if(!question)return;
-  input.value='';
-  alfredAutoResize();
-  alfredAppendMsg('user',question);
-  alfredChatHistory.push({role:'user',content:question});
-
-  alfredSending=true;
-  const sendBtn=document.getElementById('alfred-send');
-  if(sendBtn)sendBtn.disabled=true;
-  const thinkingEl=alfredAppendMsg('bot','Alfred is thinking…','thinking');
-
-  // If a warm-up ping is still in flight (e.g. the model hasn't loaded into
-  // memory yet), wait for it rather than firing a second request alongside
-  // it — Ollama processes one at a time anyway, so racing them just makes
-  // the real question wait behind the warm-up regardless, minus the honesty.
-  if(window._alfredWarmPromise&&!window._alfredLastWarm){
-    if(thinkingEl)thinkingEl.textContent='Waking Alfred up (first message can take longer)…';
-    try{ await window._alfredWarmPromise; }catch(e){}
-    if(thinkingEl)thinkingEl.textContent='Alfred is thinking…';
-  }
-
-  // Keep only the last few turns in context — small local models lose the
-  // thread (and slow way down) if handed a long running transcript.
-  const recentHistory=alfredChatHistory.slice(-10);
-  const sysBase=(typeof TERM_ALFRED_SYSTEM!=='undefined')?TERM_ALFRED_SYSTEM:'You are Alfred, a helpful assistant.';
-  const sysCtx=(typeof canopusContextForAlfred==='function')?canopusContextForAlfred():'';
-
-  let res;
-  try{
-    res=await fetch(TERM_OLLAMA_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:TERM_OLLAMA_MODEL,
-        stream:true,
-        options:{num_predict:200},
-        messages:[{role:'system',content:sysBase+sysCtx},...recentHistory]
-      })
-    });
-  }catch(e){
-    if(thinkingEl){thinkingEl.textContent='Alfred is unreachable — is Ollama running? (ollama serve)';thinkingEl.className='alfred-msg bot error';}
-    alfredSending=false;
-    if(sendBtn)sendBtn.disabled=false;
-    return;
-  }
-  if(!res.ok||!res.body){
-    let detailMsg='';
-    try{ const errBody=await res.clone().json(); if(errBody&&errBody.error)detailMsg=errBody.error; }catch(e){}
-    if(thinkingEl){thinkingEl.textContent='Alfred error ('+res.status+')'+(detailMsg?': '+detailMsg:'');thinkingEl.className='alfred-msg bot error';}
-    alfredSending=false;
-    if(sendBtn)sendBtn.disabled=false;
-    return;
-  }
-  const reader=res.body.getReader();
-  const decoder=new TextDecoder();
-  let full='';
-  let started=false;
-  const log=document.getElementById('alfred-log');
-  while(true){
-    const {done,value}=await reader.read();
-    if(done)break;
-    const chunk=decoder.decode(value,{stream:true});
-    chunk.split('\n').filter(Boolean).forEach(line=>{
-      try{
-        const json=JSON.parse(line);
-        if(json.message&&json.message.content){
-          if(!started){ started=true; if(thinkingEl)thinkingEl.className='alfred-msg bot'; }
-          full+=json.message.content;
-          if(thinkingEl)thinkingEl.textContent=full;
-          if(log)log.scrollTop=log.scrollHeight;
-        }
-      }catch(e){/* ignore partial JSON */}
-    });
-  }
-  if(!full.trim()&&thinkingEl){thinkingEl.textContent='(no response)';thinkingEl.className='alfred-msg bot error';}
-  if(full.trim())alfredChatHistory.push({role:'assistant',content:full});
-  alfredSending=false;
-  if(sendBtn)sendBtn.disabled=false;
-}
-
-document.addEventListener('DOMContentLoaded',function(){
-  const input=document.getElementById('alfred-input');
-  if(input){
-    input.addEventListener('input',alfredAutoResize);
-    input.addEventListener('keydown',function(e){
-      if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); alfredSend(); }
-    });
-  }
-});
-
-// Ctrl+Q anywhere in Canopus opens/closes the Alfred quick-chat. Esc closes it.
-document.addEventListener('keydown',function(e){
-  if(e.ctrlKey&&!e.altKey&&!e.metaKey&&(e.key||'').toLowerCase()==='q'){
-    e.preventDefault();
-    alfredToggle();
-    return;
-  }
-  if(e.key==='Escape'&&alfredIsOpen()){
-    e.preventDefault();
-    alfredClose();
-  }
-},true);
-</script>
-
-<div id="cmdk-overlay" onclick="if(event.target===this)cmdkClose()">
-  <div id="cmdk-box">
-    <div id="cmdk-input-row">
-      <i class="ti ti-search"></i>
-      <input id="cmdk-input" type="text" placeholder="Jump to a page, search entries or stories…" autocomplete="off" spellcheck="false">
-      <span id="cmdk-esc">ESC</span>
-    </div>
-    <div id="cmdk-list"></div>
-  </div>
-</div>
-
-<script>
-(function(){
-  const CMDK_ACTIONS = [
-    {label:'Focus',sub:'Timer & sessions',icon:'ti-hourglass-empty',run:()=>showPage('focus')},
-    {label:'Schedule',sub:'Plan your day',icon:'ti-calendar',run:()=>showPage('schedule')},
-    {label:'Progress',sub:'Study goals & history',icon:'ti-chart-bar',run:()=>showPage('progress')},
-    {label:'Sky',sub:'Star catalog',icon:'ti-moon-stars',run:()=>showPage('sky')},
-    {label:'Capsule',sub:'Journal',icon:'ti-capsule',run:()=>showPage('capsule')},
-    {label:'Grind',sub:'Experience journal',icon:'ti-flame',run:()=>showPage('grind')},
-    {label:'Literature',sub:'Short stories',icon:'ti-feather',run:()=>showPage('literature')},
-    {label:'Features',sub:'What Canopus can do',icon:'ti-stars',run:()=>showPage('features')},
-    {label:'Terminal',sub:'Alfred',icon:'ti-terminal-2',run:()=>showPage('terminal')},
-    {label:'Flight',sub:'Focus-mode globe',icon:'ti-plane',run:()=>{if(window.openFlightTracker)openFlightTracker();}},
-    {label:'Passport',sub:'Session stamps',icon:'ti-passport',run:()=>{if(window.openPassport)openPassport();}},
-    {label:'Vault',sub:'Knowledge vault',icon:'ti-lock-square-rounded',run:()=>{if(window.openVault)openVault();}},
-    {label:'Empires',sub:'World history',icon:'ti-map-2',run:()=>{if(window.openEmpires)openEmpires();}},
-    {label:'Conflicts',sub:'Antares',icon:'ti-swords',run:()=>{if(window.openConflicts)openConflicts();}},
-    {label:'Sirius',sub:'',icon:'ti-atom-2',run:()=>{if(window.openLOQ)openLOQ();}},
-    {label:'Library',sub:'',icon:'ti-books',run:()=>{if(window.openLibrary)openLibrary();}},
-    {label:'Interests',sub:'',icon:'ti-heart',run:()=>{if(window.openInterests)openInterests();}},
-    {label:'Toggle theme',sub:'Light / dark',icon:'ti-sun',run:()=>{if(window.toggleAppTheme)toggleAppTheme();}}
-  ];
-
-  let cmdkResults=[];
-  let cmdkIndex=0;
-
-  function cmdkEsc(s){
-    return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  function cmdkCapsuleMatches(q){
-    let posts=[];
-    try{ posts=JSON.parse(localStorage.getItem('dayplan_capsule')||'[]'); }catch(e){ posts=[]; }
-    const ql=q.toLowerCase();
-    return posts.filter(p=>p.text && p.text.toLowerCase().includes(ql))
-      .sort((a,b)=>(b.ts||0)-(a.ts||0))
-      .slice(0,5)
-      .map(p=>{
-        const d=p.ts?new Date(p.ts):null;
-        const dateStr=d?d.toLocaleDateString(undefined,{month:'short',day:'numeric'}):'';
-        return {
-          label:p.text.length>70?p.text.slice(0,70)+'…':p.text,
-          sub:dateStr,
-          icon:'ti-capsule',
-          run:()=>{
-            showPage('capsule');
-            setTimeout(()=>{
-              const el=document.getElementById('cap-entry-'+p.id);
-              if(el){
-                el.scrollIntoView({behavior:'smooth',block:'center'});
-                el.classList.add('cmdk-flash');
-                setTimeout(()=>el.classList.remove('cmdk-flash'),1400);
-              }
-            },260);
-          }
-        };
-      });
-  }
-
-  function cmdkLiteratureMatches(q){
-    if(typeof LT_STORIES==='undefined') return [];
-    const ql=q.toLowerCase();
-    return LT_STORIES.filter(s=>(s.t&&s.t.toLowerCase().includes(ql))||(s.d&&s.d.toLowerCase().includes(ql)))
-      .slice(0,5)
-      .map(s=>({
-        label:s.t,
-        sub:s.y||'',
-        icon:'ti-feather',
-        run:()=>{
-          showPage('literature');
-          setTimeout(()=>{ if(window.ltOpenStory) ltOpenStory(s.id); },260);
-        }
-      }));
-  }
-
-  function cmdkSearch(q){
-    if(!q.trim()){
-      return [{group:'Go to',items:CMDK_ACTIONS.slice(0,9)}];
-    }
-    const ql=q.toLowerCase();
-    const actions=CMDK_ACTIONS.filter(a=>a.label.toLowerCase().includes(ql)||(a.sub&&a.sub.toLowerCase().includes(ql)));
-    const caps=cmdkCapsuleMatches(q);
-    const lit=cmdkLiteratureMatches(q);
-    const groups=[];
-    if(actions.length) groups.push({group:'Pages & actions',items:actions});
-    if(caps.length) groups.push({group:'Capsule',items:caps});
-    if(lit.length) groups.push({group:'Literature',items:lit});
-    return groups;
-  }
-
-  function cmdkRender(){
-    const list=document.getElementById('cmdk-list');
-    const q=document.getElementById('cmdk-input').value;
-    const groups=cmdkSearch(q);
-    cmdkResults=[];
-    groups.forEach(g=>g.items.forEach(it=>cmdkResults.push(it)));
-    if(!cmdkResults.length){
-      list.innerHTML='<div id="cmdk-empty">No matches</div>';
-      return;
-    }
-    if(cmdkIndex>=cmdkResults.length) cmdkIndex=0;
-    let flat=0;
-    let html='';
-    groups.forEach(g=>{
-      html+=`<div class="cmdk-group-label">${cmdkEsc(g.group)}</div>`;
-      g.items.forEach(it=>{
-        const i=flat++;
-        html+=`<div class="cmdk-item${i===cmdkIndex?' active':''}" data-i="${i}"><i class="ti ${it.icon}"></i><span class="cmdk-item-title">${cmdkEsc(it.label)}</span><span class="cmdk-item-sub">${cmdkEsc(it.sub||'')}</span></div>`;
-      });
-    });
-    list.innerHTML=html;
-    list.querySelectorAll('.cmdk-item').forEach(el=>{
-      el.addEventListener('click',()=>{ cmdkIndex=+el.getAttribute('data-i'); cmdkSelect(); });
-      el.addEventListener('mouseenter',()=>{
-        cmdkIndex=+el.getAttribute('data-i');
-        list.querySelectorAll('.cmdk-item').forEach(x=>x.classList.remove('active'));
-        el.classList.add('active');
-      });
-    });
-    const activeEl=list.querySelector('.cmdk-item.active');
-    if(activeEl) activeEl.scrollIntoView({block:'nearest'});
-  }
-
-  function cmdkSelect(){
-    const item=cmdkResults[cmdkIndex];
-    if(!item) return;
-    cmdkClose();
-    try{ item.run(); }catch(e){}
-  }
-
-  window.cmdkOpen=function(){
-    cmdkIndex=0;
-    document.getElementById('cmdk-overlay').classList.add('open');
-    const input=document.getElementById('cmdk-input');
-    input.value='';
-    cmdkRender();
-    setTimeout(()=>input.focus(),10);
-  };
-  window.cmdkClose=function(){
-    document.getElementById('cmdk-overlay').classList.remove('open');
-  };
-
-  document.getElementById('cmdk-input').addEventListener('input',()=>{ cmdkIndex=0; cmdkRender(); });
-  document.getElementById('cmdk-input').addEventListener('keydown',e=>{
-    if(e.key==='ArrowDown'){ e.preventDefault(); cmdkIndex=Math.min(cmdkIndex+1,cmdkResults.length-1); cmdkRender(); }
-    else if(e.key==='ArrowUp'){ e.preventDefault(); cmdkIndex=Math.max(cmdkIndex-1,0); cmdkRender(); }
-    else if(e.key==='Enter'){ e.preventDefault(); cmdkSelect(); }
-    else if(e.key==='Escape'){ e.preventDefault(); cmdkClose(); }
-  });
-
-  document.addEventListener('keydown',e=>{
-    if((e.metaKey||e.ctrlKey)&&(e.key==='k'||e.key==='K')){
-      e.preventDefault();
-      const overlay=document.getElementById('cmdk-overlay');
-      if(overlay.classList.contains('open')) cmdkClose(); else cmdkOpen();
-    }
-  });
 })();
 </script>
 </body>
