@@ -42,7 +42,26 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(createWindow);
+function setAutoLaunch() {
+  // Built-in Electron API for launching at login. Works well for packaged
+  // apps (electron-builder/electron-forge) on Windows and macOS.
+  // NOTE: On Linux this API is unreliable across distros — if you're
+  // targeting Linux, use the `auto-launch` npm package instead, or ship a
+  // .desktop file to ~/.config/autostart/ during install.
+  // NOTE: This only has effect in a packaged app — running via `electron .`
+  // in dev mode will not actually register anything useful.
+  if (process.platform === 'win32' || process.platform === 'darwin') {
+    app.setLoginItemSettings({
+      openAtLogin: true,
+      openAsHidden: false // macOS only — set true to start in the background
+    });
+  }
+}
+
+app.whenReady().then(() => {
+  setAutoLaunch();
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canopus — Features</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#000;color:#fff;font-family:'Inter',sans-serif;height:100%;overflow:hidden}
+
+  #orbit-stage{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  #orbit-wrap{position:relative;width:100%;max-width:1000px;height:100%;display:flex;align-items:center;justify-content:center}
+  #orbit-root{position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+
+  /* center pulsing core */
+  #orbit-core{position:absolute;width:64px;height:64px;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, #444, #000 70%);
+    display:flex;align-items:center;justify-content:center;z-index:10;
+    animation:corePulse 2s cubic-bezier(.4,0,.6,1) infinite}
+  #orbit-core .ring{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.15);animation:ringPing 2s cubic-bezier(0,0,.2,1) infinite}
+  #orbit-core .ring.r1{width:80px;height:80px}
+  #orbit-core .ring.r2{width:96px;height:96px;animation-delay:.5s}
+  #orbit-core .dot{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px)}
+  @keyframes corePulse{0%,100%{opacity:1}50%{opacity:.55}}
+  @keyframes ringPing{75%,100%{transform:scale(2);opacity:0}}
+
+  #orbit-track{position:absolute;width:460px;height:460px;border-radius:50%;border:1px solid rgba(255,255,255,.1)}
+
+  .orbit-node{position:absolute;transition:transform .7s cubic-bezier(.4,0,.2,1),opacity .3s;cursor:pointer;top:50%;left:50%;margin:-20px}
+
+  .node-glow{position:absolute;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle, rgba(255,255,255,.2) 0%, rgba(255,255,255,0) 70%)}
+  .node-glow.pulsing{animation:glowPulse 1s cubic-bezier(.4,0,.6,1) infinite}
+  @keyframes glowPulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+  .node-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:#000;color:#fff;border:2px solid rgba(255,255,255,.4);
+    transition:all .3s;font-size:16px}
+  .orbit-node.related .node-dot{background:rgba(255,255,255,.5);color:#000;border-color:#fff;animation:relatedPulse 2s infinite}
+  .orbit-node.expanded .node-dot{background:#fff;color:#000;border-color:#fff;box-shadow:0 0 20px rgba(255,255,255,.3);transform:scale(1.5)}
+  @keyframes relatedPulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+  .node-label{position:absolute;top:48px;left:50%;transform:translateX(-50%);white-space:nowrap;
+    font-size:11px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.7);transition:all .3s}
+  .orbit-node.expanded .node-label{color:#fff;transform:translateX(-50%) scale(1.2)}
+
+  .node-card{position:absolute;top:80px;left:50%;transform:translateX(-50%);width:260px;
+    background:rgba(0,0,0,.92);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.3);
+    border-radius:10px;box-shadow:0 12px 32px rgba(255,255,255,.08);z-index:200;
+    animation:cardIn .25s ease-out}
+  @keyframes cardIn{from{opacity:0;transform:translateX(-50%) translateY(-6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+  .node-card::before{content:'';position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:1px;height:12px;background:rgba(255,255,255,.5)}
+  .card-head{padding:14px 16px 8px}
+  .card-head-row{display:flex;justify-content:space-between;align-items:center}
+  .card-badge{font-size:9.5px;font-weight:700;letter-spacing:.08em;padding:3px 8px;border-radius:99px;border:1px solid}
+  .card-badge.completed{background:#000;color:#fff;border-color:#fff}
+  .card-badge.in-progress{background:#fff;color:#000;border-color:#000}
+  .card-badge.pending{background:rgba(0,0,0,.4);color:#fff;border-color:rgba(255,255,255,.5)}
+  .card-date{font-size:10.5px;font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.5)}
+  .card-title{font-size:14px;font-weight:600;margin-top:8px}
+  .card-body{padding:0 16px 16px;font-size:12px;line-height:1.5;color:rgba(255,255,255,.8)}
+  .card-section{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)}
+  .energy-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:6px}
+  .energy-row i{margin-right:4px;font-size:11px}
+  .energy-track{width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
+  .energy-fill{height:100%;background:linear-gradient(90deg,#888,#fff)}
+  .rel-head{display:flex;align-items:center;margin-bottom:8px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.7)}
+  .rel-head i{margin-right:5px;font-size:11px}
+  .rel-btns{display:flex;flex-wrap:wrap;gap:6px}
+  .rel-btn{display:flex;align-items:center;gap:4px;font-size:10.5px;padding:4px 9px;border-radius:99px;
+    border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.8);cursor:pointer;
+    font-family:'Inter',sans-serif;transition:background .15s,color .15s}
+  .rel-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+
+  .open-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:14px;
+    padding:9px 0;border-radius:7px;border:1px solid rgba(255,255,255,.25);background:#fff;color:#000;
+    font-size:11.5px;font-weight:600;letter-spacing:.03em;cursor:pointer;font-family:'Inter',sans-serif;
+    transition:background .15s,transform .15s}
+  .open-btn:hover{background:#ddd}
+  .open-btn:active{transform:scale(.97)}
+
+  #orbit-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-size:10.5px;
+    letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);text-align:center}
+</style>
+</head>
+<body>
+
+<div id="orbit-stage">
+  <div id="orbit-wrap">
+    <div id="orbit-root">
+      <div id="orbit-track"></div>
+      <div id="orbit-core">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="dot"></div>
+      </div>
+      <!-- nodes injected here -->
+    </div>
+  </div>
+  <div id="orbit-hint">Click a node to expand · "Open" jumps to that feature · click empty space to reset</div>
+</div>
+
+<script>
+(function(){
+  // Real Canopus features, pulled from the existing Features page.
+  // action.type: 'page' -> calls window.showPage(id) when embedded in index.html
+  //              'link' -> navigates to a standalone page file
+  const timelineData = [
+    { id:1, title:"Focus", star:"Alcyone", assoc:"Krittika Nakshatra", icon:"ti-clock",
+      content:"Krittika is associated with courage, discipline, and unwavering resolve. Focus is named Alcyone because every meaningful pursuit begins with a choice: set aside excuses and dedicate yourself completely.",
+      tags:"Courage · Discipline · Determination", relatedIds:[2,3],
+      action:{type:'page', target:'focus'} },
+
+    { id:2, title:"Sky", star:"Polaris", assoc:"Dhruva", icon:"ti-telescope",
+      content:"Known in Hindu tradition as Dhruva, Polaris symbolizes constancy and purpose — remaining steadfast while the sky moves around it. Sky is named Polaris because every discovery begins by looking upward.",
+      tags:"Guidance · Purpose · Exploration", relatedIds:[1,3],
+      action:{type:'page', target:'sky'} },
+
+    { id:3, title:"Capsule", star:"Pushya", assoc:"Pushya Nakshatra", icon:"ti-hourglass-empty",
+      content:"Pushya, governed by Brihaspati, symbolizes learning and growth — its name means 'to nourish.' Capsule believes great knowledge builds through countless small lessons accumulated over time.",
+      tags:"Learning · Wisdom · Growth", relatedIds:[1,2,4],
+      action:{type:'page', target:'capsule'} },
+
+    { id:4, title:"Vault", star:"Canopus", assoc:"Agastya", icon:"ti-books",
+      content:"Canopus is identified with sage Agastya, revered for expanding the frontiers of human understanding. The Vault preserves knowledge not just as information, but as wisdom to be explored and passed forward.",
+      tags:"Wisdom · Scholarship · Discovery", relatedIds:[3,7,8],
+      action:{type:'link', target:'vault.html'} },
+
+    { id:5, title:"Empires", star:"Regulus", assoc:"Magha Nakshatra", icon:"ti-crown",
+      content:"Regulus anchors Magha, the nakshatra of thrones and inherited authority. Empires traces authority built on what preceded it — from Maurya and Mughal India to Rome and the Mongols — on a rotating globe.",
+      tags:"Power · Legacy · Ancestry", relatedIds:[4,6],
+      action:{type:'link', target:'empires.html'} },
+
+    { id:6, title:"Conflicts", star:"Antares", assoc:"Jyeshtha Nakshatra", icon:"ti-sitemap",
+      content:"Antares anchors Jyeshtha, the nakshatra of seniority and hard-won authority. Conflicts traces fifteen major world conflicts and the branching flowchart of how each one caused the next.",
+      tags:"History · Causality · Consequence", relatedIds:[5],
+      action:{type:'link', target:'conflicts.html'} },
+
+    { id:7, title:"Literature", star:"Venus", assoc:"Shukra", icon:"ti-feather",
+      content:"Shukra (Venus) is celebrated as a master of literature, poetry, and philosophy — knowledge that lives in beauty and imagination, not facts alone. Stories preserve civilizations and speak across centuries.",
+      tags:"Literature · Poetry · Culture", relatedIds:[4,8],
+      action:{type:'page', target:'literature'} },
+
+    { id:8, title:"LOQ", star:"Sirius", assoc:"Mrigavyadha", icon:"ti-quote",
+      content:"Sirius, the brightest star, is 'the deer hunter' — precision cutting through the dark. LOQ gathers history's sharpest quotations, distilled thought at its brightest point, organised for easy finding.",
+      tags:"Wisdom · Brevity · Clarity", relatedIds:[7,9],
+      action:{type:'link', target:'sirius.html'} },
+
+    { id:9, title:"Library", star:"Mercury", assoc:"Budha", icon:"ti-library",
+      content:"Budha (Mercury) rules intellect and the spoken word. The Library gathers the world's great schools of philosophy and its most consequential speeches — clear thinking and clear speech under one roof.",
+      tags:"Reason · Rhetoric · Eloquence", relatedIds:[8,4],
+      action:{type:'page', target:'library'} }
+  ];
+
+  function openFeature(item){
+    if(!item.action) return;
+    if(item.action.type==='page'){
+      if(window.showPage){ window.showPage(item.action.target); }
+      else { console.log('[demo] would call showPage(\'' + item.action.target + '\')'); }
+    } else if(item.action.type==='link'){
+      if(window.top && window.top !== window){ window.top.location.href = item.action.target; }
+      else { window.location.href = item.action.target; }
+    }
+  }
+
+  const root = document.getElementById('orbit-root');
+  let rotationAngle = 0;
+  let autoRotate = true;
+  let activeNodeId = null;
+  let expandedId = null;
+  let rotTimer = null;
+
+  const nodeEls = {};
+
+  function relatedIdsOf(id){
+    const it = timelineData.find(t=>t.id===id);
+    return it ? it.relatedIds : [];
+  }
+
+  function buildNodes(){
+    timelineData.forEach((item,index)=>{
+      const el = document.createElement('div');
+      el.className = 'orbit-node';
+      el.dataset.id = item.id;
+
+      const glowSize = 56;
+      el.innerHTML = `
+        <div class="node-glow" style="width:${glowSize}px;height:${glowSize}px;left:${-(glowSize-40)/2}px;top:${-(glowSize-40)/2}px"></div>
+        <div class="node-dot"><i class="ti ${item.icon}"></i></div>
+        <div class="node-label">${item.title}</div>
+        <div class="node-card-slot"></div>
+      `;
+      el.addEventListener('click', (e)=>{ e.stopPropagation(); toggleItem(item.id); });
+      root.appendChild(el);
+      nodeEls[item.id] = el;
+    });
+    positionNodes();
+  }
+
+  function positionNodes(){
+    const total = timelineData.length;
+    timelineData.forEach((item,index)=>{
+      const angle = ((index/total)*360 + rotationAngle) % 360;
+      const radius = 230;
+      const radian = angle*Math.PI/180;
+      const x = radius*Math.cos(radian);
+      const y = radius*Math.sin(radian);
+      const zIndex = Math.round(100 + 50*Math.cos(radian));
+      const opacity = Math.max(0.4, Math.min(1, 0.4 + 0.6*((1+Math.sin(radian))/2)));
+
+      const el = nodeEls[item.id];
+      const isExpanded = expandedId===item.id;
+      el.style.transform = `translate(${x}px, ${y}px)`;
+      el.style.zIndex = isExpanded ? 200 : zIndex;
+      el.style.opacity = isExpanded ? 1 : opacity;
+    });
+  }
+
+  function startRotation(){
+    if(rotTimer) clearInterval(rotTimer);
+    rotTimer = setInterval(()=>{
+      if(!autoRotate) return;
+      rotationAngle = (rotationAngle + 0.3) % 360;
+      positionNodes();
+    }, 50);
+  }
+
+  function renderCard(item){
+    const related = item.relatedIds.map(rid=>{
+      const r = timelineData.find(t=>t.id===rid);
+      return `<button class="rel-btn" data-rel="${rid}">${r?r.title:''} <i class="ti ti-arrow-right"></i></button>`;
+    }).join('');
+
+    return `
+      <div class="node-card">
+        <div class="card-head">
+          <div class="card-head-row">
+            <span class="card-badge completed">${item.star.toUpperCase()}</span>
+            <span class="card-date">${item.assoc}</span>
+          </div>
+          <div class="card-title">${item.title}</div>
+        </div>
+        <div class="card-body">
+          <p>${item.content}</p>
+          <div class="card-section">
+            <span class="card-date" style="letter-spacing:.06em">${item.tags}</span>
+          </div>
+          ${item.relatedIds.length ? `
+          <div class="card-section">
+            <div class="rel-head"><i class="ti ti-link"></i>Related</div>
+            <div class="rel-btns">${related}</div>
+          </div>` : ''}
+          <button class="open-btn" data-open="${item.id}">Open ${item.title} <i class="ti ti-arrow-up-right"></i></button>
+        </div>
+      </div>`;
+  }
+
+  function toggleItem(id){
+    const el = nodeEls[id];
+    const willExpand = expandedId !== id;
+
+    // collapse any currently expanded node
+    if(expandedId!==null && nodeEls[expandedId]){
+      nodeEls[expandedId].classList.remove('expanded');
+      nodeEls[expandedId].querySelector('.node-card-slot').innerHTML = '';
+    }
+    Object.values(nodeEls).forEach(n=>n.classList.remove('related'));
+
+    if(willExpand){
+      expandedId = id;
+      activeNodeId = id;
+      autoRotate = false;
+      el.classList.add('expanded');
+      el.querySelector('.node-card-slot').innerHTML = renderCard(timelineData.find(t=>t.id===id));
+      el.querySelectorAll('.rel-btn').forEach(btn=>{
+        btn.addEventListener('click',(e)=>{ e.stopPropagation(); toggleItem(+btn.dataset.rel); });
+      });
+      el.querySelector('.open-btn').addEventListener('click',(e)=>{
+        e.stopPropagation();
+        openFeature(timelineData.find(t=>t.id===id));
+      });
+      relatedIdsOf(id).forEach(rid=>{ if(nodeEls[rid]) nodeEls[rid].classList.add('related'); });
+      centerViewOnNode(id);
+    } else {
+      expandedId = null;
+      activeNodeId = null;
+      autoRotate = true;
+    }
+    positionNodes();
+  }
+
+  function centerViewOnNode(id){
+    const idx = timelineData.findIndex(t=>t.id===id);
+    const total = timelineData.length;
+    const targetAngle = (idx/total)*360;
+    rotationAngle = 270 - targetAngle;
+    positionNodes();
+  }
+
+  document.getElementById('orbit-stage').addEventListener('click',(e)=>{
+    if(e.target.id==='orbit-stage' || e.target.id==='orbit-wrap' || e.target.id==='orbit-root' || e.target.id==='orbit-track'){
+      if(expandedId!==null && nodeEls[expandedId]){
+        nodeEls[expandedId].classList.remove('expanded');
+        nodeEls[expandedId].querySelector('.node-card-slot').innerHTML = '';
+      }
+      Object.values(nodeEls).forEach(n=>n.classList.remove('related'));
+      expandedId = null;
+      activeNodeId = null;
+      autoRotate = true;
+      positionNodes();
+    }
+  });
+
+  buildNodes();
+  startRotation();
+})();
+</script>
+</body>
+</html>

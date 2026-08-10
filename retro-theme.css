@@ -115,7 +115,26 @@ html.crt-retro body *{
    the generic rule above, so it wins regardless of order. */
 html.crt-retro .ti,
 html.crt-retro .ti::before,
-html.crt-retro .ti::after{
+html.crt-retro .ti::after,
+html.crt-retro [class*="ti-"],
+html.crt-retro [class*="ti-"]::before,
+html.crt-retro [class*="ti-"]::after{
+  font-family:'tabler-icons' !important;
+}
+/* Belt-and-suspenders: if vhs-theme.css or harsh-mode.css (loaded after
+   this file, see index.html <head>) carry their own blanket font-family
+   reset, an equal- or higher-specificity rule loaded later in the
+   cascade can silently win and re-break the icon font again. Repeating
+   the .crt-retro class doesn't change what this matches but does add
+   another class-selector to the specificity count, so this copy keeps
+   winning even against a later rule with one more class than the
+   version above. */
+html.crt-retro.crt-retro .ti,
+html.crt-retro.crt-retro .ti::before,
+html.crt-retro.crt-retro .ti::after,
+html.crt-retro.crt-retro [class*="ti-"],
+html.crt-retro.crt-retro [class*="ti-"]::before,
+html.crt-retro.crt-retro [class*="ti-"]::after{
   font-family:'tabler-icons' !important;
 }
 
@@ -202,6 +221,31 @@ html.crt-retro #vnReviewVideo,
 html.crt-retro #vnPlayerVideo{
   filter:none !important;
   opacity:1 !important;
+}
+
+/* Exception: the accent/phosphor colour-picker swatches in the nav's
+   settings menu (.accent-swatch, .phosphor-swatch). Each swatch's whole
+   job is to preview a specific colour via its own --swatch/--sw
+   variable on background-color, with box-shadow drawing the ring for
+   the "active" swatch — but the blanket "body *" rule above forces
+   background-color:transparent and box-shadow:none, so every swatch
+   (including the literal green one) renders as an invisible,
+   ring-less circle. Restore both here so swatches keep showing their
+   real colours and active state no matter which phosphor is on.
+   Two classes beats the blanket rule's one-class+one-element
+   selector, so this wins regardless of source order, same pattern
+   used for the exceptions above.*/
+html.crt-retro .accent-swatch{
+  background-color:var(--swatch) !important;
+}
+html.crt-retro .phosphor-swatch{
+  background-color:var(--sw) !important;
+}
+html.crt-retro .accent-swatch.active{
+  box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--swatch) !important;
+}
+html.crt-retro .phosphor-swatch.active{
+  box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--sw) !important;
 }
 
 /* scrollbars */

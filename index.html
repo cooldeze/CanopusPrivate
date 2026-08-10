@@ -597,6 +597,209 @@ body.light .nm-modal-signoff{color:#8a8578}
   transition:all .25s;backdrop-filter:blur(8px);display:none;
 }
 .flight-back:hover{border-color:rgba(255,255,255,1);color:#fff}
+/* ── SESSION MODE SWITCH (Free Run / Pomodoro / PomoMix, mid-session) ── */
+.flight-mode-switch{position:relative}
+.flight-mode-switch-btn{
+  width:34px;height:34px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.35);
+  background:rgba(0,0,0,0.4);color:rgba(255,255,255,0.85);cursor:pointer;
+  display:none;align-items:center;justify-content:center;font-size:14px;
+  transition:all .25s;backdrop-filter:blur(8px);
+}
+/* Only relevant once a session is actually running */
+.flight-overlay.tracking-flight .flight-mode-switch-btn{display:flex}
+.flight-mode-switch-btn:hover{border-color:rgba(255,255,255,1);color:#fff}
+.flight-mode-switch-btn.shake{animation:pomoShake .4s ease}
+.flight-mode-switch-menu{
+  position:absolute;top:42px;right:0;
+  background:rgba(8,8,8,0.97);border:0.5px solid rgba(255,255,255,0.18);border-radius:10px;
+  padding:6px;display:none;flex-direction:column;gap:2px;min-width:152px;z-index:30;
+  backdrop-filter:blur(10px);box-shadow:0 16px 34px -10px rgba(0,0,0,0.7);
+}
+.flight-mode-switch-menu.open{display:flex}
+.fms-item{
+  display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;
+  font-size:11px;letter-spacing:.04em;color:rgba(255,255,255,0.8);cursor:pointer;
+  transition:background .15s,color .15s;font-family:'Inter',sans-serif;white-space:nowrap;
+}
+.fms-item:hover{background:rgba(255,255,255,0.1);color:#fff}
+.fms-item.current{opacity:.35;pointer-events:none}
+.fms-item i{font-size:14px;width:15px;text-align:center;flex-shrink:0}
+.fms-hint{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:.05em;padding:7px 10px 3px;border-top:0.5px solid rgba(255,255,255,0.08);margin-top:3px;white-space:normal;line-height:1.4}
+/* ── STUDY ACHIEVEMENT TOAST (brief celebratory pop after a session completes) ── */
+.study-achievement-toast{
+  position:absolute;top:86px;left:50%;
+  transform:translateX(-50%) translateY(-8px) scale(.94);
+  z-index:50;
+  display:flex;align-items:center;gap:11px;
+  padding:11px 20px;border-radius:14px;
+  background:rgba(10,12,14,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:0.5px solid rgba(255,255,255,0.16);
+  box-shadow:0 16px 40px -10px rgba(0,0,0,0.6);
+  opacity:0;pointer-events:none;
+  transition:opacity .35s ease,transform .35s cubic-bezier(.22,.9,.32,1.28);
+  font-family:'Inter',sans-serif;white-space:nowrap;
+}
+.study-achievement-toast.show{
+  opacity:1;transform:translateX(-50%) translateY(0) scale(1);
+}
+.study-achievement-icon{font-size:19px;line-height:1;flex-shrink:0}
+.study-achievement-toast.show .study-achievement-icon{animation:studyAchPop .5s ease}
+@keyframes studyAchPop{0%{transform:scale(.4) rotate(-12deg);opacity:0}55%{transform:scale(1.2) rotate(4deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.study-achievement-text{display:flex;flex-direction:column;gap:1px}
+.study-achievement-main{font-size:12.5px;letter-spacing:.03em;color:rgba(255,255,255,0.92);font-weight:600}
+.study-achievement-sub{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.45)}
+@media (max-width:600px){
+  .study-achievement-toast{top:78px;padding:9px 16px;gap:9px}
+  .study-achievement-main{font-size:11.5px}
+}
+/* ── SESSION CELEBRATION (full-screen confetti burst shown after a focus session completes) ── */
+.session-celebrate-overlay{
+  position:fixed;inset:0;z-index:700;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  padding:40px 24px;
+  background:radial-gradient(circle at 50% 28%,rgba(255,255,255,0.07),rgba(0,0,0,0.74) 68%);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;overflow:hidden;
+  transition:opacity .45s ease;
+  font-family:'Inter',sans-serif;text-align:center;cursor:pointer;
+}
+.session-celebrate-overlay.show{opacity:1;pointer-events:auto}
+.sess-confetti-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.sess-confetti-piece{position:absolute;top:-8vh;will-change:transform,opacity;opacity:0}
+@keyframes sessConfettiFall{
+  0%{transform:translateY(0) translateX(0) rotate(0deg);opacity:0}
+  8%{opacity:1}
+  100%{transform:translateY(116vh) translateX(var(--drift,0px)) rotate(var(--spin,540deg));opacity:.85}
+}
+.sess-celeb-headline{
+  position:relative;z-index:2;max-width:380px;
+  font-size:21px;font-weight:700;line-height:1.35;color:#fff;letter-spacing:-.01em;
+  animation:sessCelebPopIn .5s cubic-bezier(.22,.9,.32,1.28) both;
+}
+.sess-celeb-headline span{color:var(--accent)}
+.sess-celeb-card{
+  position:relative;z-index:2;width:100%;max-width:300px;cursor:default;
+  background:linear-gradient(160deg,var(--accent-soft),rgba(255,255,255,0.02));
+  border:0.5px solid var(--surf-line);border-radius:20px;
+  padding:26px 24px 22px;
+  box-shadow:0 24px 60px -18px rgba(0,0,0,0.6);
+  animation:sessCelebPopIn .55s .08s cubic-bezier(.22,.9,.32,1.28) both;
+}
+.sess-celeb-card-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:6px}
+.sess-celeb-card-time{font-size:34px;font-weight:700;color:#fff;letter-spacing:-.02em}
+.sess-celeb-card-divider{height:0.5px;background:var(--surf-line);margin:16px 0 12px}
+.sess-celeb-card-sub{font-size:11.5px;letter-spacing:.04em;color:rgba(255,255,255,0.5)}
+.sess-celeb-continue{
+  position:relative;z-index:2;
+  background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.16);color:rgba(255,255,255,0.85);
+  padding:11px 30px;border-radius:100px;font-size:12.5px;letter-spacing:.04em;cursor:pointer;
+  transition:all .2s;animation:sessCelebPopIn .6s .16s cubic-bezier(.22,.9,.32,1.28) both;
+}
+.sess-celeb-continue:hover{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.3)}
+@keyframes sessCelebPopIn{0%{opacity:0;transform:translateY(14px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@media (max-width:600px){
+  .sess-celeb-headline{font-size:18px;max-width:320px}
+  .sess-celeb-card-time{font-size:28px}
+}
+/* ── SESSION CELEBRATION — RETRO CRT COMPATIBILITY FIXES ──
+   The global retro theme (retro-theme.css) forces every element's text
+   colour to the phosphor tint, flattens every background/gradient to
+   transparent, and (via its "[class*=overlay]" rule) paints this very
+   overlay flat black — because normally that's exactly what a fullscreen
+   overlay needs to hide the page behind it. But this overlay's whole
+   point is a colourful confetti reward, not another CRT screen, so it
+   should look identical in every theme. ID selector gives these enough
+   specificity to beat retro-theme.css's rules regardless of load order,
+   the same pattern used for the webcam preview there. Confetti pieces get
+   their colour from a CSS variable (set per-piece in JS) rather than the
+   inline `background` retro-theme.css's !important would otherwise wipe. */
+html.crt-retro #session-celebrate-overlay{
+  background:radial-gradient(circle at 50% 28%,rgba(255,255,255,0.07),rgba(0,0,0,0.74) 68%) !important;
+}
+html.crt-retro #session-celebrate-overlay,
+html.crt-retro #session-celebrate-overlay *{
+  font-family:'Inter',sans-serif !important;
+  text-shadow:none !important;
+}
+html.crt-retro #session-celebrate-overlay .sess-celeb-headline{color:#fff !important}
+html.crt-retro #session-celebrate-overlay .sess-celeb-headline span{color:var(--accent) !important}
+html.crt-retro #session-celebrate-overlay .sess-celeb-card{
+  background:linear-gradient(160deg,var(--accent-soft),rgba(255,255,255,0.02)) !important;
+  border-color:var(--surf-line) !important;
+  box-shadow:0 24px 60px -18px rgba(0,0,0,0.6) !important;
+}
+html.crt-retro #session-celebrate-overlay .sess-celeb-card-label{color:var(--accent) !important}
+html.crt-retro #session-celebrate-overlay .sess-celeb-card-time{color:#fff !important}
+html.crt-retro #session-celebrate-overlay .sess-celeb-card-divider{background-color:var(--surf-line) !important}
+html.crt-retro #session-celebrate-overlay .sess-celeb-card-sub{color:rgba(255,255,255,0.5) !important}
+html.crt-retro #session-celebrate-overlay .sess-celeb-continue{
+  background-color:rgba(255,255,255,0.08) !important;
+  border-color:rgba(255,255,255,0.16) !important;
+  color:rgba(255,255,255,0.85) !important;
+}
+html.crt-retro #session-celebrate-overlay .sess-celeb-continue:hover{
+  background-color:rgba(255,255,255,0.14) !important;
+  border-color:rgba(255,255,255,0.3) !important;
+}
+html.crt-retro #session-celebrate-overlay .sess-confetti-piece{
+  background-color:var(--confetti-color) !important;
+}
+/* ── FLIGHT CALCULATOR (Ctrl/Cmd+0 while in flight mode) ── */
+.flight-calc-overlay{
+  position:absolute;inset:0;z-index:90;
+  display:flex;align-items:flex-start;justify-content:flex-end;
+  padding:86px 26px 0 0;
+  background:transparent;pointer-events:none;
+  opacity:0;transition:opacity .18s ease;
+}
+/* Only the panel itself catches clicks/pointer events — the rest of the overlay
+   stays fully click-through and visually untouched so the flight/pomo/pomomix
+   timer behind it keeps counting down in full view, not dimmed or blurred out. */
+.flight-calc-overlay.open{opacity:1}
+.flight-calc-overlay.open .flight-calc-panel{pointer-events:auto}
+.flight-calc-panel{
+  width:250px;max-width:88vw;
+  background:rgba(14,15,18,0.97);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:0.5px solid rgba(255,255,255,0.14);border-radius:16px;
+  padding:14px 14px 16px;
+  box-shadow:0 28px 70px -14px rgba(0,0,0,0.7);
+  transform:translateY(-6px) scale(.97);transition:transform .18s ease;
+  font-family:'Inter',sans-serif;
+}
+.flight-calc-overlay.open .flight-calc-panel{transform:translateY(0) scale(1)}
+.flight-calc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.flight-calc-title{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
+.flight-calc-close{
+  width:22px;height:22px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);
+  background:none;color:rgba(255,255,255,0.6);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s;
+}
+.flight-calc-close:hover{border-color:rgba(255,255,255,0.6);color:#fff}
+.flight-calc-display{
+  font-family:'IBM Plex Mono',monospace;font-size:26px;color:#fff;
+  text-align:right;padding:10px 6px;margin-bottom:10px;
+  min-height:36px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  border-bottom:0.5px solid rgba(255,255,255,0.12);
+}
+.flight-calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.flight-calc-btn{
+  padding:12px 0;border-radius:9px;border:0.5px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.88);
+  font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;transition:all .15s;
+  user-select:none;
+}
+.flight-calc-btn:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25)}
+.flight-calc-btn:active{transform:scale(.94)}
+.flight-calc-btn.op{background:rgba(120,200,255,0.1);color:rgba(150,215,255,0.95);border-color:rgba(120,200,255,0.25)}
+.flight-calc-btn.op:hover{background:rgba(120,200,255,0.2)}
+.flight-calc-btn.eq{background:rgba(120,200,255,0.28);color:#fff;border-color:rgba(120,200,255,0.5)}
+.flight-calc-btn.eq:hover{background:rgba(120,200,255,0.4)}
+.flight-calc-btn.fn{color:rgba(255,255,255,0.5);font-size:12px}
+.flight-calc-btn.zero{grid-column:span 2}
+@media (max-width:600px){
+  .flight-calc-overlay{padding:70px 14px 0 0}
+  .flight-calc-panel{width:220px}
+}
 #globe-canvas{
   position:absolute;inset:0;width:100%;height:100%;
   background:#00000c;
@@ -1059,6 +1262,23 @@ html.crt-retro .flight-presence-preview.hud-idle .flight-presence-preview-close{
 .gsc-slider::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.55);border:none;cursor:pointer}
 .gsc-val{font-size:10px;color:rgba(255,255,255,0.8);font-variant-numeric:tabular-nums;min-width:18px;text-align:right;letter-spacing:.04em}
 
+/* Globe phosphor colour swatches — lets the person change the retro CRT
+   phosphor colour (green/amber/blue) right from the globe controls,
+   instead of having to open the nav's colour picker or use the Terminal.
+   Only meaningful once the retro theme is on, since the globe canvas
+   only picks up a phosphor tint (via the blanket img/video/svg/canvas
+   filter in retro-theme.css) while html.crt-retro is set — so this
+   whole group stays hidden otherwise. */
+.globe-phosphor-ctrl{display:none;align-items:center;gap:6px}
+html.crt-retro .globe-phosphor-ctrl{display:flex}
+/* Two classes (.phosphor-swatch.globe-phosphor-swatch) beats the nav
+   picker's single-class .phosphor-swatch rule, so these size/position
+   overrides win regardless of source order while still reusing that
+   rule's --sw colour + active-ring logic and updatePhosphorSwatches()'s
+   existing querySelectorAll('.phosphor-swatch') targeting. */
+.phosphor-swatch.globe-phosphor-swatch{width:10px;height:10px;border:0.5px solid rgba(255,255,255,0.3)}
+.phosphor-swatch.globe-phosphor-swatch.active{box-shadow:0 0 0 2px #000,0 0 0 3px var(--sw)}
+
 /* ── FLIGHT TRACKER: MOBILE ── */
 @media(max-width:640px){
   /* Header: let title + controls wrap onto their own row instead of overflowing */
@@ -1177,6 +1397,8 @@ body.light kbd{background:#f0f0eb;border-color:#ddd;color:#666}
 
 /* ── WIND ROW ── */
 .flight-wind-row{font-size:10px;color:rgba(255,255,255,0.65);letter-spacing:.14em;text-transform:uppercase;margin-top:5px;min-height:14px;transition:color .4s;text-align:center}
+.flight-today-row{font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:.14em;text-transform:uppercase;margin-top:5px;min-height:14px;transition:color .4s;text-align:center}
+.flight-today-row span{color:rgba(255,255,255,0.85)}
 
 /* ── DEST TIME ── */
 .flight-dest-time{font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
@@ -1366,6 +1588,7 @@ body.light kbd{background:#f0f0eb;border-color:#ddd;color:#666}
 .prog-entry:hover{border-color:#1e1e1e}
 .prog-entry-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .prog-entry-name{font-size:12px;color:#888;flex:1;letter-spacing:.03em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog-entry-partial{font-size:9px;color:#8a6a2a;letter-spacing:.08em;text-transform:uppercase;border:0.5px solid #3a2f18;border-radius:4px;padding:2px 5px;flex-shrink:0}
 .prog-entry-dur{font-size:11px;color:#2a2a2a;font-variant-numeric:tabular-nums;letter-spacing:.06em;flex-shrink:0}
 .prog-entry-time{font-size:10px;color:#1e1e1e;letter-spacing:.06em;flex-shrink:0;font-variant-numeric:tabular-nums}
 
@@ -1376,6 +1599,7 @@ body.light .prog-section-label{color:#bbb}
 body.light .prog-day-header{color:#bbb;border-color:#e5e5e0}
 body.light .prog-entry{background:#fff;border-color:#e5e5e0}
 body.light .prog-entry-name{color:#555}
+body.light .prog-entry-partial{color:#8a6a2a;border-color:#e8d9b5}
 body.light .prog-entry-dur{color:#aaa}
 body.light .prog-entry-time{color:#ccc}
 body.light .prog-clear-btn{border-color:#ddd;color:#bbb}
@@ -2070,6 +2294,7 @@ html,body{overflow-x:hidden}
   .flight-overlay.term-embed #globe-canvas{width:100%;height:100%}
   .flight-overlay.term-embed .flight-header{padding:12px 16px}
   .flight-overlay.term-embed .flight-mode-toggle,
+  .flight-overlay.term-embed .flight-mode-switch,
   .flight-overlay.term-embed .sat-legend,
   .flight-overlay.term-embed #idle-flights-badge,
   .flight-overlay.term-embed .globe-spin-ctrl{display:none!important}
@@ -3679,6 +3904,17 @@ window.AccessGate={ hashCode:aqgHash };
         <button class="fmt-btn active" id="fmt-min" onclick="setFlightMode('minimal')">Minimal</button>
         <button class="fmt-btn" id="fmt-det" onclick="setFlightMode('detailed')">Detailed</button>
       </div>
+      <div class="flight-mode-switch" id="flight-mode-switch">
+        <button class="flight-mode-switch-btn" id="flight-mode-switch-btn" onclick="toggleFlightModeSwitchMenu(event)" title="Switch session mode — keeps your route &amp; progress">
+          <i class="ti ti-arrows-left-right"></i>
+        </button>
+        <div class="flight-mode-switch-menu" id="flight-mode-switch-menu">
+          <div class="fms-item" id="fms-freerun" onclick="switchFlightMode('freerun')"><i class="ti ti-plane-departure"></i> Free Run</div>
+          <div class="fms-item" id="fms-pomodoro" onclick="switchFlightMode('pomodoro')"><i class="ti ti-clock-hour-4"></i> Pomodoro</div>
+          <div class="fms-item" id="fms-pomomix" onclick="switchFlightMode('pomomix')"><i class="ti ti-hourglass-high"></i> PomoMix</div>
+          <div class="fms-hint">keeps your route &amp; progress</div>
+        </div>
+      </div>
       <button class="flight-close" onclick="closeFlightTracker()"><i class="ti ti-x"></i></button>
     </div>
   </div>
@@ -4028,6 +4264,7 @@ window.AccessGate={ hashCode:aqgHash };
       <div class="fsc-divider"></div>
       <div id="flight-phase-row" class="flight-phase-row"></div>
       <div class="flight-wind-row" id="flight-wind-row"></div>
+      <div class="flight-today-row" id="flight-today-row">studied today · <span id="flight-today-total">0m</span></div>
     </div>
     <div class="alt-curve-wrap" style="height:36px"><canvas id="alt-canvas" height="36"></canvas></div>
     <div class="flight-progress-track">
@@ -4037,6 +4274,64 @@ window.AccessGate={ hashCode:aqgHash };
     <button class="freerun-land-btn" id="freerun-land-btn" onclick="landFreeRunNow()" title="End the free run and save your progress"><i class="ti ti-plane-arrival" style="margin-right:6px"></i>land now</button>
 
     <div class="flight-hud-resize" id="flight-hud-resize" title="Drag to resize"><i class="ti ti-arrows-maximize"></i></div>
+  </div>
+
+  <!-- Study achievement toast — brief celebratory pop shown after each session completes -->
+  <div class="study-achievement-toast" id="study-achievement-toast">
+    <div class="study-achievement-icon">🏆</div>
+    <div class="study-achievement-text">
+      <div class="study-achievement-main" id="study-achievement-main">Session complete</div>
+      <div class="study-achievement-sub" id="study-achievement-sub">studied today</div>
+    </div>
+  </div>
+
+  <!-- Session celebration — full-screen confetti burst shown after a focus session completes -->
+  <div class="session-celebrate-overlay" id="session-celebrate-overlay" onclick="dismissSessionCelebration()">
+    <div class="sess-confetti-wrap" id="session-celebrate-confetti"></div>
+    <div class="sess-celeb-headline">Yay! You focused for <span id="sess-celeb-headline-time">0m</span> without distractions!</div>
+    <div class="sess-celeb-card" onclick="event.stopPropagation()">
+      <div class="sess-celeb-card-label">Focus Time</div>
+      <div class="sess-celeb-card-time" id="sess-celeb-card-time">0m</div>
+      <div class="sess-celeb-card-divider"></div>
+      <div class="sess-celeb-card-sub" id="sess-celeb-card-sub">studied today</div>
+    </div>
+    <button class="sess-celeb-continue" onclick="event.stopPropagation();dismissSessionCelebration()">Continue</button>
+  </div>
+
+  <!-- Flight calculator — Ctrl/Cmd+0 toggles this while in flight mode -->
+  <div class="flight-calc-overlay" id="flight-calc-overlay">
+    <div class="flight-calc-panel">
+      <div class="flight-calc-head">
+        <div class="flight-calc-title">Calculator</div>
+        <button class="flight-calc-close" onclick="closeFlightCalc()" title="Close (Esc)" aria-label="Close calculator"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="flight-calc-display" id="flight-calc-display">0</div>
+      <div class="flight-calc-grid">
+        <button class="flight-calc-btn fn" onclick="calcClear()">C</button>
+        <button class="flight-calc-btn fn" onclick="calcToggleSign()">±</button>
+        <button class="flight-calc-btn fn" onclick="calcSetOp('%')">%</button>
+        <button class="flight-calc-btn op" onclick="calcSetOp('/')">÷</button>
+
+        <button class="flight-calc-btn" onclick="calcInputDigit('7')">7</button>
+        <button class="flight-calc-btn" onclick="calcInputDigit('8')">8</button>
+        <button class="flight-calc-btn" onclick="calcInputDigit('9')">9</button>
+        <button class="flight-calc-btn op" onclick="calcSetOp('*')">×</button>
+
+        <button class="flight-calc-btn" onclick="calcInputDigit('4')">4</button>
+        <button class="flight-calc-btn" onclick="calcInputDigit('5')">5</button>
+        <button class="flight-calc-btn" onclick="calcInputDigit('6')">6</button>
+        <button class="flight-calc-btn op" onclick="calcSetOp('-')">−</button>
+
+        <button class="flight-calc-btn" onclick="calcInputDigit('1')">1</button>
+        <button class="flight-calc-btn" onclick="calcInputDigit('2')">2</button>
+        <button class="flight-calc-btn" onclick="calcInputDigit('3')">3</button>
+        <button class="flight-calc-btn op" onclick="calcSetOp('+')">+</button>
+
+        <button class="flight-calc-btn zero" onclick="calcInputDigit('0')">0</button>
+        <button class="flight-calc-btn" onclick="calcInputDot()">.</button>
+        <button class="flight-calc-btn eq" onclick="calcEquals()">=</button>
+      </div>
+    </div>
   </div>
 
   <!-- Webcam preview — sits outside the HUD panel so it can be dragged anywhere on screen -->
@@ -4095,6 +4390,16 @@ window.AccessGate={ hashCode:aqgHash };
     <button onclick="adjustGlobeZoom(-0.15)" style="background:none;border:0.5px solid rgba(255,255,255,0.12);border-radius:5px;width:22px;height:22px;color:rgba(255,255,255,0.4);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Inter',sans-serif;padding:0" onmouseover="this.style.borderColor='rgba(255,255,255,0.35)';this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.4)'">−</button>
     <span class="gsc-val" id="gsc-zoom-val">0.5×</span>
     <button onclick="adjustGlobeZoom(0.15)" style="background:none;border:0.5px solid rgba(255,255,255,0.12);border-radius:5px;width:22px;height:22px;color:rgba(255,255,255,0.4);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Inter',sans-serif;padding:0" onmouseover="this.style.borderColor='rgba(255,255,255,0.35)';this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.4)'">+</button>
+    <!-- Retro phosphor colour, only shown when the CRT retro theme is on (see
+         .globe-phosphor-ctrl in the CSS). Reuses setRetroPhosphor()/the
+         .phosphor-swatch active-state logic that already drives the nav's
+         colour picker, so picking one here stays in sync everywhere else. -->
+    <div class="globe-phosphor-ctrl">
+      <span class="gsc-label">phosphor</span>
+      <button class="phosphor-swatch globe-phosphor-swatch" data-phosphor="green" onclick="setRetroPhosphor('green')" title="Retro CRT: Green phosphor" aria-label="Green CRT phosphor"></button>
+      <button class="phosphor-swatch globe-phosphor-swatch" data-phosphor="amber" onclick="setRetroPhosphor('amber')" title="Retro CRT: Amber phosphor" aria-label="Amber CRT phosphor"></button>
+      <button class="phosphor-swatch globe-phosphor-swatch" data-phosphor="blue" onclick="setRetroPhosphor('blue')" title="Retro CRT: Blue phosphor (WarGames/NORAD)" aria-label="Blue CRT phosphor"></button>
+    </div>
   </div>
 </div>
 <!-- Shown after a strict-mode presence cancellation: a filmstrip of the raw
@@ -4705,6 +5010,29 @@ function openFsTimer(){
 }
 function closeFsTimer(){document.getElementById('fs-overlay').classList.remove('open');}
 
+// Live elapsed time for the fs-overlay timer, whether running or paused —
+// mirrors getTimerElapsedSec() for the sidebar timer above.
+function getFsElapsedSec(){
+  if(fsRunning){
+    const rem=Math.max(0,Math.round((fsEndTime-Date.now())/1000));
+    return Math.max(0,fsTotalSec-rem);
+  }
+  return fsElapsedSec;
+}
+// Saves whatever's been done on the current fs-overlay session as a "partial"
+// entry before it's discarded via "edit timer" (back) or the reset button.
+// No-op if no session is running, or if it already completed in full (fsTick
+// already recorded that case and fsRemSec will be 0).
+function commitPartialFsSession(){
+  if(fsScreen!=='running')return;
+  const elapsed=getFsElapsedSec();
+  if(elapsed>=10&&fsRemSec>0){
+    const fsLbl=document.getElementById('fs-run-label').textContent||'Timer';
+    const fsType=(fsSessionMode==='sched'&&fsSelectedSchedIdx>=0)?sessions[fsSelectedSchedIdx].type:'timer';
+    recordSession(fsLbl,elapsed,fsType,'timer',true);
+  }
+}
+
 function fsRenderSetup(){
   document.getElementById('fs-setup').style.display='flex';
   document.getElementById('fs-running').style.display='none';
@@ -4713,6 +5041,7 @@ function fsRenderSetup(){
   fsSessMode(fsSessionMode,true);
 }
 function fsGoSetup(){
+  commitPartialFsSession();
   clearInterval(fsInt);fsRunning=false;
   fsRenderSetup();
 }
@@ -4835,6 +5164,7 @@ function fsBtnToggle(){
   }
 }
 function fsBtnReset(){
+  commitPartialFsSession();
   clearInterval(fsInt);fsInt=null;fsRunning=false;fsEndTime=null;
   fsRemSec=fsTotalSec;fsElapsedSec=0;
   document.getElementById('fs-play-ic').className='ti ti-player-play';
@@ -5130,6 +5460,8 @@ function isUpcoming(s,cur){
 }
 let timerLoadedType='timer'; // tracks type when loaded from a scheduled session
 function loadToTimer(idx){
+  if(timerRunning)return;
+  commitPartialTimer();
   const s=sessions[idx];
   timerSec=sessDur(s)*60;timerTotal=timerSec;
   timerLoadedType=s.type||'timer';
@@ -5142,6 +5474,30 @@ function updateTimerDisplay(){
   if(el)el.textContent=pad(Math.floor(timerSec/60))+':'+pad(timerSec%60);
 }
 let timerLabelAtStart='',timerTypeAtStart='timer';
+// How much of the current timer has actually elapsed right now, whether it's
+// running (compute live from the end-time) or paused (timerSec already holds
+// the frozen remaining time).
+function getTimerElapsedSec(){
+  if(timerRunning){
+    const rem=Math.max(0,Math.round((timerEndTime-Date.now())/1000));
+    return Math.max(0,timerTotal-rem);
+  }
+  return Math.max(0,timerTotal-timerSec);
+}
+// Saves whatever progress has been made on the current timer as a "partial"
+// session before it gets discarded (reset, or switched to a different preset
+// mid-session) — so e.g. 35 minutes into a planned 2-hour session still ends
+// up in the history instead of vanishing. Safe to call any time; it's a no-op
+// if no session was ever started, or if it already ran to full completion
+// (that case is recorded in full by pomodoroTick, which clears the marker below).
+function commitPartialTimer(){
+  if(!timerLabelAtStart)return;
+  const elapsed=getTimerElapsedSec();
+  if(elapsed>=10&&elapsed<timerTotal){
+    recordSession(timerLabelAtStart,elapsed,timerTypeAtStart,'timer',true);
+  }
+  timerLabelAtStart='';
+}
 function pomodoroTick(){
   const rem=Math.max(0,Math.round((timerEndTime-Date.now())/1000));
   timerSec=rem;
@@ -5151,6 +5507,7 @@ function pomodoroTick(){
     document.getElementById('play-ic').className='ti ti-player-play';
     document.getElementById('timer-lbl').textContent='complete ✓';
     recordSession(timerLabelAtStart,timerTotal,timerTypeAtStart,'timer');
+    timerLabelAtStart=''; // fully recorded — don't let a later reset re-log it as partial
   }
 }
 function toggleTimer(){
@@ -5170,9 +5527,10 @@ function toggleTimer(){
   }
 }
 function adjTimer(m){if(timerRunning)return;timerSec=Math.max(60,Math.min(7200,timerSec+m*60));timerTotal=timerSec;updateTimerDisplay();}
-function resetTimer(){clearInterval(timerInt);timerRunning=false;timerSec=timerTotal;document.getElementById('play-ic').className='ti ti-player-play';document.getElementById('timer-lbl').textContent='focus timer';updateTimerDisplay();}
+function resetTimer(){commitPartialTimer();clearInterval(timerInt);timerRunning=false;timerSec=timerTotal;document.getElementById('play-ic').className='ti ti-player-play';document.getElementById('timer-lbl').textContent='focus timer';updateTimerDisplay();}
 function setTimer(m,btn){
   if(timerRunning)return;
+  commitPartialTimer();
   timerSec=m*60;timerTotal=m*60;
   timerLoadedType='timer';
   document.getElementById('timer-lbl').textContent=m+'m focus timer';
@@ -5531,6 +5889,42 @@ function slerp(a,b,t){
   return {lat:Math.asin(Math.max(-1,Math.min(1,py)))*180/Math.PI, lon:Math.atan2(pz,px)*180/Math.PI};
 }
 
+// PERF: the tracked-flight ghost route + traveled trail used to call slerp() (which
+// does an acos + several sin/cos) for every one of ~334 points, EVERY animation frame,
+// even though the route between two fixed airports never changes — only how much of
+// it is "traveled" changes. Bake the great-circle once per route (same technique as
+// the idle-flight arcs) and reuse projectVec (cheap, memoized) to draw it each frame.
+let _flightArcVecs=null, _flightArcKey=null;
+function getFlightArcVecs(fromC, toC, fromCode, toCode){
+  const key=fromCode+'|'+toCode;
+  if(_flightArcKey===key && _flightArcVecs) return _flightArcVecs;
+  _flightArcKey=key;
+  const toRad=x=>x*Math.PI/180;
+  const la1=toRad(fromC.lat), lo1=toRad(fromC.lon);
+  const la2=toRad(toC.lat), lo2=toRad(toC.lon);
+  const ax=Math.cos(la1)*Math.cos(lo1), ay=Math.cos(la1)*Math.sin(lo1), az=Math.sin(la1);
+  const bx=Math.cos(la2)*Math.cos(lo2), by=Math.cos(la2)*Math.sin(lo2), bz=Math.sin(la2);
+  let dot=ax*bx+ay*by+az*bz;
+  dot=Math.max(-1,Math.min(1,dot));
+  const omega=Math.acos(dot);
+  const sinO=Math.sin(omega);
+  const STEPS=334; // matches the previous t+=0.003 point density
+  const vecs=[];
+  for(let i=0;i<=STEPS;i++){
+    const t=i/STEPS;
+    let x,y,z;
+    if(sinO<0.0001){
+      x=ax+(bx-ax)*t; y=ay+(by-ay)*t; z=az+(bz-az)*t;
+    } else {
+      const c1=Math.sin((1-t)*omega)/sinO, c2=Math.sin(t*omega)/sinO;
+      x=c1*ax+c2*bx; y=c1*ay+c2*by; z=c1*az+c2*bz;
+    }
+    vecs.push({x,y,z});
+  }
+  _flightArcVecs=vecs;
+  return vecs;
+}
+
 const AIRPORTS={
   // North America
   JFK:{lat:40.6413,lon:-73.7781,name:'New York JFK'},LAX:{lat:33.9425,lon:-118.4081,name:'Los Angeles'},
@@ -5707,7 +6101,10 @@ let globeStars=null;
 let globeLoadError=false;
 let globeSpinSpeed=0.006; // radians per frame during flight
 let globeTheme='bw'; // 'color' | 'bw' — b&amp;w is the default look
-let globeZoom=0.5; // zoom multiplier (0.4 – 3.0)
+const GLOBE_ZOOM_KEY='canopus_globe_zoom';
+// zoom multiplier (0.4 – 3.0) — restored from wherever the person last left it
+// (e.g. 1.17×) so it stays put across reloads instead of resetting to 0.5×.
+let globeZoom=(function(){ try{ const v=parseFloat(localStorage.getItem(GLOBE_ZOOM_KEY)); return (isFinite(v)&&v>0)?v:0.5; }catch(e){ return 0.5; } })();
 const PLANE_STYLES=['jet','dart','fighter','classic','dot'];
 let planeStyle=(function(){ try{ const v=localStorage.getItem('flightPlaneStyle'); return PLANE_STYLES.includes(v)?v:'jet'; }catch(e){ return 'jet'; } })();
 
@@ -5894,10 +6291,20 @@ function updateIdleFlights(){
 }
 
 // Pre-project a 3D unit vector to screen using current globe rotation (fast, no trig)
+// PERF: cos/sin of globeLambda & globePhi only actually change once per animation
+// frame (or on drag), but this function used to recompute all 4 trig calls on
+// EVERY point of EVERY idle flight — up to 25,000+ redundant Math.cos/sin calls
+// per frame with 320 idle flights. Cache them and only recompute when the
+// rotation actually changed since the last call.
+let _pvLambdaCache=null, _pvPhiCache=null, _pvCosL=1, _pvSinL=0, _pvCosP=1, _pvSinP=0;
 function projectVec(v, R, cx, cy){
   // v = {x,y,z} unit vector; apply globe rotation lambda (Y-axis) then phi (X-axis)
-  const cosL=Math.cos(globeLambda), sinL=Math.sin(globeLambda);
-  const cosP=Math.cos(globePhi),  sinP=Math.sin(globePhi);
+  if(globeLambda!==_pvLambdaCache || globePhi!==_pvPhiCache){
+    _pvLambdaCache=globeLambda; _pvPhiCache=globePhi;
+    _pvCosL=Math.cos(globeLambda); _pvSinL=Math.sin(globeLambda);
+    _pvCosP=Math.cos(globePhi);    _pvSinP=Math.sin(globePhi);
+  }
+  const cosL=_pvCosL, sinL=_pvSinL, cosP=_pvCosP, sinP=_pvSinP;
   // rotate around Y by -lambda
   const xr = v.x*cosL - v.z*sinL;
   const zr = v.x*sinL + v.z*cosL;
@@ -6423,13 +6830,14 @@ function presencePassed(){
 
 // Central place every flight-landing code path now calls instead of hitting
 // recordSession + passportRecordLanding directly, so presence strict mode gates
-// all of them consistently.
-function recordFlightSession(name,durationSec){
+// all of them consistently. partial=true marks a session that was cut short —
+// used by switchFlightMode() below so a mode change never silently drops progress.
+function recordFlightSession(name,durationSec,partial){
   if(!presencePassed()){
     notifySafe('Canopus ✈','Flight not logged — presence check failed mid-flight.');
     return;
   }
-  recordSession(name,durationSec,'flight','flight');
+  recordSession(name,durationSec,'flight','flight',partial);
   if(window.passportRecordLanding) passportRecordLanding(flightFrom,flightTo,durationSec);
 }
 
@@ -6458,11 +6866,18 @@ function setGlobeSpinSpeed(val){
   document.getElementById('gsc-val').textContent=parseFloat(mult)+'×';
 }
 
+// Updates the zoom readout and persists the current globeZoom so it's
+// restored next time index.html is opened, instead of resetting to 0.5×.
+function syncGlobeZoomDisplay(){
+  const el=document.getElementById('gsc-zoom-val');
+  if(el) el.textContent=globeZoom.toFixed(2)+'×';
+  try{ localStorage.setItem(GLOBE_ZOOM_KEY, globeZoom); }catch(e){}
+}
+
 function adjustGlobeZoom(delta){
   const factor = delta > 0 ? 1.2 : 0.833;
   globeZoom = Math.max(0.001, globeZoom * factor);
-  const el=document.getElementById('gsc-zoom-val');
-  if(el) el.textContent=globeZoom.toFixed(2)+'×';
+  syncGlobeZoomDisplay();
 }
 
 // Scroll-wheel zoom on the globe canvas
@@ -6473,20 +6888,27 @@ document.addEventListener('wheel',(e)=>{
   e.preventDefault();
   const factor = e.deltaY < 0 ? 1.08 : 0.926;
   globeZoom = Math.max(0.001, globeZoom * factor);
-  const el=document.getElementById('gsc-zoom-val');
-  if(el) el.textContent=globeZoom.toFixed(2)+'×';
+  syncGlobeZoomDisplay();
 },{passive:false});
 
 // Orthographic projection: lat/lon → screen XY
 // lambda = rotation around Y (lon shift in radians)
 // phi    = rotation around X (lat tilt in radians)
+// PERF: phi (globe tilt) is constant across an entire draw pass — only lambda/lat/lon
+// vary point-to-point (graticule lines, country borders, capitals, terminator can add
+// up to several thousand calls per frame). Recomputing cos(phi)/sin(phi) on every single
+// point call was pure waste. Cache them and only recompute when phi actually changes.
+// Safe across multiple globes (e.g. the mini term-globe uses its own phi value) because
+// the cache key is the phi value itself, not which globe called it.
+let _opPhiCache=null, _opCosPhi=1, _opSinPhi=0;
 function orthoProject(lat, lon, lambda, phi, R, cx, cy){
   const lam = lon * Math.PI/180 - lambda;
   const la  = lat * Math.PI/180;
   // apply rotations
   const cosLa=Math.cos(la), sinLa=Math.sin(la);
   const cosLam=Math.cos(lam), sinLam=Math.sin(lam);
-  const cosPhi=Math.cos(phi), sinPhi=Math.sin(phi);
+  if(phi!==_opPhiCache){ _opPhiCache=phi; _opCosPhi=Math.cos(phi); _opSinPhi=Math.sin(phi); }
+  const cosPhi=_opCosPhi, sinPhi=_opSinPhi;
   // 3D unit vector on sphere
   const x0 = cosLa * sinLam;
   const y0 = sinLa;
@@ -6981,11 +7403,12 @@ function drawGlobe(){
         if(!geom) continue;
         const polys=geom.type==='Polygon'?[geom.coordinates]:geom.type==='MultiPolygon'?geom.coordinates:[];
         for(const poly of polys){
+          // PERF: build the ring path ONCE and fill+stroke the same path, instead of
+          // re-projecting every point twice (once for fill, once for stroke). Canvas
+          // lets fill() and stroke() both act on the current path — no visual change.
           ctx.beginPath();
           for(const ring of poly) drawRing(ctx,ring,globeLambda,globePhi,R,cx,cy);
           ctx.fillStyle='rgba(42,110,58,0.82)'; ctx.fill('evenodd');
-          ctx.beginPath();
-          for(const ring of poly) drawRing(ctx,ring,globeLambda,globePhi,R,cx,cy);
           ctx.strokeStyle='rgba(80,170,90,0.55)'; ctx.lineWidth=0.65; ctx.stroke();
         }
       }
@@ -7042,13 +7465,17 @@ function drawGlobe(){
     const progress=flightRunning&&flightTotalSec>0
       ? Math.max(0,Math.min(0.9999,1-(flightRemSec/flightTotalSec))) : 0;
 
+    // Baked great-circle points for this route — computed once, reused every frame
+    // (see getFlightArcVecs above) instead of re-running slerp() per point per frame.
+    const arcVecs=getFlightArcVecs(fromC,toC,flightFrom,flightTo);
+    const arcSteps=arcVecs.length-1;
+
     // ghost route (dashed style via segments)
     ctx.setLineDash([4,6]);
     ctx.beginPath();
     let pen=false;
-    for(let t=0;t<=1;t+=0.003){
-      const pt=slerp(fromC,toC,t);
-      const p=orthoProject(pt.lat,pt.lon,globeLambda,globePhi,R,cx,cy);
+    for(let i=0;i<=arcSteps;i++){
+      const p=projectVec(arcVecs[i],R,cx,cy);
       if(!p.visible){pen=false;continue;}
       pen?(ctx.lineTo(p.sx,p.sy)):(ctx.moveTo(p.sx,p.sy),pen=true);
     }
@@ -7057,10 +7484,10 @@ function drawGlobe(){
 
     // traveled arc (bright white trail)
     if(progress>0.003){
+      const traveledIdx=Math.min(arcSteps, Math.floor(progress*arcSteps));
       ctx.beginPath(); pen=false;
-      for(let t=0;t<=progress;t+=0.003){
-        const pt=slerp(fromC,toC,t);
-        const p=orthoProject(pt.lat,pt.lon,globeLambda,globePhi,R,cx,cy);
+      for(let i=0;i<=traveledIdx;i++){
+        const p=projectVec(arcVecs[i],R,cx,cy);
         if(!p.visible){pen=false;continue;}
         pen?(ctx.lineTo(p.sx,p.sy)):(ctx.moveTo(p.sx,p.sy),pen=true);
       }
@@ -7208,6 +7635,11 @@ function initGlobe(){
   globeInited=true;
   const planeBtn=document.getElementById('plane-style-btn');
   if(planeBtn) planeBtn.textContent='plane: '+planeStyle;
+  // Reflect the zoom level restored from localStorage (see globeZoom's
+  // declaration) in the readout — the HTML markup itself is hardcoded to
+  // "0.5×" since it can't know the saved value ahead of time.
+  const zoomEl=document.getElementById('gsc-zoom-val');
+  if(zoomEl) zoomEl.textContent=globeZoom.toFixed(2)+'×';
   const container=document.getElementById('globe-canvas');
   container.innerHTML='';
   globeCanvas=document.createElement('canvas');
@@ -7479,6 +7911,113 @@ function closeFlightTracker(force){
   if(globeAnimFrame){cancelAnimationFrame(globeAnimFrame);globeAnimFrame=null;}
   if(typeof termFlightDocked!=='undefined'&&termFlightDocked&&typeof termCloseFlightDock==='function')termCloseFlightDock();
   { const fbf=document.getElementById('flight-break-float'); if(fbf) fbf.classList.remove('show'); }
+  closeFlightModeSwitchMenu();
+}
+
+// =================== MID-SESSION MODE SWITCHING ===================
+// Lets the user change from Free Run to Pomodoro to PomoMix (or any direction
+// between them) without losing anything: progress made so far on the current
+// leg is saved to history exactly like an early stop (see the partial-session
+// work above), and the new mode picks up on the SAME route — same from/to
+// airports — instead of starting over from a blank setup screen.
+
+function currentFlightSessionMode(){
+  if(pomoRunning) return 'pomodoro';
+  if(pomomixRunning) return 'pomomix';
+  if(flightRunning) return flightFreeRun?'freerun':'flight';
+  return null;
+}
+
+function toggleFlightModeSwitchMenu(e){
+  if(e) e.stopPropagation();
+  const menu=document.getElementById('flight-mode-switch-menu');
+  if(!menu) return;
+  const opening=!menu.classList.contains('open');
+  if(opening) syncFlightModeSwitchMenu();
+  menu.classList.toggle('open',opening);
+}
+function closeFlightModeSwitchMenu(){
+  const menu=document.getElementById('flight-mode-switch-menu');
+  if(menu) menu.classList.remove('open');
+}
+// Grey out / disable whichever entry matches the mode already running, so the
+// menu can't "switch" to the mode you're already in.
+function syncFlightModeSwitchMenu(){
+  const current=currentFlightSessionMode();
+  ['freerun','pomodoro','pomomix'].forEach(m=>{
+    const el=document.getElementById('fms-'+m);
+    if(el) el.classList.toggle('current',m===current);
+  });
+}
+// Close the menu on an outside click, same pattern as the other flight popovers.
+document.addEventListener('click',function(e){
+  const menu=document.getElementById('flight-mode-switch-menu');
+  const btn=document.getElementById('flight-mode-switch-btn');
+  if(!menu||!menu.classList.contains('open')) return;
+  if(menu.contains(e.target)||(btn&&btn.contains(e.target))) return;
+  closeFlightModeSwitchMenu();
+});
+
+function switchFlightMode(target){
+  const current=currentFlightSessionMode();
+  if(!current||current===target){ closeFlightModeSwitchMenu(); return; }
+  // Same commitment-device lock that guards the close/quit button — switching
+  // modes mid-strict-pomodoro would otherwise be a backdoor out of it.
+  if(pomoQuitLocked()){
+    pomoFlashLocked(document.getElementById('flight-mode-switch-btn'));
+    pomoStrictNudge();
+    return;
+  }
+  closeFlightModeSwitchMenu();
+
+  // Save whatever's been done on the current leg so switching never costs
+  // progress — logged the same way an early stop/reset would be.
+  const elapsed=flightInProgressStudySec();
+  const fromInfo=getAirportCoords(flightFrom);
+  const toInfo=getAirportCoords(flightTo);
+  const carryName=(fromInfo.name||flightFrom)+' → '+(toInfo.name||flightTo);
+  if(elapsed>=10){
+    recordFlightSession(carryName,elapsed,true);
+  }
+
+  // Tear down whichever mode is currently running. This intentionally skips
+  // closeFlightTracker()/showFlightSetup()'s own bookkeeping (idle flights,
+  // closing the overlay, etc.) — we're not leaving the tracker, just changing
+  // how the same flight is being timed.
+  stopPresenceCheck();
+  if(flightInterval){clearInterval(flightInterval);flightInterval=null;}
+  if(pomoInterval){clearInterval(pomoInterval);pomoInterval=null;}
+  if(pomomixInterval){clearInterval(pomomixInterval);pomomixInterval=null;}
+  if(flightBreakInterval){clearInterval(flightBreakInterval);flightBreakInterval=null;}
+  flightRunning=false; flightPaused=false; flightOnBreak=false;
+  pomoRunning=false; pomoPaused=false;
+  pomomixRunning=false; pomomixPaused=false; pomomixEndTime=null;
+  flightFreeRun=false; flightElapsedSec=0; flightFreeRunBaseSec=0; flightFreeRunStart=null;
+  { const landBtn=document.getElementById('freerun-land-btn'); if(landBtn) landBtn.style.display='none'; }
+  const bov=document.getElementById('flight-break-overlay');
+  if(bov) bov.classList.remove('active');
+  document.getElementById('flight-hud').classList.remove('pomo-mode','pomomix-mode');
+  syncPauseBadge();
+
+  // Carry the route forward into each mode's own setup fields so launching it
+  // continues on the same from/to instead of resetting to whatever was there
+  // before this session started.
+  const ftFrom=document.getElementById('ft-from'), ftTo=document.getElementById('ft-to');
+  if(ftFrom) ftFrom.value=flightFrom;
+  if(ftTo) ftTo.value=flightTo;
+  const pmxFrom=document.getElementById('pmx-from'), pmxTo=document.getElementById('pmx-to');
+  if(pmxFrom) pmxFrom.value=flightFrom;
+  if(pmxTo) pmxTo.value=flightTo;
+
+  if(target==='freerun'){
+    flightFreeRun=true;
+    launchFlight();
+  } else if(target==='pomodoro'){
+    launchPomodoro();
+  } else if(target==='pomomix'){
+    launchPomomix();
+  }
+  notifySafe('Canopus ✈','Switched to '+({freerun:'Free Run',pomodoro:'Pomodoro',pomomix:'PomoMix'}[target])+' — progress saved.');
 }
 
 function showFlightSetup(){
@@ -7886,6 +8425,7 @@ function tickFlight(){
     const flightName=(fromInfo2.name||flightFrom)+' → '+(toInfo2.name||flightTo);
     recordFlightSession(flightName,flightTotalSec);
     stopPresenceCheck();
+    if(presencePassed()){showStudyAchievement(flightTotalSec);showSessionCelebration(flightTotalSec);}
 
     updateGlobeArcs();
     // Zoom to destination on globe
@@ -7896,7 +8436,248 @@ function tickFlight(){
   }
 }
 
+// ── Studied-today total: sums today's completed history entries plus whatever
+// elapsed time the currently in-progress flight-mode session (free-run flight,
+// pomodoro work phase, or pomomix block) has racked up so far. Pomodoro breaks
+// and pomomix reminder time don't count as "studied" — only active work phases.
+function flightInProgressStudySec(){
+  try{
+    if(typeof pomoRunning!=='undefined'&&pomoRunning&&pomoPhase==='work'){
+      return Math.max(0,(pomoTotalSec||0)-(pomoRemSec||0));
+    }
+    if(typeof pomomixRunning!=='undefined'&&pomomixRunning){
+      return Math.max(0,(pomomixTotalSec||0)-(pomomixRemSec||0));
+    }
+    if(typeof flightRunning!=='undefined'&&flightRunning&&!(typeof pomoRunning!=='undefined'&&pomoRunning)){
+      return flightFreeRun?(flightElapsedSec||0):Math.max(0,(flightTotalSec||0)-(flightRemSec||0));
+    }
+  }catch(e){}
+  return 0;
+}
+function todayStudiedTotalSec(){
+  let sec=0;
+  try{
+    const todayD=new Date().toDateString();
+    sec=loadHistory().filter(e=>e.ts&&new Date(e.ts).toDateString()===todayD).reduce((a,e)=>a+(e.dur||0),0);
+  }catch(e){}
+  return sec+flightInProgressStudySec();
+}
+function fmtStudiedHM(sec){
+  sec=Math.max(0,Math.round(sec));
+  const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);
+  return h>0?(h+'h '+m+'m'):(m+'m');
+}
+function updateTodayStudiedDisplay(){
+  const el=document.getElementById('flight-today-total');
+  if(!el)return;
+  el.textContent=fmtStudiedHM(todayStudiedTotalSec());
+}
+
+// ── Achievement toast: fired right after a session finishes recording, while
+// the just-finished session's time is still counted in todayStudiedTotalSec()
+// (call this BEFORE any running/elapsed state for that session gets reset).
+// sessionSec is the duration of the session that just completed, for the sub-line.
+let studyAchievementTimer=null;
+function showStudyAchievement(sessionSec){
+  const toast=document.getElementById('study-achievement-toast');
+  if(!toast)return;
+  const mainEl=document.getElementById('study-achievement-main');
+  const subEl=document.getElementById('study-achievement-sub');
+  if(mainEl)mainEl.textContent='studied '+fmtStudiedHM(todayStudiedTotalSec())+' today';
+  if(subEl)subEl.textContent=sessionSec?('+'+fmtStudiedHM(sessionSec)+' this session'):'session complete';
+  toast.classList.remove('show');
+  // force reflow so the pop-in animation replays even if the toast was already showing
+  void toast.offsetWidth;
+  toast.classList.add('show');
+  clearTimeout(studyAchievementTimer);
+  studyAchievementTimer=setTimeout(()=>toast.classList.remove('show'),3600);
+}
+
+// ── Session celebration: full-screen confetti burst + "Yay! You focused for
+// Xh Ym without distractions!" card, shown alongside the achievement toast
+// right after a focus session finishes recording.
+const SESS_CELEBRATE_COLORS=['#5a9fd4','#4a9a6a','#c9952a','#e0629c','#7c6fe0','#e0574a','#3fc0c0','#e0b23f'];
+let sessionCelebrateTimer=null,sessionCelebrateBurstTimer=null;
+
+function spawnSessionConfetti(container,count){
+  if(!container)return;
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='sess-confetti-piece';
+    const isCircle=Math.random()<0.35;
+    const size=(Math.random()*7+5);
+    const color=SESS_CELEBRATE_COLORS[Math.floor(Math.random()*SESS_CELEBRATE_COLORS.length)];
+    p.style.left=(Math.random()*100)+'%';
+    p.style.width=size.toFixed(1)+'px';
+    p.style.height=(isCircle?size:size*(Math.random()*0.7+0.9)).toFixed(1)+'px';
+    p.style.background=color;
+    p.style.setProperty('--confetti-color',color);
+    p.style.borderRadius=isCircle?'50%':(Math.random()<0.5?'2px':'0');
+    const dur=(Math.random()*1.6+2.4).toFixed(2);
+    const delay=(Math.random()*0.7).toFixed(2);
+    const drift=Math.round(Math.random()*140-70);
+    const spin=Math.round(Math.random()*420+380);
+    p.style.setProperty('--drift',drift+'px');
+    p.style.setProperty('--spin',spin+'deg');
+    p.style.animation=`sessConfettiFall ${dur}s cubic-bezier(.25,.46,.45,.94) ${delay}s forwards`;
+    frag.appendChild(p);
+  }
+  container.appendChild(frag);
+}
+
+function showSessionCelebration(sessionSec){
+  const overlay=document.getElementById('session-celebrate-overlay');
+  if(!overlay)return;
+  const timeStr=fmtStudiedHM(sessionSec);
+  const headlineTime=document.getElementById('sess-celeb-headline-time');
+  const cardTime=document.getElementById('sess-celeb-card-time');
+  const cardSub=document.getElementById('sess-celeb-card-sub');
+  if(headlineTime)headlineTime.textContent=timeStr;
+  if(cardTime)cardTime.textContent=timeStr;
+  if(cardSub)cardSub.textContent='studied '+fmtStudiedHM(todayStudiedTotalSec())+' today';
+
+  const confettiWrap=document.getElementById('session-celebrate-confetti');
+  clearTimeout(sessionCelebrateTimer);
+  clearTimeout(sessionCelebrateBurstTimer);
+  if(confettiWrap){
+    confettiWrap.innerHTML='';
+    spawnSessionConfetti(confettiWrap,50);
+    // a lighter second burst partway through keeps the shower feeling full
+    sessionCelebrateBurstTimer=setTimeout(()=>spawnSessionConfetti(confettiWrap,22),450);
+  }
+  overlay.classList.add('show');
+  sessionCelebrateTimer=setTimeout(dismissSessionCelebration,5200);
+}
+
+function dismissSessionCelebration(){
+  const overlay=document.getElementById('session-celebrate-overlay');
+  if(!overlay)return;
+  overlay.classList.remove('show');
+  clearTimeout(sessionCelebrateTimer);
+  const confettiWrap=document.getElementById('session-celebrate-confetti');
+  setTimeout(()=>{if(confettiWrap)confettiWrap.innerHTML='';},450);
+}
+
+// ── Flight calculator: basic four-function calculator, keyboard-first.
+// Toggled with Ctrl/Cmd+0 while the flight overlay is open (see the
+// document-level keydown listener further down for the shortcut itself).
+let calcCurrent='0',calcPrevVal=null,calcPendingOp=null,calcResetNext=false;
+
+function calcUpdateDisplay(){
+  const el=document.getElementById('flight-calc-display');
+  if(el) el.textContent=calcCurrent;
+}
+function calcFmtResult(n){
+  if(typeof n!=='number'||isNaN(n)||!isFinite(n)) return 'Error';
+  // trim floating-point noise (e.g. 0.1+0.2) without mangling legit long decimals
+  const rounded=Math.round(n*1e9)/1e9;
+  return String(rounded);
+}
+function calcInputDigit(d){
+  if(calcCurrent==='Error'||calcResetNext){calcCurrent=d;calcResetNext=false;}
+  else calcCurrent=(calcCurrent==='0')?d:calcCurrent+d;
+  calcUpdateDisplay();
+}
+function calcInputDot(){
+  if(calcCurrent==='Error'||calcResetNext){calcCurrent='0.';calcResetNext=false;calcUpdateDisplay();return;}
+  if(!calcCurrent.includes('.'))calcCurrent+='.';
+  calcUpdateDisplay();
+}
+function calcApplyOp(a,b,op){
+  switch(op){
+    case '+':return a+b;
+    case '-':return a-b;
+    case '*':return a*b;
+    case '/':return b===0?NaN:a/b;
+    case '%':return b===0?NaN:a%b;
+    default:return b;
+  }
+}
+function calcSetOp(op){
+  const val=parseFloat(calcCurrent);
+  if(isNaN(val)){calcCurrent='Error';calcUpdateDisplay();return;}
+  if(calcPendingOp!==null&&!calcResetNext){
+    calcPrevVal=calcApplyOp(calcPrevVal,val,calcPendingOp);
+    calcCurrent=calcFmtResult(calcPrevVal);
+  }else{
+    calcPrevVal=val;
+  }
+  calcPendingOp=op;
+  calcResetNext=true;
+  calcUpdateDisplay();
+}
+function calcEquals(){
+  if(calcPendingOp===null)return;
+  const val=parseFloat(calcCurrent);
+  calcPrevVal=calcApplyOp(calcPrevVal,val,calcPendingOp);
+  calcCurrent=calcFmtResult(calcPrevVal);
+  calcPendingOp=null;
+  calcResetNext=true;
+  calcUpdateDisplay();
+}
+function calcClear(){
+  calcCurrent='0';calcPrevVal=null;calcPendingOp=null;calcResetNext=false;
+  calcUpdateDisplay();
+}
+function calcBackspace(){
+  if(calcCurrent==='Error'||calcResetNext){calcClear();return;}
+  calcCurrent=calcCurrent.length>1?calcCurrent.slice(0,-1):'0';
+  calcUpdateDisplay();
+}
+function calcToggleSign(){
+  if(calcCurrent==='0'||calcCurrent==='Error')return;
+  calcCurrent=calcCurrent.startsWith('-')?calcCurrent.slice(1):('-'+calcCurrent);
+  calcUpdateDisplay();
+}
+function isFlightCalcOpen(){
+  const ov=document.getElementById('flight-calc-overlay');
+  return !!(ov&&ov.classList.contains('open'));
+}
+function openFlightCalc(){
+  const ov=document.getElementById('flight-calc-overlay');
+  if(!ov)return;
+  calcClear();
+  ov.classList.add('open');
+}
+function closeFlightCalc(){
+  const ov=document.getElementById('flight-calc-overlay');
+  if(ov)ov.classList.remove('open');
+}
+function toggleFlightCalc(){
+  isFlightCalcOpen()?closeFlightCalc():openFlightCalc();
+}
+
+// Ctrl/Cmd+0 opens/closes the calculator, but only while flight mode is open —
+// mirrors the spacebar-pause shortcut's guard pattern below.
+document.addEventListener('keydown',function(e){
+  const el=document.activeElement;
+  const typing=el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);
+  if(typing)return;
+  const overlay=document.getElementById('flight-overlay');
+  if(!overlay||!overlay.classList.contains('open'))return;
+  if((e.ctrlKey||e.metaKey)&&(e.key==='0'||e.code==='Digit0')){
+    e.preventDefault();
+    toggleFlightCalc();
+    return;
+  }
+  if(!isFlightCalcOpen())return;
+  // While the calculator is open, feed it digits/operators directly and stop
+  // those keys from reaching other flight shortcuts (e.g. spacebar pause).
+  if(e.key>='0'&&e.key<='9'){e.preventDefault();e.stopPropagation();calcInputDigit(e.key);return;}
+  if(e.key==='.'){e.preventDefault();e.stopPropagation();calcInputDot();return;}
+  if(e.key==='+'){e.preventDefault();e.stopPropagation();calcSetOp('+');return;}
+  if(e.key==='-'){e.preventDefault();e.stopPropagation();calcSetOp('-');return;}
+  if(e.key==='*'){e.preventDefault();e.stopPropagation();calcSetOp('*');return;}
+  if(e.key==='/'){e.preventDefault();e.stopPropagation();calcSetOp('/');return;}
+  if(e.key==='%'){e.preventDefault();e.stopPropagation();calcSetOp('%');return;}
+  if(e.key==='Enter'||e.key==='='){e.preventDefault();e.stopPropagation();calcEquals();return;}
+  if(e.key==='Backspace'){e.preventDefault();e.stopPropagation();calcBackspace();return;}
+  if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeFlightCalc();return;}
+},true);
+
 function updateFlightDisplay(){
+  updateTodayStudiedDisplay();
   if(flightFreeRun){
     const eh=Math.floor(flightElapsedSec/3600);
     const em=Math.floor((flightElapsedSec%3600)/60);
@@ -7990,8 +8771,10 @@ function landFreeRunNow(){
   const fromInfo2=getAirportCoords(flightFrom);
   const toInfo2=getAirportCoords(flightTo);
   const flightName=(fromInfo2.name||flightFrom)+' → '+(toInfo2.name||flightTo);
+  const freeRunSessionSec=flightElapsedSec;
   recordFlightSession(flightName,flightElapsedSec);
   stopPresenceCheck();
+  if(presencePassed()){showStudyAchievement(freeRunSessionSec);showSessionCelebration(freeRunSessionSec);}
 
   if(flightInterval){clearInterval(flightInterval);flightInterval=null;}
 
@@ -8374,6 +9157,10 @@ function pomoAdvancePhase(){
     } else {
       pomoPhase='short';
     }
+    // Fire the achievement toast only now that pomoPhase has moved off 'work' —
+    // otherwise flightInProgressStudySec() would still count the just-finished
+    // work phase as "in progress" on top of the history entry just recorded above.
+    if(presencePassed()){showStudyAchievement(pomoWorkMin*60);showSessionCelebration(pomoWorkMin*60);}
   } else if(pomoPhase==='short'||pomoPhase==='long'){
     if(pomoInfinite){
       pomoPhase='work';
@@ -8422,6 +9209,7 @@ function pomoAdvancePhase(){
 }
 
 function updatePomoDisplay(){
+  updateTodayStudiedDisplay();
   const h=Math.floor(pomoRemSec/3600),m=Math.floor((pomoRemSec%3600)/60),s=pomoRemSec%60;
   document.getElementById('flight-countdown').textContent=
     h>0?h+':'+pad(m)+':'+pad(s):pad(m)+':'+pad(s);
@@ -8685,6 +9473,10 @@ function tickPomomix(){
   if(pomomixRemSec>0){
     updatePomomixDisplay();
   } else {
+    // Capture before pomomixRunning flips false, since flightInProgressStudySec()
+    // only counts this block's elapsed time while pomomixRunning is still true.
+    showStudyAchievement(pomomixTotalSec);
+    showSessionCelebration(pomomixTotalSec);
     pomomixRunning=false;
     flightRunning=false;
     if(pomomixInterval){clearInterval(pomomixInterval);pomomixInterval=null;}
@@ -8699,6 +9491,7 @@ function tickPomomix(){
 }
 
 function updatePomomixDisplay(){
+  updateTodayStudiedDisplay();
   const h=Math.floor(pomomixRemSec/3600),m=Math.floor((pomomixRemSec%3600)/60),s=pomomixRemSec%60;
   document.getElementById('flight-countdown').textContent=
     h>0?h+':'+pad(m)+':'+pad(s):pad(m)+':'+pad(s);
@@ -9111,6 +9904,17 @@ window.addEventListener('beforeunload', function(e){
   }
 });
 
+// Save whatever's in progress on the sidebar timer / fs-overlay timer if the tab
+// actually closes mid-session, so e.g. 35 minutes into a 2-hour session isn't lost
+// just because the browser got closed instead of the reset/back button being used.
+// pagehide (not beforeunload) is used here since it reliably fires on tab close,
+// refresh, and navigation alike — including cases where the beforeunload dialog
+// above was dismissed or never shown.
+window.addEventListener('pagehide', function(){
+  try{ commitPartialTimer(); }catch(e){}
+  try{ commitPartialFsSession(); }catch(e){}
+});
+
 // =================== AIRPORT TIMEZONE MAP ===================
 // UTC offset in hours for each airport (standard time approximation)
 const AIRPORT_TZ={
@@ -9379,22 +10183,27 @@ function drawSatOrbit(ctx, sat, R, cx, cy) {
 
   const steps = 180;
   let pen = false;
+  // PERF: inc/raan/globePhi are constant for the whole ring (180 points), so their
+  // cos/sin only need to be computed once here instead of on every one of the 180
+  // iterations — this was recomputing the same 4 trig values 180 times per satellite.
+  const cosInc = Math.cos(inc), sinInc = Math.sin(inc);
+  const cosRaan = Math.cos(raan), sinRaan = Math.sin(raan);
+  const cosPhi = Math.cos(globePhi), sinPhi2 = Math.sin(globePhi);
   ctx.beginPath();
   for (let i = 0; i <= steps; i++) {
     const ph = (i / steps) * Math.PI * 2;
     const ox = Math.cos(ph), oy = Math.sin(ph);
     // same rotation as getSatelliteLatLon
     const x1 = ox;
-    const y1 = oy * Math.cos(inc);
-    const z1 = oy * Math.sin(inc);
-    const x2 = x1 * Math.cos(raan) - y1 * Math.sin(raan);
-    const y2 = x1 * Math.sin(raan) + y1 * Math.cos(raan);
+    const y1 = oy * cosInc;
+    const z1 = oy * sinInc;
+    const x2 = x1 * cosRaan - y1 * sinRaan;
+    const y2 = x1 * sinRaan + y1 * cosRaan;
     const z2 = z1;
     // Use orthoProject but with oR instead of R so the orbit ring sits outside the globe
     const lam = Math.atan2(y2, x2) - globeLambda;
     const sinLat = z2, cosLat = Math.sqrt(Math.max(0, 1 - z2 * z2));
     const cosLam = Math.cos(lam), sinLam = Math.sin(lam);
-    const cosPhi = Math.cos(globePhi), sinPhi2 = Math.sin(globePhi);
     // 3D unit vector
     const px0 = cosLat * sinLam;
     const py0 = sinLat;
@@ -9663,11 +10472,14 @@ function saveHistory(h){
   try{localStorage.setItem(HISTORY_KEY,JSON.stringify(h));}catch(e){}
 }
 
-// Record a completed session. type: 'study'|'work'|'break'|'exercise'|'custom'|'timer'|'preset'|'pomodoro'
+// Record a session. type: 'study'|'work'|'break'|'exercise'|'custom'|'timer'|'preset'|'pomodoro'
 // tool identifies which mechanism produced it ('timer'|'preset'|'flight'|'pomodoro'|'schedule'), independent
 // of the display type above — e.g. a pomodoro-mode session loaded from a scheduled 'study' block still has
 // tool:'pomodoro', so goal tracking can count it correctly regardless of its display type/label.
-function recordSession(name,durationSec,type,tool){
+// partial: true when the session was stopped/closed before its full planned duration — e.g. 35 minutes
+// logged out of a planned 2-hour session. Partial entries still count toward stats/goals (time studied is
+// time studied); the history list just marks them so it's clear they didn't run the whole way.
+function recordSession(name,durationSec,type,tool,partial){
   if(!name||durationSec<10)return; // ignore trivially short completions
   const h=loadHistory();
   h.unshift({
@@ -9676,7 +10488,8 @@ function recordSession(name,durationSec,type,tool){
     dur:durationSec,
     type:type||'timer',
     tool:tool||type||'timer',
-    ts:new Date().toISOString()
+    ts:new Date().toISOString(),
+    partial:!!partial
   });
   // keep max 1000 entries
   if(h.length>1000)h.length=1000;
@@ -9862,6 +10675,7 @@ function renderHistoryList(history){
         <div class="prog-entry">
           <div class="prog-entry-dot" style="background:${TYPE_COLOR[e.type]||'#555'}"></div>
           <div class="prog-entry-name">${e.name}</div>
+          ${e.partial?'<div class="prog-entry-partial">partial</div>':''}
           <div class="prog-entry-dur">${fmtDur(e.dur)}</div>
           <div class="prog-entry-time">${fmtTime(e.ts)}</div>
         </div>`).join('')}
@@ -9907,7 +10721,7 @@ const FLIGHT_HUD_SETTINGS_KEY='canopusFlightHudSettings';
 const FLIGHT_HUD_DEFAULTS={
   showRoute:true,showOriginName:true,showFlightTime:true,showDestTime:true,
   showStatus:true,showEta:true,showPhase:true,showWind:true,
-  showAltCurve:true,showProgress:true
+  showAltCurve:true,showProgress:true,showTodayTotal:true
 };
 let savedHudSettings={};
 try{ savedHudSettings=JSON.parse(localStorage.getItem(FLIGHT_HUD_SETTINGS_KEY)||'{}'); }catch(e){}
@@ -9928,6 +10742,7 @@ function applyFlightHudSettings(){
  const wind=document.querySelector('.flight-wind-row');
  const altCurve=document.querySelector('.alt-curve-wrap');
  const progress=document.querySelector('.flight-progress-track');
+ const todayRow=document.getElementById('flight-today-row');
 
  if(route) route.style.display=s.showRoute?'':'none';
  if(originName) originName.style.display=s.showOriginName?'':'none';
@@ -9940,11 +10755,12 @@ function applyFlightHudSettings(){
  if(wind) wind.style.display=s.showWind?'':'none';
  if(altCurve) altCurve.style.display=s.showAltCurve?'':'none';
  if(progress) progress.style.display=s.showProgress?'':'none';
+ if(todayRow) todayRow.style.display=s.showTodayTotal?'':'none';
 
  // Hide the whole status card if every field inside it is turned off
  const card=document.querySelector('.flight-status-card');
  if(card){
-   const cardEmpty=!s.showStatus&&!s.showEta&&!s.showPhase&&!s.showWind;
+   const cardEmpty=!s.showStatus&&!s.showEta&&!s.showPhase&&!s.showWind&&!s.showTodayTotal;
    card.style.display=cardEmpty?'none':'';
    const divider=card.querySelector('.fsc-divider');
    if(divider) divider.style.display=(s.showPhase||s.showWind)?'':'none';
@@ -9971,7 +10787,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     {id:'showPhase',key:'showPhase',label:'Flight Phase'},
     {id:'showWind',key:'showWind',label:'Tail Wind'},
     {id:'showAltCurve',key:'showAltCurve',label:'Altitude Curve'},
-    {id:'showProgress',key:'showProgress',label:'Progress Bar'}
+    {id:'showProgress',key:'showProgress',label:'Progress Bar'},
+    {id:'showTodayTotal',key:'showTodayTotal',label:'Studied Today'}
   ];
   const panel=document.createElement('div');
   panel.id='hudPanel';
@@ -17454,6 +18271,7 @@ document.addEventListener('keydown',function(e){
   if(!overlay||!overlay.classList.contains('open')) return;
   if(!overlay.classList.contains('tracking-flight')) return; // only during an active run, not the setup screens
   if(flightOnBreak) return; // the break overlay has its own "resume flight" control
+  if(typeof isFlightCalcOpen==='function'&&isFlightCalcOpen()) return; // calculator has focus of the keyboard
   e.preventDefault();
   toggleActivePause();
 },true);
