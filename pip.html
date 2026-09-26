@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Flight — Canopus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#000;overflow:hidden;
+    font-family:'Share Tech Mono',ui-monospace,'SFMono-Regular','Courier New',monospace;color:#fff;
+    -webkit-app-region:drag} /* drag anywhere on the window to move it */
+  /* ── Resize edges ──
+     The whole window is a -webkit-app-region:drag surface (see html,body
+     above) so you can move it by clicking anywhere empty. But that drag
+     region overrides Chromium's native edge-resize hit-testing, which is
+     exactly what was stopping the window from being resized by dragging
+     its border no matter what resizable/minWidth/minHeight main.js sets.
+     These four thin strips carve the true outer edge back out as
+     no-drag, so the OS resize cursor/behaviour works there again while
+     the interior still drags-to-move as before. */
+  #pip-resize-n,#pip-resize-s,#pip-resize-e,#pip-resize-w{position:absolute;-webkit-app-region:no-drag}
+  #pip-resize-n{top:0;left:0;right:0;height:8px}
+  #pip-resize-s{bottom:0;left:0;right:0;height:8px}
+  #pip-resize-w{top:0;bottom:0;left:0;width:8px}
+  #pip-resize-e{top:0;bottom:0;right:0;width:8px}
+
+  #pip-root{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
+  #pip-globe{width:100%;flex:1 1 auto;display:block;min-height:0;-webkit-app-region:no-drag;cursor:grab}
+  #pip-globe.dragging{cursor:grabbing}
+  #pip-info{flex:0 0 auto;padding:8px 0 12px;text-align:center}
+  #pip-timer{font-family:'Orbitron',ui-monospace,'SFMono-Regular','Courier New',monospace;
+    font-size:28px;font-weight:500;letter-spacing:.05em;font-variant-numeric:tabular-nums;
+    text-shadow:0 0 12px rgba(255,255,255,.25)}
+  #pip-status{margin-top:5px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+  #pip-pause-dur{margin-top:2px;font-size:11px;letter-spacing:.1em;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.55);display:none}
+  #pip-pause-dur.show{display:block}
+  #pip-studied{margin-top:3px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+  #pip-close{
+    position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:6px;
+    border:0.5px solid rgba(255,255,255,.3);background:rgba(0,0,0,.4);color:rgba(255,255,255,.7);
+    font-size:12px;line-height:1;cursor:pointer;-webkit-app-region:no-drag;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .15s,color .15s,border-color .15s;
+  }
+  body:hover #pip-close{opacity:1;pointer-events:auto}
+  #pip-close:hover{color:#fff;border-color:#fff}
+  #pip-theme{
+    position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:6px;
+    border:0.5px solid rgba(255,255,255,.3);background:rgba(0,0,0,.4);
+    cursor:pointer;-webkit-app-region:no-drag;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .15s;
+  }
+  body:hover #pip-theme{opacity:1;pointer-events:auto}
+  #pip-theme:hover{border-color:#fff}
+  #pip-theme span{width:10px;height:10px;border-radius:50%;background:currentColor}
+
+  /* ── Transparent background mode ──
+     This makes the page background see-through. For the actual OS window
+     to look transparent (not just show black through it) the Electron
+     BrowserWindow also needs to be created with transparent:true — see the
+     comment near applyTransparent() in the script below. */
+  html.pip-transparent, html.pip-transparent body{background:transparent !important}
+
+  /* ── Auto-hide toggle ──
+     By default all control buttons fade out unless the cursor is over the
+     window (existing body:hover rules above). Checking "off" in settings
+     adds this class, which forces them to stay visible. */
+  body.pip-noautohide #pip-close,
+  body.pip-noautohide #pip-theme,
+  body.pip-noautohide #pip-settings{opacity:1;pointer-events:auto}
+
+  #pip-settings{
+    position:absolute;top:6px;right:32px;width:22px;height:22px;border-radius:6px;
+    border:0.5px solid rgba(255,255,255,.3);background:rgba(0,0,0,.4);color:rgba(255,255,255,.7);
+    font-size:12px;line-height:1;cursor:pointer;-webkit-app-region:no-drag;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .15s,color .15s,border-color .15s;
+  }
+  body:hover #pip-settings{opacity:1;pointer-events:auto}
+  #pip-settings:hover{color:#fff;border-color:#fff}
+  #pip-settings.open{opacity:1;pointer-events:auto;color:#fff;border-color:#fff}
+
+  #pip-settings-panel{
+    position:absolute;top:32px;right:6px;width:190px;z-index:20;
+    background:rgba(10,10,10,.92);border:0.5px solid rgba(255,255,255,.25);
+    border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.5;
+    -webkit-app-region:no-drag;display:none;
+  }
+  #pip-settings-panel.open{display:block}
+  #pip-settings-panel label{display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:7px}
+  #pip-settings-panel .row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:7px}
+  #pip-settings-panel select{background:#111;color:#fff;border:0.5px solid rgba(255,255,255,.3);border-radius:4px;font-size:11px}
+  #pip-settings-panel input[type=range]{width:100px}
+  #pip-settings-panel .done-btn{
+    width:100%;margin-top:2px;padding:5px 0;border-radius:6px;
+    border:0.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);
+    color:#fff;font-size:11px;cursor:pointer;
+  }
+  #pip-settings-panel .done-btn:hover{background:rgba(255,255,255,.16)}
+
+  /* ── Shape presets ──
+     Visually clips the window content. Note this only reshapes what's
+     drawn; the underlying OS window is still a rectangle unless main.js
+     also gives it a transparent, frameless surface (see script comment). */
+  body.pip-shape-square{clip-path:none}
+  body.pip-shape-rounded{clip-path:inset(0 round 26px)}
+  body.pip-shape-circle{clip-path:circle(50% at 50% 50%)}
+  body.pip-shape-hex{clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)}
+</style>
+</head>
+<body>
+  <div id="pip-resize-n"></div>
+  <div id="pip-resize-s"></div>
+  <div id="pip-resize-w"></div>
+  <div id="pip-resize-e"></div>
+  <div id="pip-root">
+    <canvas id="pip-globe"></canvas>
+    <div id="pip-info">
+      <div id="pip-timer" title="Press space to pause / resume">--:--:--</div>
+      <div id="pip-status"></div>
+      <div id="pip-pause-dur"></div>
+      <div id="pip-studied"></div>
+    </div>
+  </div>
+  <button id="pip-close" title="Close pop-out" aria-label="Close">✕</button>
+  <button id="pip-theme" title="Cycle globe colour" aria-label="Cycle globe colour"><span></span></button>
+  <button id="pip-settings" title="Pop-out settings" aria-label="Settings">⚙</button>
+  <div id="pip-settings-panel">
+    <label><input type="checkbox" id="opt-transparent"> Transparent background</label>
+    <label><input type="checkbox" id="opt-autohide" checked> Auto-hide controls</label>
+    <div class="row">Shape
+      <select id="opt-shape">
+        <option value="square">Square</option>
+        <option value="rounded">Rounded</option>
+        <option value="circle">Circle</option>
+        <option value="hex">Hexagon</option>
+      </select>
+    </div>
+    <div class="row">Size <input type="range" id="opt-size" min="150" max="640" value="280"><span id="opt-size-val">280px</span></div>
+    <button class="done-btn" id="opt-done">Done</button>
+  </div>
+
+  <script>
+    /* This window renders its OWN copy of the globe locally at its own
+       requestAnimationFrame rate — it is NOT a mirrored screenshot of the
+       main window's canvas. index.html sends the world geometry + route +
+       theme ONCE on open (flight-pip:data, kind:'init'), then just tiny
+       text/number updates once a second after that (kind:'tick').
+       Rotation, drawing, and DPI scaling all happen right here, independent
+       of whatever the main window is doing — which is what lets index.html
+       stop rendering its own globe entirely while this is open (see
+       globeAnimLoop's flightPipActive check) without the pop-out stalling
+       too. */
+
+    const canvas = document.getElementById('pip-globe');
+    const ctx = canvas.getContext('2d');
+    const timerEl = document.getElementById('pip-timer');
+    const statusEl = document.getElementById('pip-status');
+    const pauseDurEl = document.getElementById('pip-pause-dur');
+    const studiedEl = document.getElementById('pip-studied');
+    const dpr = window.devicePixelRatio || 1;
+
+    document.getElementById('pip-close').addEventListener('click', () => {
+      window.canopusPipBridge.requestClose();
+    });
+
+    // Spacebar pauses/resumes the flight, same as clicking the timer or
+    // pressing space in the main window — this window just forwards the
+    // request over IPC (main.js relays it to index.html's toggleActivePause)
+    // since it has no direct handle on the session state itself.
+    document.addEventListener('keydown', (e) => {
+      if (e.code !== 'Space' && e.key !== ' ') return;
+      e.preventDefault();
+      window.canopusPipBridge.requestPauseToggle();
+    });
+
+    // ── Live "paused for MM:SS" readout ──
+    // pauseStartedAt (epoch ms) arrives once, on the tick where the pause
+    // began — keep re-deriving the elapsed duration locally every second
+    // rather than waiting on further ticks from the main window, so the
+    // count stays smooth even between its once-a-second updates.
+    let pauseStartedAt = null;
+    let pauseDurInterval = null;
+    function fmtPauseDur(sec){
+      const m = Math.floor(sec / 60), s = sec % 60;
+      return m + ':' + String(s).padStart(2, '0');
+    }
+    function updatePauseDurText(){
+      if (pauseStartedAt == null) return;
+      const elapsed = Math.max(0, Math.floor((Date.now() - pauseStartedAt) / 1000));
+      pauseDurEl.textContent = 'paused for ' + fmtPauseDur(elapsed);
+    }
+    function setPipPaused(isPaused, startedAt){
+      if (isPaused) {
+        if (pauseStartedAt == null) {
+          pauseStartedAt = startedAt || Date.now();
+          updatePauseDurText();
+          if (pauseDurInterval) clearInterval(pauseDurInterval);
+          pauseDurInterval = setInterval(updatePauseDurText, 1000);
+        }
+        pauseDurEl.classList.add('show');
+      } else {
+        if (pauseDurInterval) { clearInterval(pauseDurInterval); pauseDurInterval = null; }
+        pauseStartedAt = null;
+        pauseDurEl.textContent = '';
+        pauseDurEl.classList.remove('show');
+      }
+    }
+
+    // ── State, filled in by 'init' then kept current by 'tick' ──
+    let geoData = null;
+    let wireRgb = '80,220,255';
+    let spinSpeed = 0.006;
+    let viewMode = 'minimal';
+    let lambda = 0, phi = 0.3;
+    let fromC = null, toC = null;
+    let progress = 0;
+    let flightRunning = false;
+    let paused = false;
+    let haveInit = false;
+
+    // ── Manual drag-to-rotate ──
+    // Purely local to this window — same math as the main window's globe
+    // drag handler, just applied to this window's own lambda/phi instead of
+    // index.html's globeLambda/globePhi. Dragging suppresses the idle
+    // auto-drift (see loop() below) for as long as the drag lasts, exactly
+    // like the main window's globeDragging flag does.
+    let pipDragging = false, pipDragLast = {x:0, y:0};
+    function pipDragStart(e){
+      pipDragging = true;
+      const t = e.touches ? e.touches[0] : e;
+      pipDragLast = {x:t.clientX, y:t.clientY};
+      canvas.classList.add('dragging');
+    }
+    function pipDragMove(e){
+      if(!pipDragging) return;
+      const t = e.touches ? e.touches[0] : e;
+      lambda -= (t.clientX - pipDragLast.x) * 0.005;
+      phi    += (t.clientY - pipDragLast.y) * 0.005;
+      phi = Math.max(-Math.PI/2+0.1, Math.min(Math.PI/2-0.1, phi));
+      pipDragLast = {x:t.clientX, y:t.clientY};
+    }
+    function pipDragEnd(){
+      pipDragging = false;
+      canvas.classList.remove('dragging');
+    }
+    canvas.addEventListener('mousedown', pipDragStart);
+    canvas.addEventListener('touchstart', pipDragStart, {passive:true});
+    window.addEventListener('mousemove', pipDragMove);
+    window.addEventListener('touchmove', pipDragMove, {passive:true});
+    window.addEventListener('mouseup', pipDragEnd);
+    window.addEventListener('touchend', pipDragEnd);
+
+    // ── Colour cycling ──
+    // Local to the pop-out only — doesn't write back to the main window's
+    // theme setting (see flight-pip:pause-toggle for how a round-trip like
+    // that would work if this ever needs to sync both ways instead). Starts
+    // on whichever colour the 'init' payload sent, then just walks the same
+    // palette index.html's own theme cycler uses.
+    const PIP_THEMES = [
+      {label:'mono',     rgb:'255,255,255'},
+      {label:'cyan',     rgb:'80,220,255'},
+      {label:'amber',    rgb:'255,176,64'},
+      {label:'phosphor', rgb:'80,255,140'},
+      {label:'violet',   rgb:'190,120,255'},
+      {label:'signal',   rgb:'255,90,90'}
+    ];
+    let pipThemeIndex = 0;
+    const themeBtn = document.getElementById('pip-theme');
+    function applyPipTheme(idx){
+      pipThemeIndex = ((idx % PIP_THEMES.length) + PIP_THEMES.length) % PIP_THEMES.length;
+      wireRgb = PIP_THEMES[pipThemeIndex].rgb;
+      themeBtn.style.color = `rgb(${wireRgb})`;
+      themeBtn.title = 'Globe colour: ' + PIP_THEMES[pipThemeIndex].label + ' (click to cycle)';
+    }
+    themeBtn.addEventListener('click', () => applyPipTheme(pipThemeIndex + 1));
+    applyPipTheme(0);
+
+    // ── Geometry helpers (same math as the main window's globe) ──
+    function orthoProject(lat, lon, lambda, phi, R, cx, cy){
+      const lam = lon * Math.PI/180 - lambda;
+      const la  = lat * Math.PI/180;
+      const cosLa=Math.cos(la), sinLa=Math.sin(la);
+      const cosLam=Math.cos(lam), sinLam=Math.sin(lam);
+      const cosPhi=Math.cos(phi), sinPhi=Math.sin(phi);
+      const x0 = cosLa * sinLam;
+      const y0 = sinLa;
+      const z0 = cosLa * cosLam;
+      const y1 = y0*cosPhi - z0*sinPhi;
+      const z1 = y0*sinPhi + z0*cosPhi;
+      return { sx: cx + R*x0, sy: cy - R*y1, visible: z1 > 0 };
+    }
+    function drawRing(ring, R, cx, cy){
+      let penDown=false;
+      for(let i=0;i<ring.length;i++){
+        const lon=ring[i][0], lat=ring[i][1];
+        const p=orthoProject(lat,lon,lambda,phi,R,cx,cy);
+        if(!p.visible){ penDown=false; continue; }
+        if(!penDown){ ctx.moveTo(p.sx,p.sy); penDown=true; }
+        else ctx.lineTo(p.sx,p.sy);
+      }
+    }
+    function slerp(a,b,t){
+      const lat1=a.lat*Math.PI/180,lon1=a.lon*Math.PI/180;
+      const lat2=b.lat*Math.PI/180,lon2=b.lon*Math.PI/180;
+      const p1={x:Math.cos(lat1)*Math.cos(lon1),y:Math.sin(lat1),z:Math.cos(lat1)*Math.sin(lon1)};
+      const p2={x:Math.cos(lat2)*Math.cos(lon2),y:Math.sin(lat2),z:Math.cos(lat2)*Math.sin(lon2)};
+      let dot=p1.x*p2.x+p1.y*p2.y+p1.z*p2.z;
+      dot=Math.max(-1,Math.min(1,dot));
+      const omega=Math.acos(dot);
+      if(Math.abs(omega)<0.0001) return {lat:a.lat+(b.lat-a.lat)*t,lon:a.lon+(b.lon-a.lon)*t};
+      const sinO=Math.sin(omega);
+      const c1=Math.sin((1-t)*omega)/sinO, c2=Math.sin(t*omega)/sinO;
+      const px=c1*p1.x+c2*p2.x, py=c1*p1.y+c2*p2.y, pz=c1*p1.z+c2*p2.z;
+      return {lat:Math.asin(Math.max(-1,Math.min(1,py)))*180/Math.PI, lon:Math.atan2(pz,px)*180/Math.PI};
+    }
+
+    // Great-circle route baked once per from/to pair (matches the main
+    // window's approach — no reason to re-run slerp() ~100 times a frame
+    // for a route that never moves).
+    let arcPts=null, arcKey=null;
+    function getArcPts(){
+      if(!fromC||!toC) return null;
+      const key=fromC.code+'|'+toC.code;
+      if(arcKey===key && arcPts) return arcPts;
+      arcKey=key;
+      arcPts=[];
+      const steps=96;
+      for(let i=0;i<=steps;i++) arcPts.push(slerp(fromC,toC,i/steps));
+      return arcPts;
+    }
+
+    function sizeCanvas(){
+      const w=Math.round(canvas.clientWidth*dpr), h=Math.round(canvas.clientHeight*dpr);
+      if(canvas.width!==w) canvas.width=w;
+      if(canvas.height!==h) canvas.height=h;
+    }
+    window.addEventListener('resize', sizeCanvas);
+
+    function drawGlobe(){
+      sizeCanvas();
+      const W=canvas.width, H=canvas.height;
+      const cx=W/2, cy=H/2;
+      const R=Math.min(W,H)*0.42;
+      ctx.clearRect(0,0,W,H);
+
+      // Black scope background, accent-tinted wireframe — same look as
+      // the main window's wireframe theme (mono/cyan/amber/phosphor/etc).
+      ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2);
+      if(!transparentBg){ ctx.fillStyle='#000'; ctx.fill(); }
+
+      ctx.save();
+      ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.clip();
+
+      // Graticule
+      ctx.strokeStyle=`rgba(${wireRgb},0.07)`; ctx.lineWidth=Math.max(0.5,0.5*dpr);
+      for(let lat=-80;lat<=80;lat+=20){
+        ctx.beginPath();
+        for(let lon=-180;lon<=180;lon+=3){
+          const p=orthoProject(lat,lon,lambda,phi,R,cx,cy);
+          if(!p.visible) continue;
+          lon===(-180) ? ctx.moveTo(p.sx,p.sy) : ctx.lineTo(p.sx,p.sy);
+        }
+        ctx.stroke();
+      }
+      for(let lon=-180;lon<180;lon+=20){
+        ctx.beginPath();
+        for(let lat=-88;lat<=88;lat+=3){
+          const p=orthoProject(lat,lon,lambda,phi,R,cx,cy);
+          if(!p.visible) continue;
+          lat===(-88) ? ctx.moveTo(p.sx,p.sy) : ctx.lineTo(p.sx,p.sy);
+        }
+        ctx.stroke();
+      }
+
+      // Country borders
+      if(geoData){
+        for(const feat of geoData){
+          const geom=feat.geometry;
+          if(!geom) continue;
+          const polys=geom.type==='Polygon'?[geom.coordinates]:geom.type==='MultiPolygon'?geom.coordinates:[];
+          for(const poly of polys){
+            ctx.beginPath();
+            for(const ring of poly) drawRing(ring,R,cx,cy);
+            ctx.strokeStyle=`rgba(${wireRgb},0.85)`; ctx.lineWidth=Math.max(0.7,0.8*dpr);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Flight route + plane
+      const pts=getArcPts();
+      if(pts){
+        ctx.setLineDash([4*dpr,4*dpr]);
+        ctx.beginPath();
+        let pen=false;
+        for(const pt of pts){
+          const p=orthoProject(pt.lat,pt.lon,lambda,phi,R,cx,cy);
+          if(!p.visible){ pen=false; continue; }
+          if(!pen){ ctx.moveTo(p.sx,p.sy); pen=true; } else ctx.lineTo(p.sx,p.sy);
+        }
+        ctx.strokeStyle=`rgba(${wireRgb},0.55)`; ctx.lineWidth=Math.max(1,1*dpr);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // endpoint dots
+        const pf=orthoProject(fromC.lat,fromC.lon,lambda,phi,R,cx,cy);
+        const pt2=orthoProject(toC.lat,toC.lon,lambda,phi,R,cx,cy);
+        for(const dp of [pf,pt2]){
+          if(!dp.visible) continue;
+          ctx.beginPath(); ctx.arc(dp.sx,dp.sy,2.5*dpr,0,Math.PI*2);
+          ctx.fillStyle=`rgba(${wireRgb},0.9)`; ctx.fill();
+        }
+
+        // plane marker
+        if(flightRunning){
+          const t0=Math.max(0,progress-0.01), t1=Math.min(0.999,progress+0.01);
+          const pA=orthoProject(slerp(fromC,toC,t0).lat,slerp(fromC,toC,t0).lon,lambda,phi,R,cx,cy);
+          const pB=orthoProject(slerp(fromC,toC,t1).lat,slerp(fromC,toC,t1).lon,lambda,phi,R,cx,cy);
+          const pt3=slerp(fromC,toC,progress);
+          const p=orthoProject(pt3.lat,pt3.lon,lambda,phi,R,cx,cy);
+          if(p.visible){
+            const angle=(pA.visible&&pB.visible)?Math.atan2(pB.sy-pA.sy,pB.sx-pA.sx):-Math.PI/4;
+            const s=R*0.05;
+            ctx.save();
+            ctx.translate(p.sx,p.sy); ctx.rotate(angle);
+            const glow=ctx.createRadialGradient(0,0,0,0,0,s*3);
+            glow.addColorStop(0,`rgba(${wireRgb},0.5)`);
+            glow.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.beginPath(); ctx.arc(0,0,s*3,0,Math.PI*2); ctx.fillStyle=glow; ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(s*1.4,0); ctx.lineTo(-s*0.9,s*0.8); ctx.lineTo(-s*0.5,0); ctx.lineTo(-s*0.9,-s*0.8);
+            ctx.closePath();
+            ctx.fillStyle='#fff'; ctx.fill();
+            ctx.restore();
+          }
+        }
+      }
+
+      ctx.restore();
+
+      // Crisp sphere edge
+      ctx.strokeStyle=`rgba(${wireRgb},0.55)`; ctx.lineWidth=Math.max(1,1.2*dpr);
+      ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.stroke();
+    }
+
+    let raf=null;
+    function loop(){
+      if(!paused && haveInit && !pipDragging){
+        lambda -= flightRunning ? spinSpeed : (viewMode==='minimal'?0.004:0);
+      }
+      if(haveInit) drawGlobe();
+      raf=requestAnimationFrame(loop);
+    }
+    raf=requestAnimationFrame(loop);
+
+    // ── Pop-out appearance settings (transparency / auto-hide / shape / size) ──
+    // Persisted locally in this window via localStorage so they stick between
+    // opens. Two of these — true OS-level background transparency and actual
+    // window resizing — can't be done from a renderer script alone in
+    // Electron; a renderer can only draw a transparent *canvas*, not make the
+    // BrowserWindow itself transparent, and it can't resize itself. So this
+    // wires up the full visual behaviour locally (canvas fill, CSS clip-path
+    // shape, button auto-hide) AND sends best-effort IPC calls —
+    // canopusPipBridge.setTransparent(bool) / .requestResize(w,h) — that are
+    // no-ops if main.js hasn't implemented them yet. To get a truly
+    // see-through window and free OS-level resizing, main.js needs to create
+    // this BrowserWindow with `transparent: true, backgroundColor:
+    // '#00000000', resizable: true` and handle those two IPC messages. Happy
+    // to wire that up too if you share main.js / the preload bridge file.
+    let transparentBg = false; // read by drawGlobe() above to skip the black disk fill
+
+    const settingsBtn = document.getElementById('pip-settings');
+    const settingsPanel = document.getElementById('pip-settings-panel');
+    const optTransparent = document.getElementById('opt-transparent');
+    const optAutohide = document.getElementById('opt-autohide');
+    const optShape = document.getElementById('opt-shape');
+    const optSize = document.getElementById('opt-size');
+    const optSizeVal = document.getElementById('opt-size-val');
+    const optDone = document.getElementById('opt-done');
+
+    function loadPipPrefs(){
+      try{ const raw = localStorage.getItem('flightPipPrefs'); return raw ? JSON.parse(raw) : {}; }
+      catch(e){ return {}; }
+    }
+    function savePipPrefs(){
+      try{
+        localStorage.setItem('flightPipPrefs', JSON.stringify({
+          transparent: optTransparent.checked,
+          autohide: optAutohide.checked,
+          shape: optShape.value,
+          size: Number(optSize.value)
+        }));
+      }catch(e){}
+    }
+
+    function applyTransparent(on){
+      transparentBg = on;
+      document.documentElement.classList.toggle('pip-transparent', on);
+      if (window.canopusPipBridge && typeof window.canopusPipBridge.setTransparent === 'function') {
+        window.canopusPipBridge.setTransparent(on);
+      }
+    }
+    function applyAutohide(on){
+      document.body.classList.toggle('pip-noautohide', !on);
+    }
+    function applyShape(shape){
+      document.body.classList.remove('pip-shape-circle','pip-shape-rounded','pip-shape-square','pip-shape-hex');
+      document.body.classList.add('pip-shape-' + shape);
+    }
+    function applySize(px, requestWindowResize){
+      optSizeVal.textContent = px + 'px';
+      // requestWindowResize is false when this is just syncing the label to
+      // a saved preference (e.g. on window open) — main.js already restores
+      // the pop-out to its last real size/position on its own, so re-sending
+      // a resize here too would fight with that. Only an actual slider drag
+      // should move the window.
+      if (requestWindowResize && window.canopusPipBridge && typeof window.canopusPipBridge.requestResize === 'function') {
+        window.canopusPipBridge.requestResize(px, px);
+      }
+    }
+    function applyAllPrefs(p){
+      optTransparent.checked = !!p.transparent;
+      optAutohide.checked = p.autohide !== false;
+      optShape.value = p.shape || 'square';
+      optSize.value = p.size || 280;
+      applyTransparent(optTransparent.checked);
+      applyAutohide(optAutohide.checked);
+      applyShape(optShape.value);
+      applySize(Number(optSize.value), false);
+    }
+    applyAllPrefs(loadPipPrefs());
+
+    settingsBtn.addEventListener('click', () => {
+      const open = settingsPanel.classList.toggle('open');
+      settingsBtn.classList.toggle('open', open);
+    });
+    optDone.addEventListener('click', () => {
+      settingsPanel.classList.remove('open');
+      settingsBtn.classList.remove('open');
+    });
+    // Each control only applies (and requests) its own effect — previously
+    // every listener called all four apply* functions together, which meant
+    // toggling e.g. "Transparent background" also silently re-sent whatever
+    // the size slider happened to be set to via applySize()'s
+    // requestResize() call, snapping the window back to that value even if
+    // it had since been resized by hand at the edge. Only the size slider
+    // itself should ever trigger a resize.
+    optTransparent.addEventListener('input', () => {
+      applyTransparent(optTransparent.checked);
+      savePipPrefs();
+    });
+    optAutohide.addEventListener('input', () => {
+      applyAutohide(optAutohide.checked);
+      savePipPrefs();
+    });
+    optShape.addEventListener('input', () => {
+      applyShape(optShape.value);
+      savePipPrefs();
+    });
+    optSize.addEventListener('input', () => {
+      applySize(Number(optSize.value), true);
+      savePipPrefs();
+    });
+
+    window.canopusPipBridge.onData((data) => {
+      if(data.kind==='init'){
+        geoData=data.geoData||null;
+        if(data.wireRgb){
+          const matchIdx=PIP_THEMES.findIndex(t=>t.rgb===data.wireRgb);
+          applyPipTheme(matchIdx>=0?matchIdx:0);
+        }
+        spinSpeed=typeof data.spinSpeed==='number'?data.spinSpeed:spinSpeed;
+        viewMode=data.viewMode||viewMode;
+        lambda=typeof data.lambda==='number'?data.lambda:lambda;
+        phi=typeof data.phi==='number'?data.phi:phi;
+        fromC=data.from||null;
+        toC=data.to||null;
+        arcKey=null; // force the arc to rebake for the new route
+        haveInit=true;
+        return;
+      }
+      // 'tick' — cheap text/number refresh, once a second
+      if(data.timerText!=null) timerEl.textContent=data.timerText;
+      if(data.statusText!=null) statusEl.textContent=data.statusText;
+      if(data.studiedText!=null) studiedEl.textContent=data.studiedText;
+      if(typeof data.progress==='number') progress=data.progress;
+      if(typeof data.flightRunning==='boolean') flightRunning=data.flightRunning;
+      if(typeof data.paused==='boolean'){
+        paused=data.paused;
+        setPipPaused(paused, data.pauseStartedAt);
+      }
+      if(data.viewMode) viewMode=data.viewMode;
+    });
+  </script>
+</body>
+</html>

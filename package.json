@@ -29,6 +29,15 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility",
+      "icon": "apple-touch-icon.png"
     }
+  },
+  "allowScripts": {
+    "active-win@8.2.1": true,
+    "electron@31.7.7": true
   }
 }

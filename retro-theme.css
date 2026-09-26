@@ -7,11 +7,12 @@
 
    PHOSPHOR COLOUR: the actual colour is a set of CSS variables so it
    can be swapped without touching any of the rules below. The colour
-   itself is chosen with `theme retro green|amber` in the Terminal, or
-   the swatches in the nav's colour picker, and persisted under
-   'canopus_retro_phosphor' (retro-theme.js applies it as
-   html[data-phosphor="..."]). Default is green; amber is the classic
-   monochrome-amber CRT look.
+   itself is chosen with `theme retro green|amber|blue|signal|violet|rgb`
+   in the Terminal, or the swatches in the nav's colour picker, and
+   persisted under 'canopus_retro_phosphor' (retro-theme.js applies it
+   as html[data-phosphor="..."]). Default is green; amber/blue/signal/
+   violet are fixed monochrome CRT looks, and rgb is a shuffle mode that
+   continuously cycles through all of them (see the rgb block below).
    ══════════════════════════════════════════════════════════════════ */
 
 html.crt-retro{
@@ -88,9 +89,79 @@ html.crt-retro[data-phosphor="blue"]{
   --phos-vignette-glow:rgba(95,212,255,.08);
 }
 
+/* Signal phosphor — the flight tracker's "signal" (red) globe-theme
+   colour, offered here too so the CRT retro theme can match it.
+   Same rules everywhere below, different variable values. */
+html.crt-retro[data-phosphor="signal"]{
+  --phos-text:#ff5a5a;
+  --phos-shadow-1:rgba(255,90,90,.45);
+  --phos-shadow-2:rgba(255,90,90,.8);
+  --phos-border:rgba(255,90,90,.28);
+  --phos-decoration:rgba(255,90,90,.5);
+  --phos-outline:rgba(255,90,90,.5);
+  --phos-heading:#ff9c9c;
+  --phos-heading-shadow:rgba(255,156,156,.75);
+  --phos-link:#ffcfcf;
+  --phos-link-border:rgba(255,90,90,.35);
+  --phos-caret:#ff5a5a;
+  --phos-hover:#ff7a7a;
+  --phos-hover-shadow:rgba(255,122,122,.9);
+  --phos-placeholder:rgba(255,90,90,.32);
+  --phos-selection:rgba(255,90,90,.3);
+  --phos-dim:#a83a3a;
+  --phos-scroll-track:#000;
+  --phos-scroll-thumb:#a83a3a;
+  --phos-img-filter:grayscale(1) sepia(1) hue-rotate(-50deg) saturate(6) brightness(1) contrast(1.1);
+  --phos-vignette-glow:rgba(255,90,90,.07);
+}
+
+/* Violet phosphor — the flight tracker's "violet" globe-theme colour,
+   offered here too so the CRT retro theme can match it. Same rules
+   everywhere below, different variable values. */
+html.crt-retro[data-phosphor="violet"]{
+  --phos-text:#be78ff;
+  --phos-shadow-1:rgba(190,120,255,.45);
+  --phos-shadow-2:rgba(190,120,255,.8);
+  --phos-border:rgba(190,120,255,.28);
+  --phos-decoration:rgba(190,120,255,.5);
+  --phos-outline:rgba(190,120,255,.5);
+  --phos-heading:#dcb3ff;
+  --phos-heading-shadow:rgba(220,179,255,.75);
+  --phos-link:#ecd6ff;
+  --phos-link-border:rgba(190,120,255,.35);
+  --phos-caret:#be78ff;
+  --phos-hover:#cf9aff;
+  --phos-hover-shadow:rgba(207,154,255,.9);
+  --phos-placeholder:rgba(190,120,255,.32);
+  --phos-selection:rgba(190,120,255,.3);
+  --phos-dim:#6e3aa3;
+  --phos-scroll-track:#000;
+  --phos-scroll-thumb:#6e3aa3;
+  --phos-img-filter:grayscale(1) sepia(1) hue-rotate(200deg) saturate(5) brightness(1) contrast(1.1);
+  --phos-vignette-glow:rgba(190,120,255,.07);
+}
+
 html.crt-retro,
 html.crt-retro body{
   background:#000 !important;
+}
+
+/* RGB phosphor — a shuffle mode rather than a fixed colour. No dedicated
+   variable block: it inherits the base (green) --phos-* values from the
+   top of this file, then this animates a hue-rotate filter across the
+   whole page so text glow, borders, and the tinted globe/canvas all
+   cycle through colour together, like an RGB-lighting peripheral. Filter
+   on body composites everything under it, and hue-rotate leaves the
+   pure-black background untouched, so nothing else needs to change. */
+html.crt-retro[data-phosphor="rgb"] body{
+  animation:crtRgbCycle 8s linear infinite;
+}
+@keyframes crtRgbCycle{
+  from{ filter:hue-rotate(0deg); }
+  to{ filter:hue-rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce){
+  html.crt-retro[data-phosphor="rgb"] body{ animation:none; filter:hue-rotate(90deg); }
 }
 
 html.crt-retro body,
@@ -149,6 +220,32 @@ html.crt-retro [class*="modal"]{
   background-color:#000 !important;
 }
 
+/* Exception: absolutely/fixed-positioned dropdown & popover panels that
+   float on top of other page content but whose class/id names don't
+   contain "overlay" or "modal", so the selector above misses them —
+   the airport City/IATA autocomplete dropdown (.airport-suggest) and
+   the "browse all airports" picker (#airport-browse-overlay has no
+   class at all, and its inner #airport-browse-box has no "overlay"/
+   "modal" in its id either) are the ones reported jumbled, plus the
+   same-shaped nav popovers and schedule pickers that would have the
+   identical problem. Without an opaque backdrop here the blanket rule
+   above leaves them fully transparent, so whatever's underneath (page
+   text, other form rows) shows straight through and visually merges
+   with the dropdown's own list — restore solid black panels so they
+   read the same way the overlay/modal exception above does. Higher
+   specificity (class/id + .crt-retro) wins over the blanket rule
+   regardless of source order, same pattern as the rest of this file. */
+html.crt-retro .airport-suggest,
+html.crt-retro .flight-sched-picker,
+html.crt-retro .session-picker,
+html.crt-retro .nav-menu-pop,
+html.crt-retro .nav-accent-pop,
+html.crt-retro .nav-profile-pop,
+html.crt-retro #airport-browse-overlay,
+html.crt-retro #airport-browse-box{
+  background-color:#000 !important;
+}
+
 html.crt-retro body *::before,
 html.crt-retro body *::after{
   color:var(--phos-text) !important;
@@ -180,6 +277,25 @@ html.crt-retro ::placeholder{
   -webkit-text-fill-color:var(--phos-placeholder) !important;
 }
 html.crt-retro ::selection{ background:var(--phos-selection); color:#000; }
+
+/* Exception: "selected" chip/button state (.sel) — used all over the app
+   (.fdc.sel, .fs-chip.sel, .qb.sel, .dur-opt.sel, .route-pack-chip.sel,
+   .uf-chip.sel, .abr-item.sel, .fs-sched-item.sel, .fs-chip.flight-chip.sel,
+   etc., e.g. the flight setup screen's duration/break-length picker).
+   Each of these normally distinguishes the picked option with its own
+   tinted background + brighter text, but the blanket "body *" rule above
+   forces every button to the same transparent background and same
+   --phos-link text colour, so a selected chip like "5m" for the break
+   length looks identical to the unselected ones and the pick becomes
+   invisible. Give .sel a solid phosphor-filled background with dark
+   text so the active choice is unmistakable, same as a lit CRT key. */
+html.crt-retro .sel{
+  background-color:var(--phos-text) !important;
+  color:#000 !important;
+  border-color:var(--phos-text) !important;
+  text-shadow:none !important;
+  box-shadow:0 0 8px var(--phos-shadow-2),0 0 2px var(--phos-shadow-1) !important;
+}
 
 /* muted / secondary text stays legible but dimmer, no glow */
 html.crt-retro [class*="dim"], html.crt-retro [class*="muted"], html.crt-retro [class*="hint"],
@@ -248,6 +364,39 @@ html.crt-retro .phosphor-swatch.active{
   box-shadow:0 0 0 2px #000,0 0 0 3.5px var(--sw) !important;
 }
 
+/* Exception: the GitHub-style activity heatmap on the Progress page
+   (.prog-hm-cell, both the grid itself and its "Less…More" legend).
+   Each cell's colour is a literal inline background encoding one of 5
+   fixed activity levels (0 = no activity … 4 = most active) — but the
+   blanket "body *" rule above forces every background to transparent
+   !important, so the whole heatmap (and legend) renders as a flat,
+   level-less grid. This isn't green-specific: every phosphor colour is
+   equally wiped out.
+
+   Restore each level explicitly, matched by the exact literal inline
+   colour index.html's heatmap always emits (same technique as the
+   swatch exceptions above — there's no cleaner hook without touching
+   the JS that generates these cells). Levels 1–4 reuse the existing
+   --phos-border/--phos-shadow-1/--phos-shadow-2/--phos-text brightness
+   steps already defined per phosphor colour above, so the gradient
+   correctly follows whichever phosphor is active instead of being
+   hardcoded to green. */
+html.crt-retro .prog-hm-cell[style*="background:#111"]{
+  background-color:#0a0a0a !important;
+}
+html.crt-retro .prog-hm-cell[style*="background:#1a3020"]{
+  background-color:var(--phos-border) !important;
+}
+html.crt-retro .prog-hm-cell[style*="background:#2a5535"]{
+  background-color:var(--phos-shadow-1) !important;
+}
+html.crt-retro .prog-hm-cell[style*="background:#3a7a4a"]{
+  background-color:var(--phos-shadow-2) !important;
+}
+html.crt-retro .prog-hm-cell[style*="background:#52aa68"]{
+  background-color:var(--phos-text) !important;
+}
+
 /* scrollbars */
 html.crt-retro{ scrollbar-color:var(--phos-text) var(--phos-scroll-track); }
 html.crt-retro ::-webkit-scrollbar{ background:#000; }
@@ -314,4 +463,92 @@ html.crt-retro .grind-entry:hover{
 }
 html.crt-retro .grind-wrap::before{
   filter:none !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EXCEPTION: NOTES reader/editor + in-app file viewer
+   Both render as solid panels floating on top of the app (a "paper"
+   note page, a dark file-preview modal) rather than being part of the
+   CRT screen itself. The blanket "body *" rule above strips every
+   element's background to transparent, so with html/body forced to
+   pure black, that black bleeds straight through the panel — the note
+   page and file viewer look like a hole cut into the CRT screen
+   instead of a card sitting on top of it, and any dark viewer text
+   becomes unreadable against the phosphor-green glow. Restore solid
+   backgrounds and legible foreground colours here. Same
+   specificity/!important pattern as the Grind exception above. */
+html.crt-retro .nt-page{
+  background-color:#F5F3EE !important;
+}
+html.crt-retro .nt-page-bar{
+  background-color:#EAE7DE !important;
+}
+html.crt-retro .nt-page-bar-btn{
+  background-color:#fff !important;
+  color:#4a473e !important;
+  text-shadow:none !important;
+}
+html.crt-retro .nt-page-status{
+  color:#8a8676 !important;
+  text-shadow:none !important;
+}
+html.crt-retro .nt-page-title,
+html.crt-retro .nt-page-content{
+  color:#1c1a16 !important;
+  text-shadow:none !important;
+}
+html.crt-retro .nt-page-title::placeholder,
+html.crt-retro .nt-page-content::placeholder{
+  color:#a7a292 !important;
+}
+html.crt-retro .nt-attach-chip{
+  background-color:#EAE7DE !important;
+  color:#2b2820 !important;
+}
+html.crt-retro .nt-attach-chip-name{
+  color:#2b2820 !important;
+  text-shadow:none !important;
+}
+html.crt-retro .nt-attach-chip-size,
+html.crt-retro .nt-attach-uploading{
+  color:#8a8676 !important;
+  text-shadow:none !important;
+}
+
+html.crt-retro .nt-reader{
+  background-color:rgba(0,0,0,.86) !important;
+}
+html.crt-retro .nt-viewer-bg{
+  background-color:rgba(0,0,0,.82) !important;
+}
+html.crt-retro .nt-viewer{
+  background-color:var(--surf-modal,#0d0e10) !important;
+}
+html.crt-retro .nt-viewer-bar{
+  background-color:var(--surf-panel-hi,#111) !important;
+}
+html.crt-retro .nt-viewer-body{
+  background-color:#000 !important;
+}
+html.crt-retro .nt-viewer-body pre{
+  background-color:#0a0a0b !important;
+  color:#D8D9DB !important;
+  text-shadow:none !important;
+}
+html.crt-retro .nt-viewer-name,
+html.crt-retro .nt-viewer-fallback-title{
+  color:#EDEDEE !important;
+  text-shadow:none !important;
+}
+html.crt-retro .nt-viewer-size,
+html.crt-retro .nt-viewer-fallback-sub{
+  color:#7a7b80 !important;
+  text-shadow:none !important;
+}
+/* the attached image/PDF/photo itself should show true colours, same
+   reasoning as the webcam-preview exception further up this file —
+   it's the actual file content the person opened, not decorative UI. */
+html.crt-retro .nt-viewer-body img{
+  filter:none !important;
+  opacity:1 !important;
 }

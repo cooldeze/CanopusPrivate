@@ -1,0 +1,17 @@
+Progression & stakes
+
+Layovers: after landing, a short forced break themed as a "layover" — could tie into your existing break system but with airport-specific flavor text ("Refueling at JFK...")
+Flight delays: random small chance a leg gets "delayed," adding a few minutes — mimics real flight unpredictability and adds light tension
+Turbulence events: mid-session micro-interruptions (a quick tap-to-confirm) that double as a lightweight focus check, replacing or supplementing the webcam presence system for people who don't want camera use
+
+Passport & collection depth
+
+Airline "loyalty tiers": total distance/hours flown unlocks tiers (Economy → Business → First), maybe just cosmetic globe/HUD themes
+Continent completion badges: visiting every country's airport on a continent unlocks a stamp/badge
+Rare stamps: some countries get special/foil stamp art for being visited during a streak or a long session
+
+
+Quality of life
+
+Weather/timezone flavor on the HUD for the destination airport (fetched or just static) to make each leg feel more real
+Voice/audio cues for takeoff/landing moments (chime already exists for presence — could extend that system)
